@@ -332,6 +332,60 @@ def get_cmap_limits(da, quantile = .5):
 
 
 
+def get_nicenround_steps(cmap_limits, Nsteps = 10):
+    '''
+    Readjust given colormap limits in order to have
+    nice and rounded intervals between levels.
+    INPUT:
+    cmap_limits --- tuple of extend, min level, max level
+                    or for extend == both, tuple of extend, max magnitude
+    Nsteps --- number of intervals in the colormap
+    OUTPUT:
+    tuple of extend, min level, max level, interval between level
+    '''
+    if cmap_limits[0] == 'both':
+        # align the centre with zero
+        minmaxstep = symmetric_about_white_cmap_levels(cmap_limits[1],
+                                                       Ncolours = Nsteps)
+        return tuple(['both'] + list(minmaxstep))
+    elif cmap_limits[0] in ['min', 'max']:
+        extend, cmap_min, cmap_max = cmap_limits
+        rough_cmap_step = (cmap_max - cmap_min) / Nsteps
+        nice_cmap_step = muths.round_to_1(rough_cmap_step)
+        if extend == 'min':
+            # align the top
+            nice_cmap_min = cmap_max - Nsteps * nice_cmap_step
+            return (extend, nice_cmap_min, cmap_max, nice_cmap_step)
+        elif extend == 'max':
+            # align the bottom
+            nice_cmap_max = cmap_min + Nsteps * nice_cmap_step
+            return (extend, cmap_min, nice_cmap_max, nice_cmap_step)
+        
+            
+
+
+def get_cmap_levels(da, quantile = .5):
+    '''
+    Get colormap levels for contourf plotting from data array
+    INPUT:
+    da --- DataArray
+    quantile --- between 0. and 1., to indicate from what value
+                 the colormap should extend beyond
+    OUTPUT:
+    tuple of (extend, minimum level, maximum level, interval between levels)
+    '''
+    cmap_limits = get_cmap_limits(da, quantile = quantile)
+    if cmap_limits[0] == 'both':
+        Nsteps = 11
+    else:
+        Nsteps = 10
+    cmap_levels = get_nicenround_steps(cmap_limits,
+                                       Nsteps = Nsteps)
+    return cmap_levels
+    
+            
+
+
 
 #def contourf_interest_for_all_cases(dict_ds, interest = 'CLOUD',
 #                                    contour_levels = None,
