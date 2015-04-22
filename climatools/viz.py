@@ -165,33 +165,29 @@ def plot_vertical_profile(ax, da,
 
 def contourf_DataArray(ax, da,
                        datetime_label = True, mbar_label = True,
-                       contour_levels = None,
-                       cmap = matplotlib.cm.jet,
-                       extend = 'neither'):
+                       cmap_levels = None,
+                       cmap = matplotlib.cm.jet):
     '''
     Returns a contour-fill plot of time vs level vs variable for variable
     of dimensions (time, level, lon0, lat0), where lon0 and lat0 are fixed.
     INPUT:
     da --- xray DataArray
-    contour_levels --- tuple (vmin, vmax, vstep) of
+    cmap_levels --- tuple (extend, vmin, vmax, vstep) of
+                   whether to extend colormap,
                    minimum, maximum and step of contour levels to use
     cmap --- maplotlib colormap object
-    extend --- whether use colour and extend colorbar for those values
-               above maximum contour level, or below minimum contour level:
-               \'neither\', \'both\', \'min\' or \'max\'
     '''
-
     y = da['lev'].values
     x = [pd.Timestamp(dtns).to_datetime() for dtns in da['time'].values]
-    Z = da[{'lon': 0, 'lat': 0}].transpose('lev', 'time')
-    
-    if contour_levels:
-        lev_min, lev_max, lev_step = contour_levels
+    Z = da.transpose('lev', 'time')
+
+    if cmap_levels:
+        extend, lev_min, lev_max, lev_step = cmap_levels
     else:
         lev_min, lev_max, lev_step = Z.min(), Z.max(), (Z.max() - Z.min()) / 20
         
     levels = np.arange(lev_min, lev_max + .1 * lev_step, lev_step)
-        
+    
     cs = ax.contourf(x, y, Z,
                      levels = levels,
                      cmap = cmap,
@@ -207,9 +203,10 @@ def contourf_DataArray(ax, da,
     cbar.update_ticks()
     
     ax.set_title('{}\n{}'.format(da.attrs['case_name'],
-                                   da.attrs['long_name']))
+                                 da.attrs['long_name']))
     
     [spine.set_color((1., 1., 1)) for k, spine in ax.spines.items()]
+    
     
     ax.invert_yaxis()
     ax.set_ylabel('lev [{}]'.format(da['lev'].units))
@@ -217,7 +214,7 @@ def contourf_DataArray(ax, da,
     ax.yaxis.grid(b = True, which = 'major')
     ax.yaxis.set_tick_params(length = 6, which = 'major')
     ax.yaxis.set_tick_params(length = 3, which = 'minor')
-    
+
     ax.set_xlabel('time [{}]'.format(da['time'].units))
     ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator())
     ax.xaxis.set_minor_locator(matplotlib.dates.DayLocator(interval = 2))
