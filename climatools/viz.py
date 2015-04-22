@@ -298,6 +298,41 @@ def get_common_cmap_levels(cmap_levels, Nsteps = 10):
     
 
 
+
+def get_cmap_limits(da, quantile = .5):
+    '''
+    Returns colormap limits from an xray DataArray.
+    INPUT:
+    da --- DataArray
+    quantile --- between 0 and 1
+    OUTPUT:
+    (extend, lev_min or abs(lev_max), lev_max)
+    extend --- how to extend the colormap, can be \'min\', \'max\', or \'both\'
+    lev_min --- value of minimum level
+    lev_max --- value of maximum level
+    abs(lev_max) --- for data array with positive and negative values,
+                     the value of the level that is farthest from zero
+    '''
+    df = da.to_pandas()
+    
+    if np.all(df <= 0):
+        lev_min = df.stack().quantile(q = 1 - quantile)
+        return ('min', lev_min, 0.)
+    elif np.all(df >= 0):
+        lev_max = df.stack().quantile(q = quantile)
+        return ('max', 0., lev_max)
+    else:
+        dfmax, dfmin = df.stack().min(), df.stack().max()
+        if abs(dfmax) > abs(dfmin):
+            cmap_limit = df[df >= 0].stack().quantile(q = quantile)
+        elif abs(dfmax) < abs(dfmin):
+            cmap_limit = df[df <= 0].stack().quantile(q = 1 - quantile)
+        return ('both', abs(cmap_limit))
+        
+
+
+
+
 #def contourf_interest_for_all_cases(dict_ds, interest = 'CLOUD',
 #                                    contour_levels = None,
 #                                    cmap = matplotlib.cm.jet,
