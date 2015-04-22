@@ -265,6 +265,38 @@ def daytime_nighttime_shading(ax, dts,
 
 
 
+def get_common_cmap_levels(cmap_levels, Nsteps = 10):
+    cmap_minmin = sorted(cmap_levels, key = lambda x: x[1])[0]
+    cmap_maxmax = sorted(cmap_levels, key = lambda x: x[2])[0]
+
+    if cmap_minmin[0] in ['min', 'both']:
+        extend_min = True
+    else:
+        extend_min = False
+    if cmap_maxmax[0] in ['max', 'both']:
+        extend_max = True
+    else:
+        extend_max = False
+        
+    if extend_min and not extend_max:
+        extend = 'min'
+    elif extend_max and not extend_min:
+        extend = 'max'
+    elif extend_min and extend_max:
+        extend = 'both'
+    else:
+        extend = 'neither'
+        
+    if extend == 'both':
+        cmap_limits = (extend, max(abs(cmap_minmin[1]), abs(cmap_maxmax[2])), )
+        Nsteps = 11
+    elif extend in ['min', 'max']:
+        cmap_limits = (extend, cmap_minmin[1], cmap_maxmax[2])
+        Nsteps = 10
+        
+    return get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
+    
+
 
 #def contourf_interest_for_all_cases(dict_ds, interest = 'CLOUD',
 #                                    contour_levels = None,
