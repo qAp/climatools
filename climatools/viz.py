@@ -195,18 +195,29 @@ def contourf_DataArray(ax, da,
     
     cs.cmap.set_over('yellow')
     cs.cmap.set_under('black')
-    
+
     cbar = plt.colorbar(cs, ax = ax)
     cbar.ax.set_ylabel('[{}]'.format(da.units))
     cbar.set_ticks(levels)
     
+    cbar.formatter.set_powerlimits((0, 0)) # this works as alternative to what's below
+
+#    cbarlabel_decimal = 0
+#    cbartick_pow = muths.pow_base10_for_decimal(lev_step,
+#                                                decimal = cbarlabel_decimal)
+#    print(lev_step, cbartick_pow)
+#    cbar_format_string = '{}' #'{{:.{}f}}'.format(cbarlabel_decimal)
+#    cbar.formatter = matplotlib.ticker.FuncFormatter(
+#        lambda x, pos: cbar_format_string.format(10**int(cbartick_pow) * x))
+
+#    cbar.ax.text(x = 1, y = 1.07, s = '1e{}'.format(- cbartick_pow))
+
     cbar.update_ticks()
     
     ax.set_title('{}\n{}'.format(da.attrs['case_name'],
                                  da.attrs['long_name']))
     
     [spine.set_color((1., 1., 1)) for k, spine in ax.spines.items()]
-    
     
     ax.invert_yaxis()
     ax.set_ylabel('lev [{}]'.format(da['lev'].units))
@@ -387,107 +398,108 @@ def get_cmap_levels(da, quantile = .5):
 
 
 
-#def contourf_interest_for_all_cases(dict_ds, interest = 'CLOUD',
-#                                    contour_levels = None,
-#                                    cmap = matplotlib.cm.jet,
-#                                    extend = 'neither'):
-#    '''
-#    Returns a figure of subplots for all models/runs in DICT_DS,
-#    for a field INTEREST.
-#    INPUT:
-#    dict_ds --- dictionary whose keys refer to models/runs. Each
-#                value is an xray Dataset, each of whose DataArray
-#                corresponds to a field
-#    '''
-#    fig, axes = plt.subplots(nrows = 1,
-#                             ncols = len(list(dict_ds.keys())),
-#                             figsize = (17, 5), dpi = 300)
-#    
-#    for axis, da in zip(axes, [dict_ds[case][interest]
-#                               for case in sorted(dict_ds.keys())]):
-#        axis = climaviz.contourf_DataArray(axis, da,
-#                                           contour_levels = contour_levels,
-#                                           cmap = cmap,
-#                                           extend = extend)
-#    plt.tight_layout()
+def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
+                                   cmap = plt.get_cmap('PuBuGn')):
+    '''
+    Function to contourf a set of DataArrays
+    INPUT:
+    d3sets --- a dictionary of xray.Datasets containing xray.DataArrays of
+               dimensions (time, lev, lon, lat)
+    interest --- which field to plot
+    cmap --- matplotlib colormap object, i.e. which colormap to use for contourf
+    '''
+    cases = sorted(d3sets.keys())
 
+    das = [d3sets[case][interest][{'lon': 0, 'lat': 0}] for case in cases]
 
+    cmap_levels = [get_cmap_levels(da, quantile = .9999)\
+                   for da in das]
+    common_cmap_levels = get_common_cmap_levels(cmap_levels)
 
-#def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
-#                                               interest = 'CLOUD',
-#                                               xscale = 'linear',
-#                                               bot_xlim = None,
-#                                               bot_xaxis_pow = 0,
-#                                               bot_xlabels_rotate = 0.,
-#                                               top_xlim = None,
-#                                               top_xaxis_pow = 0,
-#                                               top_xlabels_rotate = 0.,
-#                                               yscale = 'linear', ylim = None,):
-#    line_props = get_line_props()
-#    
-#    vspairs = [[p.strip() for p in diff_case.split('-')]
-#               for diff_case in sorted(diff_d3sets.keys())]
-#    
-#    fig, axes = plt.subplots(figsize = (9, 9), dpi = 300,
-#                             nrows = 1, ncols = len(vspairs),
-#                             sharey = True)
-#    
-#    labels, handles = [], []
-#    
-#    axes[0].invert_yaxis()
-#    
-#    for ax, vspair in zip(axes, vspairs):
-#        x, y = vspair
-#        
-#        for model in vspair:
-#            da = average_over_time(d3sets[model][interest])
-#            
-#            # plot each member in the comparison pair
-#            ax = climaviz.plot_vertical_profile(ax, da,
-#                                                label = '{}'.format(model),
-#                                                colour = line_props[model]['colour'],
-#                                                linestyle = line_props[model]['linestyle'],
-#                                                xscale = xscale,
-#                                                xaxis_pow = bot_xaxis_pow, xlabels_rotate = bot_xlabels_rotate,
-#                                                yscale = yscale)
-#            
-#        ax = climaviz.axes_beyond_ticks(ax, which = 'x')
-#        
-#        # plot difference on twiny
-#        ax2 = ax.twiny()
-#        
-#        da = average_over_time(diff_d3sets[' - '.join(vspair)][interest])
-#        
-#        ax2 = climaviz.plot_vertical_profile(ax2, da,
-#                                             label = 'difference',
-#                                             colour = (0.929, 0.329, 0.972),
-#                                             linestyle = '-',
-#                                             xscale = xscale,
-#                                             xaxis_pow = top_xaxis_pow,
-#                                             xlabels_rotate = top_xlabels_rotate,
-#                                             yscale = yscale)
-#        
-#        ax2 = climaviz.axes_beyond_ticks(ax2, which = 'x')
-#        
-#        handles1, labels1 = ax.get_legend_handles_labels()
-#        handles2, labels2 = ax.get_legend_handles_labels()
-#        handles.extend(handles1 + handles2)
-#        labels.extend(labels1 + labels2)
-#        
-#    ## Make 1 legend for whole figure
-#    uhandles, ulabels = climamisc.any_unique_labels(handles, labels)
-#    uhandles, ulabels = zip(*sorted(zip(uhandles, ulabels), key = lambda x: x[1]))
-#    fig.legend(uhandles, ulabels,
-#               loc = 'center', ncol = 3,
-#               bbox_to_anchor = (.35, .85), prop = {'size': 12})
-#    
-#    fig.suptitle(da.attrs['long_name'])
-#    
-#    plt.figtext(x = 0.02, y = .5, s = 'lev [mbar]', rotation = 90.)
-#    plt.figtext(x = .45, y = 0.08, s = '{} [{}]'.format(interest, da.units))
-#    plt.figtext(x = .9, y = 0.08, s = '1e{}'.format(- bot_xaxis_pow))
-#    plt.figtext(x = .7, y = .91, s = 'difference')
-#    plt.figtext(x = .9, y = .91, s = '1e{}'.format(- top_xaxis_pow))
-#    plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
     
+    fig, axes = plt.subplots(nrows = 1, ncols = len(cases),
+                             figsize = (17, 5), dpi = 300)
+    
+    for ax, da in zip(axes, das):
+        ax = contourf_DataArray(ax, da,
+                                cmap_levels = common_cmap_levels,
+                                cmap = cmap)
+    plt.tight_layout()
+    return fig
         
+        
+        
+
+def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
+                                               interest = 'CLOUD',
+                                               xscale = 'linear',
+                                               bot_xlim = None,
+                                               bot_xlabels_rotate = 0.,
+                                               top_xlim = None,
+                                               top_xlabels_rotate = 0.,
+                                               yscale = 'linear',
+                                               ylim = None,):
+    line_props = get_line_props()
+    
+    vspairs = [[p.strip() for p in diff_case.split('-')]
+               for diff_case in sorted(diff_d3sets.keys())]
+    
+    fig, axes = plt.subplots(figsize = (9, 9), dpi = 300,
+                             nrows = 1, ncols = len(vspairs),
+                             sharey = True)
+    
+    labels, handles = [], []
+    
+    axes[0].invert_yaxis()
+    
+    for ax, vspair in zip(axes, vspairs):
+        x, y = vspair
+        
+        for model in vspair:
+            da = average_over_time(d3sets[model][interest])
+            
+            # plot each member in the comparison pair
+            ax = climaviz.plot_vertical_profile(ax, da,
+                                                label = '{}'.format(model),
+                                                colour = line_props[model]['colour'],
+                                                linestyle = line_props[model]['linestyle'],
+                                                xscale = xscale,
+                                                xlabels_rotate = bot_xlabels_rotate,
+                                                yscale = yscale)
+
+        ax = climaviz.axes_beyond_ticks(ax, which = 'x')
+            
+        # plot difference on twiny
+        ax2 = ax.twiny()
+        
+        da = average_over_time(diff_d3sets[' - '.join(vspair)][interest])
+        
+        ax2 = climaviz.plot_vertical_profile(ax2, da,
+                                             label = 'difference',
+                                             colour = (0.929, 0.329, 0.972), linestyle = '-',
+                                             xscale = xscale, xlabels_rotate = top_xlabels_rotate,
+                                             yscale = yscale)
+        
+        ax2 = climaviz.axes_beyond_ticks(ax2, which = 'x')
+            
+        handles1, labels1 = ax.get_legend_handles_labels()
+        handles2, labels2 = ax.get_legend_handles_labels()
+        handles.extend(handles1 + handles2)
+        labels.extend(labels1 + labels2)
+        
+    ## Make 1 legend for whole figure
+    uhandles, ulabels = climamisc.any_unique_labels(handles, labels)
+    uhandles, ulabels = zip(*sorted(zip(uhandles, ulabels), key = lambda x: x[1]))
+    fig.legend(uhandles, ulabels,
+               loc = 'center', ncol = 3,
+               bbox_to_anchor = (.35, .85), prop = {'size': 12})
+    
+    fig.suptitle(da.attrs['long_name'])
+    
+    plt.figtext(x = 0.02, y = .5, s = 'lev [mbar]', rotation = 90.)
+    plt.figtext(x = .45, y = 0.08, s = '{} [{}]'.format(interest, da.units))
+    plt.figtext(x = .9, y = 0.08, s = '1e{}'.format(- ax.xaxis_pow))
+    plt.figtext(x = .7, y = .91, s = 'difference')
+    plt.figtext(x = .9, y = .91, s = '1e{}'.format(- ax2.xaxis_pow))
+    plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
+    
