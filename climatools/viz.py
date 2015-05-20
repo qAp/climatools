@@ -416,11 +416,12 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
                    for da in das]
     common_cmap_levels = get_common_cmap_levels(cmap_levels)
 
+    Nplots = len(cases)
     
-    fig, axes = plt.subplots(nrows = 1, ncols = len(cases),
-                             figsize = (17, 5), dpi = 300)
+    fig, axes = plt.subplots(nrows = 1, ncols = Nplots,
+                             figsize = (5.3 * Nplots, 5), dpi = 300)
     
-    for ax, da in zip(axes, das):
+    for ax, da in zip([axes] if Nplots == 1 else axes, das):
         ax = contourf_DataArray(ax, da,
                                 cmap_levels = common_cmap_levels,
                                 cmap = cmap)
