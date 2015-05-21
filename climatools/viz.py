@@ -63,7 +63,8 @@ def axes_beyond_ticks(ax, which = 'x'):
 
 def plot_DataArray(ax, da,
                    datetime_label = True,
-                   title = '', label = ':D', colour = 'b', linestyle = '-',
+                   title = '', label = ':D',
+                   colour = 'b', linestyle = '-', marker = '.',
                    ylabel = 'ylabel', ylim = (-80, 80), yscale = 'linear'):
     '''
     Returns a line plot of time v.s some variable that is in an DataArray
@@ -79,7 +80,8 @@ def plot_DataArray(ax, da,
     y = da[{'lon': 0, 'lat': 0}].values
     
     ax.plot(x, y,
-            label = label, color = colour, linestyle = linestyle)
+            label = label,
+            color = colour, linestyle = linestyle, marker = marker)
     
     ax.set_title(title)
 
