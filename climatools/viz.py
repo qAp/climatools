@@ -340,6 +340,8 @@ def get_cmap_limits(da, quantile = .5):
             cmap_limit = df[df >= 0].stack().quantile(q = quantile)
         elif abs(dfmax) < abs(dfmin):
             cmap_limit = df[df <= 0].stack().quantile(q = 1 - quantile)
+        else:
+            cmap_limit = df[df >= 0].stack().quantile(q = quantile)
         return ('both', abs(cmap_limit))
         
 
