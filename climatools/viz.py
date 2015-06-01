@@ -328,7 +328,9 @@ def get_cmap_limits(da, quantile = .5):
     '''
     df = da.to_pandas()
     
-    if np.all(df <= 0):
+    if np.all(df == 0):
+        return ('both', 1e-10)
+    elif np.all(df <= 0):
         lev_min = df.stack().quantile(q = 1 - quantile)
         return ('min', lev_min, 0.)
     elif np.all(df >= 0):
