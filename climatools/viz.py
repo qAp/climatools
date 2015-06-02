@@ -123,7 +123,14 @@ def plot_vertical_profile(ax, da,
     xaxis_pow --- power of 10 to multiply xlabels by (if equals = 10, 150 because 1500 * 1e-1)
     xlabels_rotate --- angle to rotate xlabels by [degrees]
     '''
-    y = da.coords['lev'].values
+    if 'lev' in da:
+        yname = 'lev'
+    elif 'ilev' in da:
+        yname = 'ilev'
+    else:
+        raise ValueError('vertical dimension must be either named lev or ilev')
+    
+    y = da.coords[yname].values
     x = da[{'lon': 0, 'lat': 0}].values
     
     ax.plot(x, y,
@@ -179,9 +186,16 @@ def contourf_DataArray(ax, da,
                    minimum, maximum and step of contour levels to use
     cmap --- maplotlib colormap object
     '''
-    y = da['lev'].values
+    if 'lev' in da:
+        spatial_dim = 'lev'
+    elif 'ilev' in da:
+        spatial_dim = 'ilev'
+    else:
+        raise ValueError('spatial dimension to plot must be either lev or ilev')
+    
+    y = da[spatial_dim].values
     x = [pd.Timestamp(dtns).to_datetime() for dtns in da['time'].values]
-    Z = da.transpose('lev', 'time')
+    Z = da.transpose(spatial_dim, 'time')
 
     if cmap_levels:
         extend, lev_min, lev_max, lev_step = cmap_levels
@@ -222,7 +236,7 @@ def contourf_DataArray(ax, da,
     [spine.set_color((1., 1., 1)) for k, spine in ax.spines.items()]
     
     ax.invert_yaxis()
-    ax.set_ylabel('lev [{}]'.format(da['lev'].units))
+    ax.set_ylabel('{} [{}]'.format(spatial_dim, da[spatial_dim].units))
     ax.yaxis.set_minor_locator(matplotlib.ticker.MultipleLocator(50))
     ax.yaxis.grid(b = True, which = 'major')
     ax.yaxis.set_tick_params(length = 6, which = 'major')
