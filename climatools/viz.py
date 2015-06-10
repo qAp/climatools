@@ -456,7 +456,8 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
                                                xscale = 'linear',
                                                bot_xlim = None, bot_xlabels_rotate = 0.,
                                                top_xlim = None, top_xlabels_rotate = 0.,
-                                               yscale = 'linear', ylim = None,):
+                                               yscale = 'linear', ylim = None,
+                                               linestyles = None):
     
     
     vspairs = [[p.strip() for p in diff_case.split('-')]
@@ -481,8 +482,8 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
             # plot each member in the comparison pair
             ax = plot_vertical_profile(ax, da,
                                        label = '{}'.format(model),
-                                       colour = line_props[model]['colour'],
-                                       linestyle = line_props[model]['linestyle'],
+                                       colour = linestyles[model]['colour'],
+                                       linestyle = linestyles[model]['linestyle'],
                                        xscale = xscale, xlabels_rotate = bot_xlabels_rotate,
                                        yscale = yscale)
             
@@ -525,18 +526,13 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
 
 
 
-def get_line_props():
-    return {'All McICA': {'colour': 'g', 'linestyle': '--'},
-            'SW no McICA': {'colour': 'g', 'linestyle': '-'}} 
-
-line_props = get_line_props()
-
 
 
 
 def plotVS_interest_for_all_cases(dsets, diff_dsets, interest = 'FLNT',
                                   left_ylim = None,
-                                  right_ylim = None):
+                                  right_ylim = None,
+                                  linestyles = None):
 
     vspairs = [[p.strip() for p in diff_case.split('-')]
                for diff_case in sorted(diff_dsets.keys())]
@@ -554,8 +550,8 @@ def plotVS_interest_for_all_cases(dsets, diff_dsets, interest = 'FLNT',
         for model in vspair:
             ax = plot_DataArray(ax, dsets[model][interest],
                                 label = '{}'.format(model),
-                                colour = line_props[model]['colour'],
-                                linestyle = line_props[model]['linestyle'],
+                                colour = linestyles[model]['colour'],
+                                linestyle = linestyles[model]['linestyle'],
                                 marker = '',
                                 ylabel = interest, ylim = left_ylim)
             
