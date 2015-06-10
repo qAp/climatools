@@ -65,7 +65,7 @@ def plot_DataArray(ax, da,
                    datetime_label = True,
                    title = '', label = ':D',
                    colour = 'b', linestyle = '-', marker = '.',
-                   ylabel = 'ylabel', ylim = (-80, 80), yscale = 'linear'):
+                   ylabel = 'ylabel', ylim = None, yscale = 'linear'):
     '''
     Returns a line plot of time v.s some variable that is in an DataArray
     of dimensions (time, lon0, lat0), where lon0 and lat0 are fixed.
