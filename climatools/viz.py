@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 
 import climatools.muths as muths
 import climatools.dates as dates
+import climatools.misc as misc
 
 
 
@@ -450,70 +451,67 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
         
         
         
-
 def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
                                                interest = 'CLOUD',
                                                xscale = 'linear',
-                                               bot_xlim = None,
-                                               bot_xlabels_rotate = 0.,
-                                               top_xlim = None,
-                                               top_xlabels_rotate = 0.,
-                                               yscale = 'linear',
-                                               ylim = None,):
-    line_props = get_line_props()
+                                               bot_xlim = None, bot_xlabels_rotate = 0.,
+                                               top_xlim = None, top_xlabels_rotate = 0.,
+                                               yscale = 'linear', ylim = None,):
+    
     
     vspairs = [[p.strip() for p in diff_case.split('-')]
                for diff_case in sorted(diff_d3sets.keys())]
     
+    Nplots = len(vspairs)
+    
     fig, axes = plt.subplots(figsize = (9, 9), dpi = 300,
-                             nrows = 1, ncols = len(vspairs),
+                             nrows = 1, ncols = Nplots,
                              sharey = True)
     
     labels, handles = [], []
     
-    axes[0].invert_yaxis()
+    axes.invert_yaxis() if Nplots ==1 else axes[0].invert_yaxis()
     
-    for ax, vspair in zip(axes, vspairs):
+    for ax, vspair in zip([axes] if Nplots == 1 else axes, vspairs):
         x, y = vspair
         
         for model in vspair:
-            da = average_over_time(d3sets[model][interest])
+            da = dates.average_over_time(d3sets[model][interest])
             
             # plot each member in the comparison pair
-            ax = climaviz.plot_vertical_profile(ax, da,
-                                                label = '{}'.format(model),
-                                                colour = line_props[model]['colour'],
-                                                linestyle = line_props[model]['linestyle'],
-                                                xscale = xscale,
-                                                xlabels_rotate = bot_xlabels_rotate,
-                                                yscale = yscale)
-
-        ax = climaviz.axes_beyond_ticks(ax, which = 'x')
+            ax = plot_vertical_profile(ax, da,
+                                       label = '{}'.format(model),
+                                       colour = line_props[model]['colour'],
+                                       linestyle = line_props[model]['linestyle'],
+                                       xscale = xscale, xlabels_rotate = bot_xlabels_rotate,
+                                       yscale = yscale)
             
+        ax = axes_beyond_ticks(ax, which = 'x')
+
         # plot difference on twiny
         ax2 = ax.twiny()
         
-        da = average_over_time(diff_d3sets[' - '.join(vspair)][interest])
+        da = dates.average_over_time(diff_d3sets[' - '.join(vspair)][interest])
         
-        ax2 = climaviz.plot_vertical_profile(ax2, da,
-                                             label = 'difference',
-                                             colour = (0.929, 0.329, 0.972), linestyle = '-',
-                                             xscale = xscale, xlabels_rotate = top_xlabels_rotate,
-                                             yscale = yscale)
+        ax2 = plot_vertical_profile(ax2, da,
+                                    label = 'difference',
+                                    colour = (0.929, 0.329, 0.972), linestyle = '-',
+                                    xscale = xscale, xlabels_rotate = top_xlabels_rotate,
+                                    yscale = yscale)
         
-        ax2 = climaviz.axes_beyond_ticks(ax2, which = 'x')
-            
+        ax2 = axes_beyond_ticks(ax2, which = 'x')
+        
         handles1, labels1 = ax.get_legend_handles_labels()
         handles2, labels2 = ax.get_legend_handles_labels()
         handles.extend(handles1 + handles2)
         labels.extend(labels1 + labels2)
         
     ## Make 1 legend for whole figure
-    uhandles, ulabels = climamisc.any_unique_labels(handles, labels)
+    uhandles, ulabels = misc.any_unique_labels(handles, labels)
     uhandles, ulabels = zip(*sorted(zip(uhandles, ulabels), key = lambda x: x[1]))
     fig.legend(uhandles, ulabels,
                loc = 'center', ncol = 3,
-               bbox_to_anchor = (.35, .85), prop = {'size': 12})
+               bbox_to_anchor = (.35, .91), prop = {'size': 12})
     
     fig.suptitle(da.attrs['long_name'])
     
@@ -523,4 +521,75 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
     plt.figtext(x = .7, y = .91, s = 'difference')
     plt.figtext(x = .9, y = .91, s = '1e{}'.format(- ax2.xaxis_pow))
     plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
+    return fig
+
+
+
+def get_line_props():
+    return {'All McICA': {'colour': 'g', 'linestyle': '--'},
+            'SW no McICA': {'colour': 'g', 'linestyle': '-'}} 
+
+line_props = get_line_props()
+
+
+
+
+def plotVS_interest_for_all_cases(dsets, diff_dsets, interest = 'FLNT',
+                                  left_ylim = None,
+                                  right_ylim = None):
+
+    vspairs = [[p.strip() for p in diff_case.split('-')]
+               for diff_case in sorted(diff_dsets.keys())]
     
+    Nplots = len(vspairs)
+    
+    fig, axes = plt.subplots(figsize = (11, 3 * Nplots + 2.5), dpi = 300,
+                             nrows = Nplots, ncols = 1)
+    
+    handles, labels = [], []
+    
+    for ax, vspair in zip([axes] if Nplots == 1 else axes, vspairs):
+        x, y = vspair
+        
+        for model in vspair:
+            ax = plot_DataArray(ax, dsets[model][interest],
+                                label = '{}'.format(model),
+                                colour = line_props[model]['colour'],
+                                linestyle = line_props[model]['linestyle'],
+                                marker = '',
+                                ylabel = interest, ylim = left_ylim)
+            
+        da = diff_dsets[' - '.join(vspair)][interest]
+        
+        diff_colour = (0.929, 0.329, 0.972)
+        ax2 = ax.twinx()
+        ax2 = plot_DataArray(ax2, da, label = 'difference',
+                             title = '',
+                             colour = diff_colour, linestyle = '-', marker = '',
+                             ylim = right_ylim)
+        ax2.set_ylabel('')
+        [label.set_color(diff_colour)
+         for label in ax2.yaxis.get_ticklabels()]
+        
+        ### background shading for daytime and nighttime
+        ax2 = daytime_nighttime_shading(ax2, da.coords['time'].to_pandas().index,
+                                        hour_daystart = 6, hour_nightstart = 18)
+        
+        ## collect handles and labels for legend later
+        handles1, labels1 = ax.get_legend_handles_labels()
+        handles2, labels2 = ax2.get_legend_handles_labels()
+        handles.extend(handles1 + handles2)
+        labels.extend(labels1 + labels2)
+        
+    ## Make 1 legend for whole figure
+    uhandles, ulabels = misc.any_unique_labels(handles, labels)
+    uhandles, ulabels = zip(*sorted(zip(uhandles, ulabels),
+                                    key = lambda x: x[1]))
+    
+    fig.suptitle(da.attrs['long_name'])
+    
+    fig.legend(uhandles, ulabels,
+               loc = 'center', ncol = 3,
+               bbox_to_anchor = (.45, .91), prop = {'size': 12})
+    plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
+    return fig
