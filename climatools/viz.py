@@ -439,7 +439,7 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
     Nplots = len(cases)
     
     fig, axes = plt.subplots(nrows = 1, ncols = Nplots,
-                             figsize = (5.3 * Nplots, 5), dpi = 300)
+                             figsize = (5.6 * Nplots, 5), dpi = 300)
     
     for ax, da in zip([axes] if Nplots == 1 else axes, das):
         ax = contourf_DataArray(ax, da,
