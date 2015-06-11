@@ -232,7 +232,8 @@ def contourf_DataArray(ax, da,
     cbar.update_ticks()
     
     ax.set_title('{}\n{}'.format(da.attrs['case_name'],
-                                 da.attrs['long_name']))
+                                 da.attrs['long_name']),
+                 fontsize = 10)
     
     [spine.set_color((1., 1., 1)) for k, spine in ax.spines.items()]
     
