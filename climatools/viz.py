@@ -360,7 +360,7 @@ def get_cmap_limits(da, quantile = .5):
             cmap_limit = dfs[dfs <= 0].quantile(q = 1 - quantile)
         else:
             cmap_limit = dfs[dfs >= 0].quantile(q = quantile)
-
+        return ('both', abs(cmap_limit))
 
 
 def get_nicenround_steps(cmap_limits, Nsteps = 10):
