@@ -342,25 +342,24 @@ def get_cmap_limits(da, quantile = .5):
                      the value of the level that is farthest from zero
     '''
     df = da.to_pandas()
+    dfs = df.stack()
     
-    if np.all(df == 0):
+    if np.all(dfs == 0):
         return ('both', 1e-10)
-    elif np.all(df <= 0):
-        lev_min = df.stack().quantile(q = 1 - quantile)
+    elif np.all(dfs <= 0):
+        lev_min = dfs.quantile(q = 1 - quantile)
         return ('min', lev_min, 0.)
-    elif np.all(df >= 0):
-        lev_max = df.stack().quantile(q = quantile)
+    elif np.all(dfs >= 0):
+        lev_max = dfs.quantile(q = quantile)
         return ('max', 0., lev_max)
     else:
-        dfmax, dfmin = df.stack().min(), df.stack().max()
+        dfmin, dfmax = dfs.min(), dfs.max()
         if abs(dfmax) > abs(dfmin):
-            cmap_limit = df[df >= 0].stack().quantile(q = quantile)
+            cmap_limit = dfs[dfs >= 0].quantile(q = quantile)
         elif abs(dfmax) < abs(dfmin):
-            cmap_limit = df[df <= 0].stack().quantile(q = 1 - quantile)
+            cmap_limit = dfs[dfs <= 0].quantile(q = 1 - quantile)
         else:
-            cmap_limit = df[df >= 0].stack().quantile(q = quantile)
-        return ('both', abs(cmap_limit))
-        
+            cmap_limit = dfs[dfs >= 0].quantile(q = quantile)
 
 
 
