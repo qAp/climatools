@@ -490,16 +490,15 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
         ax = axes_beyond_ticks(ax, which = 'x')
 
         # plot difference on twiny
+        diff_colour = (0.929, 0.329, 0.972)
         ax2 = ax.twiny()
-        
         da = dates.average_over_time(diff_d3sets[' - '.join(vspair)][interest])
-        
         ax2 = plot_vertical_profile(ax2, da,
                                     label = 'difference',
-                                    colour = (0.929, 0.329, 0.972), linestyle = '-',
+                                    colour = diff_colour, linestyle = '-',
                                     xscale = xscale, xlabels_rotate = top_xlabels_rotate,
                                     yscale = yscale)
-        
+        [ticklabel.set_color(diff_colour) for ticklabel in ax2.xaxis.get_ticklabels()]
         ax2 = axes_beyond_ticks(ax2, which = 'x')
         
         handles1, labels1 = ax.get_legend_handles_labels()
