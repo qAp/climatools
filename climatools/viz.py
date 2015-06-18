@@ -36,6 +36,36 @@ def symmetric_about_white_cmap_levels(rough_maxabs, Ncolours = 11):
 
 
 
+
+def round_levels_with_zero_centred_between_two(vmin0, vmax0, Nsteps0):
+    '''
+    Suppose you want to divide the range (vmin0, vmax0) into roughly Nsteps0 intervals, where vmin0 < 0 < vmax0.
+    This function returns a new range(vmin, vmax) and new Nsteps that is
+    as close to the desired one as possible, but are such that dv = (vmax - vmin) / Nsteps
+    is a nice round value, and the value zero is centred on one of the Nsteps intervals.
+    INPUT:
+    vmin0 --- lower limit, must be negative.
+    vmax0 --- upper limit, must be positive.
+    Nsteps0 --- rough desired number of intervals between vmin0 and vmax0.
+    OUTPUT:
+    vmin --- lower limit
+    vmax --- upper limit
+    Nsteps --- number of intervals between vmin and vmax
+    '''
+    dv0 = (vmax0 - vmin0) / Nsteps0
+    dv = muths.round_to_1(dv0)
+    half_dv = .5 * dv
+    vmin = 0 - dv * int(np.ceil((0 - vmin0 - half_dv) / dv)) - half_dv
+    vmax = 0 + dv * int(np.ceil((vmax0 - 0 - half_dv) / dv)) + half_dv
+    Nsteps = int((vmax - vmin) / dv)
+    return (vmin, vmax, Nsteps)
+    
+    
+    
+
+
+
+
 def axes_beyond_ticks(ax, which = 'x'):
     '''
     Draws the axes with a range that is just wider than
