@@ -4,6 +4,7 @@ import pandas as pd
 
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.colors as matcolors
 
 import climatools.muths as muths
 import climatools.dates as dates
@@ -61,8 +62,46 @@ def round_levels_with_zero_centred_between_two(vmin0 = -1, vmax0 = 2, Nsteps0 = 
     return (vmin, vmax, Nsteps)
     
     
-    
 
+def slice_divergent_colormap(cmap = None, vmin = -1, vmax = 2):
+    '''
+    A divergent colormap is one that is centred at white, while extending
+    to the two sides of it are two distintive colour types.  For example,
+    the divergent colormap bwr is centred on white; to one side are blues
+    and to the other reds. The length on either side of white are the same
+    by default, making it useful to map to intervals where the negative and
+    positive limits are equal in maginitude, such as (-1, 1), (-241, 241), etc.
+
+    This function slices the default colormap up such that it can be mapped
+    to (keeping white mapped to zero)
+    intervals that are not symmetrical about 0, such as (-100, 2), (-2, 349), etc.
+    
+    INPUT:
+    cmap -- matplotlib colormap object (only really makes sense with a divergent one)
+    vmin -- lower limit of interval (negative)
+    vmax -- upper limit of interval (positive)
+    OUTPUT:
+    sliced_cmap -- sliced colormap with white mapped to zero of the interval (vmin, vmax)
+    '''
+    if not cmap:
+        cmap = plt.get_cmap('bwr')
+        
+    real_range = vmax - vmin
+    largest_abs_range = 2 * max(abs(vmin), abs(vmax))
+    fractional_range = real_range / largest_abs_range
+    
+    if abs(vmin) > abs(vmax):
+        cmap_min, cmap_max = 0, fractional_range
+    elif abs(vmax) > abs(vmin):
+        cmap_min, cmap_max = 1 - fractional_range, 1
+    else:
+        cmap_min, cmap_max = 0, 1
+
+    sliced_cmap = matcolors.\
+                  LinearSegmentedColormap.from_list('test_cmap',
+                                                    cmap(np.linspace(cmap_min, cmap_max)))
+    return sliced_cmap
+    
 
 
 
@@ -232,8 +271,13 @@ def contourf_DataArray(ax, da,
         extend, lev_min, lev_max, lev_step = cmap_levels
     else:
         lev_min, lev_max, lev_step = Z.min(), Z.max(), (Z.max() - Z.min()) / 20
-        
-    levels = np.arange(lev_min, lev_max + .1 * lev_step, lev_step)
+
+    if extend == 'both':
+        cmap = slice_divergent_colormap(cmap = cmap, vmin = lev_min, vmax = lev_max)
+        levels = np.linspace(lev_min, lev_max,
+                             int((lev_max - lev_min) / lev_step) + 1)
+    else:
+        levels = np.arange(lev_min, lev_max + .1 * lev_step, lev_step)
     
     cs = ax.contourf(x, y, Z,
                      levels = levels,
