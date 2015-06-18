@@ -325,6 +325,15 @@ def daytime_nighttime_shading(ax, dts,
 
 
 def get_common_cmap_levels(cmap_levels, Nsteps = 10):
+    '''
+    Given several sets of colormap levels, find a common set
+    that covers all the sets, with (Nsteps + 1) levels
+    INPUT:
+    cmap_levels --- a list of sets of colormap levels
+    Nsteps --- number of intervals in the return set of levels
+    OUTPUT:
+    (extend, colormap min, colormap max)
+    '''
     cmap_minmin = sorted(cmap_levels, key = lambda x: x[1])[0]
     cmap_maxmax = sorted(cmap_levels, key = lambda x: x[2])[0]
 
@@ -347,12 +356,11 @@ def get_common_cmap_levels(cmap_levels, Nsteps = 10):
         extend = 'neither'
         
     if extend == 'both':
-        cmap_limits = (extend, max(abs(cmap_minmin[1]), abs(cmap_maxmax[2])), )
         Nsteps = 11
     elif extend in ['min', 'max']:
-        cmap_limits = (extend, cmap_minmin[1], cmap_maxmax[2])
         Nsteps = 10
         
+    cmap_limits = (extend, cmap_minmin[1], cmap_maxmax[2])        
     return get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
     
 
