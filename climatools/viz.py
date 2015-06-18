@@ -408,12 +408,9 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
     tuple of extend, min level, max level, interval between level
     '''
     if cmap_limits[0] == 'both':
-        # align the centre with zero
-        minmaxstep = symmetric_about_white_cmap_levels(cmap_limits[1],
-                                                       Ncolours = Nsteps)
         cmap_min, cmap_max, cmap_Nsteps = round_levels_with_zero_centred_between_two(
             vmin0 = cmap_limits[1], vmax0 = cmap_limits[2], Nsteps0 = Nsteps)
-        cmap_step = int((cmap_max - cmap_min) / cmap_Nsteps)
+        cmap_step = (cmap_max - cmap_min) / cmap_Nsteps
         return ('both', cmap_min, cmap_max, cmap_step)
     elif cmap_limits[0] in ['min', 'max']:
         extend, cmap_min, cmap_max = cmap_limits
@@ -442,6 +439,7 @@ def get_cmap_levels(da, quantile = .5):
     tuple of (extend, minimum level, maximum level, interval between levels)
     '''
     cmap_limits = get_cmap_limits(da, quantile = quantile)
+
     if cmap_limits[0] == 'both':
         Nsteps = 11
     else:
@@ -470,6 +468,7 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
 
     cmap_levels = [get_cmap_levels(da, quantile = .9999)\
                    for da in das]
+
     common_cmap_levels = get_common_cmap_levels(cmap_levels)
 
     Nplots = len(cases)
