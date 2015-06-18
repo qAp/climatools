@@ -37,7 +37,7 @@ def symmetric_about_white_cmap_levels(rough_maxabs, Ncolours = 11):
 
 
 
-def round_levels_with_zero_centred_between_two(vmin0, vmax0, Nsteps0):
+def round_levels_with_zero_centred_between_two(vmin0 = -1, vmax0 = 2, Nsteps0 = 10):
     '''
     Suppose you want to divide the range (vmin0, vmax0) into roughly Nsteps0 intervals, where vmin0 < 0 < vmax0.
     This function returns a new range(vmin, vmax) and new Nsteps that is
@@ -400,7 +400,6 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
     nice and rounded intervals between levels.
     INPUT:
     cmap_limits --- tuple of extend, min level, max level
-                    or for extend == both, tuple of extend, max magnitude
     Nsteps --- number of intervals in the colormap
     OUTPUT:
     tuple of extend, min level, max level, interval between level
@@ -409,7 +408,10 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
         # align the centre with zero
         minmaxstep = symmetric_about_white_cmap_levels(cmap_limits[1],
                                                        Ncolours = Nsteps)
-        return tuple(['both'] + list(minmaxstep))
+        cmap_min, cmap_max, cmap_Nsteps = round_levels_with_zero_centred_between_two(
+            vmin0 = cmap_limits[1], vmax0 = cmap_limits[2], Nsteps0 = Nsteps)
+        cmap_step = int((cmap_max - cmap_min) / cmap_Nsteps)
+        return ('both', cmap_min, cmap_max, cmap_step)
     elif cmap_limits[0] in ['min', 'max']:
         extend, cmap_min, cmap_max = cmap_limits
         rough_cmap_step = (cmap_max - cmap_min) / Nsteps
