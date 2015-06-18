@@ -376,7 +376,7 @@ def get_cmap_limits(da, quantile = .5):
     dfs = df.stack()
     
     if np.all(dfs == 0):
-        return ('both', 1e-10)
+        return ('both', - 1e-10, 1e-10)
     elif np.all(dfs <= 0):
         lev_min = dfs.quantile(q = 1 - quantile)
         return ('min', lev_min, 0.)
@@ -384,14 +384,9 @@ def get_cmap_limits(da, quantile = .5):
         lev_max = dfs.quantile(q = quantile)
         return ('max', 0., lev_max)
     else:
-        dfmin, dfmax = dfs.min(), dfs.max()
-        if abs(dfmax) > abs(dfmin):
-            cmap_limit = dfs[dfs >= 0].quantile(q = quantile)
-        elif abs(dfmax) < abs(dfmin):
-            cmap_limit = dfs[dfs <= 0].quantile(q = 1 - quantile)
-        else:
-            cmap_limit = dfs[dfs >= 0].quantile(q = quantile)
-        return ('both', abs(cmap_limit))
+        return ('both',
+                dfs[dfs <= 0].quantile(q = 1 - quantile),
+                dfs[dfs >= 0].quantile(q = quantile))
 
 
 def get_nicenround_steps(cmap_limits, Nsteps = 10):
