@@ -424,11 +424,6 @@ def get_common_cmap_levels(cmap_levels, Nsteps = 10):
     else:
         extend = 'neither'
         
-    if extend == 'both':
-        Nsteps = 11
-    elif extend in ['min', 'max']:
-        Nsteps = 10
-        
     cmap_limits = (extend, cmap_minmin[1], cmap_maxmax[2])        
     return get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
     
@@ -497,31 +492,6 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
         
             
 
-
-def get_cmap_levels(da, quantile = .5):
-    '''
-    Get colormap levels for contourf plotting from data array
-    INPUT:
-    da --- DataArray
-    quantile --- between 0. and 1., to indicate from what value
-                 the colormap should extend beyond
-    OUTPUT:
-    tuple of (extend, minimum level, maximum level, interval between levels)
-    '''
-    cmap_limits = get_cmap_limits(da, quantile = quantile)
-
-    if cmap_limits[0] == 'both':
-        Nsteps = 11
-    else:
-        Nsteps = 10
-    cmap_levels = get_nicenround_steps(cmap_limits,
-                                       Nsteps = Nsteps)
-    return cmap_levels
-    
-            
-
-
-
 def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
                                    cmap = plt.get_cmap('PuBuGn')):
     '''
@@ -536,10 +506,12 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
 
     das = [d3sets[case][interest][{'lon': 0, 'lat': 0}] for case in cases]
 
-    cmap_levels = [get_cmap_levels(da, quantile = .9999)\
-                   for da in das]
+    quantile, Nsteps = .9999, 17
+    cmap_limitss = [get_cmap_limits(da, quantile = quantile) for da in das]
+    cmap_levels = [get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
+                   for cmap_limits in cmap_limitss]
 
-    common_cmap_levels = get_common_cmap_levels(cmap_levels)
+    common_cmap_levels = get_common_cmap_levels(cmap_levels, Nsteps = Nsteps)
 
     Nplots = len(cases)
     
