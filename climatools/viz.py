@@ -485,13 +485,14 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
         extend, cmap_min, cmap_max = cmap_limits
         rough_cmap_step = (cmap_max - cmap_min) / Nsteps
         nice_cmap_step = muths.round_to_1(rough_cmap_step)
+        cmap_Nsteps = int(np.ceil((cmap_max - cmap_min) / nice_cmap_step))
         if extend == 'min':
             # align the top
-            nice_cmap_min = cmap_max - Nsteps * nice_cmap_step
+            nice_cmap_min = cmap_max - cmap_Nsteps * nice_cmap_step
             return (extend, nice_cmap_min, cmap_max, nice_cmap_step)
         elif extend == 'max':
             # align the bottom
-            nice_cmap_max = cmap_min + Nsteps * nice_cmap_step
+            nice_cmap_max = cmap_min + cmap_Nsteps * nice_cmap_step
             return (extend, cmap_min, nice_cmap_max, nice_cmap_step)
         
             
