@@ -510,9 +510,9 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
     cmap_limitss = [get_cmap_limits(da, quantile = quantile) for da in das]
     cmap_levels = [get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
                    for cmap_limits in cmap_limitss]
-    print('cmap_levels =', cmap_levels, '   Nsteps =', Nsteps)
+
     common_cmap_levels = get_common_cmap_levels(cmap_levels, Nsteps = Nsteps)
-    print('common_cmap_levels', common_cmap_levels)
+
 
     Nplots = len(cases)
     
