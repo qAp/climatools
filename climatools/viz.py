@@ -404,7 +404,7 @@ def get_common_cmap_levels(cmap_levels, Nsteps = 10):
     (extend, colormap min, colormap max)
     '''
     cmap_minmin = sorted(cmap_levels, key = lambda x: x[1])[0]
-    cmap_maxmax = sorted(cmap_levels, key = lambda x: x[2])[0]
+    cmap_maxmax = sorted(cmap_levels, key = lambda x: x[2])[-1]
 
     if cmap_minmin[0] in ['min', 'both']:
         extend_min = True
@@ -510,13 +510,14 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
     cmap_limitss = [get_cmap_limits(da, quantile = quantile) for da in das]
     cmap_levels = [get_nicenround_steps(cmap_limits, Nsteps = Nsteps)
                    for cmap_limits in cmap_limitss]
-
+    print('cmap_levels =', cmap_levels, '   Nsteps =', Nsteps)
     common_cmap_levels = get_common_cmap_levels(cmap_levels, Nsteps = Nsteps)
+    print('common_cmap_levels', common_cmap_levels)
 
     Nplots = len(cases)
     
     fig, axes = plt.subplots(nrows = 1, ncols = Nplots,
-                             figsize = (5.6 * Nplots, 5), dpi = 300)
+                             figsize = (10. * Nplots, 5), dpi = 300)
     
     for ax, da in zip([axes] if Nplots == 1 else axes, das):
         ax = contourf_DataArray(ax, da,
