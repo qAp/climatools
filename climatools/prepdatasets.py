@@ -24,3 +24,17 @@ def gather_interests_from_cases(cases, interests):
     return datasets
 
 
+
+def take_difference_between_cases(datasets):
+    '''
+    Take all possible differences between Datasets in DATASETS.
+    INPUT:
+    datasets --- dictionary of xray Datasets
+    OUTPUT:
+    dictionary of xray Datsets of differences between Datsets in the input
+    DATASETS
+    '''
+    diff_strs = get_cases_difference()
+    
+    return {x + ' - ' + y: datasets[x] - datasets[y]
+            for x, y in diff_strs}
