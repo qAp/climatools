@@ -1,4 +1,5 @@
 import os
+import random
 import numpy as np
 import pandas as pd
 import xray
@@ -25,23 +26,23 @@ def gather_interests_from_cases(cases, interests):
 
 
 
-def take_difference_between_cases(datasets):
+def take_difference_between_cases(datasets, which_differences = None):
     '''
     Take all possible differences between Datasets in DATASETS.
     INPUT:
     datasets --- dictionary of xray Datasets
+    which_differences --- list of tuples, each specifying a pair of Datasets
+                          between which the difference is to be taken
     OUTPUT:
     dictionary of xray Datsets of differences between Datsets in the input
     DATASETS
     '''
-    diff_strs = get_cases_difference()
-    
     return {x + ' - ' + y: datasets[x] - datasets[y]
-            for x, y in diff_strs}
+            for x, y in which_differences}
 
 
 
-def passon_attrs_casename(datasets, diff_datasets):
+def passon_attrs_casename(datasets, diff_datasets, interests = None):
     '''
     Pass on attributes from DataArrays to differences between
     DataArrays
@@ -55,8 +56,6 @@ def passon_attrs_casename(datasets, diff_datasets):
                       from original DATASETS. Each dataset also has a new attribute of case_name,
                       its key in the dictionary
     '''
-    interests = get_d3interests()
-
     for ds_name, ds in diff_datasets.items():
         ds.attrs['case_name'] = ds_name
         for interest in interests:
