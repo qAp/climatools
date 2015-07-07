@@ -296,6 +296,7 @@ def contourf_DataArray(ax, da,
         extend, lev_min, lev_max, lev_step = cmap_levels
     else:
         lev_min, lev_max, lev_step = Z.min(), Z.max(), (Z.max() - Z.min()) / 20
+        extend = 'neither'
 
     if extend == 'both':
         cmap = slice_divergent_colormap(cmap = cmap, vmin = lev_min, vmax = lev_max)
