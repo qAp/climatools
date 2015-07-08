@@ -155,6 +155,42 @@ def axes_beyond_ticks(ax, which = 'x'):
 
 
 
+def get_datetime_major_locator(xlist):
+    '''
+    Return a good dates locator for major ticks.
+    INPUT:
+    xlist --- list: [number of unique years amongst minor ticks,
+                     number of unique months amongst minor ticks,
+                     number of unique days amongst minor ticks,
+                     number of unique hours amongst minor ticks,
+                     number of unique minutes amongst minor ticks]
+    OUTPUT:
+    locator  -- one of [matplotlib.dates.YearLocator,
+                        matplotlib.dates.MonthLocator,
+                        matplotlib.dates.DayLocator,
+                        matplotlib.dates.HourLocator,
+                        matplotlib.dates.MinuteLocator]
+    '''
+    locators = [matplotlib.dates.YearLocator,
+                matplotlib.dates.MonthLocator,
+                matplotlib.dates.DayLocator,
+                matplotlib.dates.HourLocator,
+                matplotlib.dates.MinuteLocator]
+    
+    max_number_majorticks = 5
+
+    for k, x in enumerate(xlist):
+        if x <= 1:
+            continue
+        else:
+            if x > max_number_majorticks:
+                return locators[k - 1] if k > 0 else None
+            else:
+                return locators[k]
+            return None
+
+
+
 
 def plot_DataArray(ax, da,
                    datetime_label = True,
@@ -346,9 +382,17 @@ def contourf_DataArray(ax, da,
 
     ax.set_xlabel('time [{}]'.format(da['time'].units))
     ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator())
-    ax.xaxis.set_minor_locator(matplotlib.dates.DayLocator(interval = 2))
-    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n%b %y'))
-    ax.xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('%d'))
+#    ax.xaxis.set_minor_locator(matplotlib.dates.DayLocator(interval = 2))
+    ax.xaxis.set_minor_locator(matplotlib.ticker.MaxNLocator(10))
+    minorticklocs = [matplotlib.dates.num2date(tickloc)
+                    for tickloc in ax.xaxis.get_minorticklocs()]
+    print('minute:', [tickloc.minute for tickloc in minorticklocs])
+    print('hour:', [tickloc.hour for tickloc in minorticklocs])
+    print('day:', [tickloc.day for tickloc in minorticklocs])
+    print('month:', [tickloc.month for tickloc in minorticklocs])
+    print('year:', [tickloc.year for tickloc in minorticklocs])
+    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n%b %y'))
+    ax.xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n %H:%M'))
     ax.xaxis.grid(b = True, which = 'minor')
     ax.xaxis.set_tick_params(length = 6, which = 'major')
     ax.xaxis.set_tick_params(length = 3, which = 'minor')
