@@ -242,8 +242,8 @@ def split_to_major_minor_timescales(Nlabels):
 
 
 def get_datetime_tick_formats(timescales):
-    directives = {'year':   '%y',
-                  'month'   '%b',
+    directives = {'year':   '%Y',
+                  'month':  '%m',
                   'day':    '%d',
                   'hour':   '%H',
                   'minute': '%M'}
@@ -264,22 +264,23 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
     xaxis --- an ax.xaxis or ax.yaxis object in matplotlib
     maxN_minorticks --- maximum number of minor ticks along XAXIS
     '''
-    xaxis.set_minor_locator(matplotlib.ticker.MaxNLocator(maxN_minorticks))
+    xaxis.set_minor_locator(matplotlib.ticker.MaxNLocator(maxN_minorticks - 1))
     
     Nlabels = get_N_unique_datetimeperiod_labels(xaxis.get_minorticklocs())
     
-    major_datetimes, minor_datetimes = split_to_major_minor_datetimes(Nlabels)
+    major_timescales, minor_timescales = split_to_major_minor_timescales(Nlabels)
+    print(major_timescales, minor_timescales)
+    major_locator = dates_locators_by_timescale()[major_timescales[-1]]
+    print(major_locator)
+    major_fmt = get_datetime_tick_formats(major_timescales)
+    minor_fmt = get_datetime_tick_formats(minor_timescales)
+    print(major_fmt, minor_fmt)
     
-    major_locator = dates_locators_by_timescale()[major_datetimes[-1]]
-    
-    major_fmt = get_datetime_tick_formats(major_datetimes)
-    minor_fmt = get_datetime_tick_formats(minor_datetimes)
-    
-    if major_locator_function:
-        xaxis.set_major_locator(major_locator_function())
+    if major_locator:
+        xaxis.set_major_locator(major_locator())
         
-    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n%b %y'))
-    ax.xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n %H:%M'))
+    xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n' + major_fmt))
+    xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n' + minor_fmt))
     
 
 
@@ -389,7 +390,7 @@ def plot_vertical_profile(ax, da,
     ax.xaxis.set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda x, pos: '{:.1f}'.\
                                         format(10**xaxis_pow * x)))
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
+    plt.set(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
 
 
     return ax
@@ -474,7 +475,7 @@ def contourf_DataArray(ax, da,
     ax.yaxis.set_tick_params(length = 3, which = 'minor')
 
     ax.set_xlabel('time [{}]'.format(da['time'].units))
-    set_xaxis_datetime_ticklocs_ticklabels(ax.xaxis, maxN_minorticks)
+    set_xaxis_datetime_ticklocs_ticklabels(ax.xaxis, maxN_minorticks = 10)
 
     ax.xaxis.grid(b = True, which = 'minor')
     ax.xaxis.set_tick_params(length = 6, which = 'major')
