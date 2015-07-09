@@ -239,8 +239,20 @@ def split_to_major_minor_timescales(Nlabels):
     return major_timescales, minor_timescales
 
 
-def get_datetime_tick_formats(major_datetimes):
-    
+
+
+def get_datetime_tick_formats(timescales):
+    directives = {'year':   '%y',
+                  'month'   '%b',
+                  'day':    '%d',
+                  'hour':   '%H',
+                  'minute': '%M'}
+    ymds = [directives[timescale] for timescale in timescales
+            if timescale in ['year', 'month', 'day']]
+    hms = [directives[timescale] for timescale in timescales
+           if timescale in ['hour', 'minute']]
+    return ' '.join(['/'.join(ymds), ':'.join(hms)])
+
 
 
 
