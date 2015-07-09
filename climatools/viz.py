@@ -390,7 +390,7 @@ def plot_vertical_profile(ax, da,
     ax.xaxis.set_major_formatter(
         matplotlib.ticker.FuncFormatter(lambda x, pos: '{:.1f}'.\
                                         format(10**xaxis_pow * x)))
-    plt.set(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
 
 
     return ax
