@@ -212,6 +212,24 @@ def get_N_unique_datetimeperiod_labels(ticklocs):
 
 
 
+def split_to_major_minor_timescales(Nlabels):
+    timescales = ('year', 'month', 'day', 'hour', 'minute',)
+
+    maxN_major_ticks = 5
+
+    for k, x in enumerate(Nlabels):
+        if x <= 1:
+            continue
+        else:
+            if x > maxN_major_ticks:
+                return (timescales[: k], timescales[k:])
+            else:
+                return (timescales[: k + 1], timescales[k + 1:])
+            return timescales[:]
+    return major_timescales, minor_timescales
+
+
+
 def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
     '''
     Set tick locations and labels on an xaxis (ax.axis for example)
