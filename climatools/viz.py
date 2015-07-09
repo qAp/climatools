@@ -269,12 +269,11 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
     Nlabels = get_N_unique_datetimeperiod_labels(xaxis.get_minorticklocs())
     
     major_timescales, minor_timescales = split_to_major_minor_timescales(Nlabels)
-    print(major_timescales, minor_timescales)
+
     major_locator = dates_locators_by_timescale()[major_timescales[-1]]
-    print(major_locator)
+
     major_fmt = get_datetime_tick_formats(major_timescales)
     minor_fmt = get_datetime_tick_formats(minor_timescales)
-    print(major_fmt, minor_fmt)
     
     if major_locator:
         xaxis.set_major_locator(major_locator())
