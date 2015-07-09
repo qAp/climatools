@@ -36,6 +36,16 @@ def matplotlib_colormap_names(kind = 'divergent'):
                    ('qualitative', cmaps['Qualitative']),
                    ('misc', cmaps['Miscellaneous'])])
     return ccmaps[kind]
+
+
+def dates_locators_by_timescale():
+    locators = {'year': matplotlib.dates.YearLocator,
+                'month': matplotlib.dates.MonthLocator,
+                'day': matplotlib.dates.DayLocator,
+                'hour': matplotlib.dates.HourLocator,
+                'minute': matplotlib.dates.MinuteLocator}
+    return locators
+
     
 
 def symmetric_about_white_cmap_levels(rough_maxabs, Ncolours = 11):
@@ -229,6 +239,10 @@ def split_to_major_minor_timescales(Nlabels):
     return major_timescales, minor_timescales
 
 
+def get_datetime_tick_formats(major_datetimes):
+    
+
+
 
 def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
     '''
@@ -244,7 +258,7 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
     
     major_datetimes, minor_datetimes = split_to_major_minor_datetimes(Nlabels)
     
-    major_locator = get_datetime_major_locator(major_datetimes[-1])
+    major_locator = dates_locators_by_timescale()[major_datetimes[-1]]
     
     major_fmt = get_datetime_tick_formats(major_datetimes)
     minor_fmt = get_datetime_tick_formats(minor_datetimes)
