@@ -281,6 +281,8 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
         
     xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n' + major_fmt))
     xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n' + minor_fmt))
+    if minor_fmt.count('%') > 2:
+        plt.setp(xaxis.get_minorticklabels(), rotation = 5)
     
 
 
