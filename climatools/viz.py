@@ -189,9 +189,58 @@ def get_datetime_major_locator(xlist):
                 return locators[k]
             return None
 
+def get_N_unique_datetimeperiod_labels(ticklocs):
+    '''
+    Return  number of unique datetime labels for periods
+    YEAR, MONTH, DAY, HOUR, MINUTE.
+    INPUT:
+    ticklocs --- tick locators in datetime in floating point numbers
+                 (days since 0001-01-01 UTC, plus 1)
+    OUTPUT --- list: [number of unique years amongst minor ticks,
+                      number of unique months amongst minor ticks,
+                      number of unique days amongst minor ticks,
+                      number of unique hours amongst minor ticks,
+                      number of unique minutes amongst minor ticks] 
+    '''
+    minorticklocs = [matplotlib.dates.num2date(tickloc)
+                    for tickloc in ticklocs] #ax.xaxis.get_minorticklocs()
+    return [len(set([tickloc.year for tickloc in minorticklocs])),
+            len(set([tickloc.month for tickloc in minorticklocs])),
+            len(set([tickloc.day for tickloc in minorticklocs])),
+            len(set([tickloc.hour for tickloc in minorticklocs])),
+            len(set([tickloc.minute for tickloc in minorticklocs]))]
 
 
 
+def set_xaxis_datetime_ticklocs_ticklabels(xaxis, maxN_minorticks):
+    '''
+    Set tick locations and labels on an xaxis (ax.axis for example)
+    given a maximum number of minor ticks along the xaxis.
+    INPUT:
+    xaxis --- an ax.xaxis or ax.yaxis object in matplotlib
+    maxN_minorticks --- maximum number of minor ticks along XAXIS
+    '''
+    xaxis.set_minor_locator(matplotlib.ticker.MaxNLocator(maxN_minorticks))
+    
+    Nlabels = get_N_unique_datetimeperiod_labels(xaxis.get_minorticklocs())
+    
+    major_datetimes, minor_datetimes = split_to_major_minor_datetimes(Nlabels)
+    
+    major_locator = get_datetime_major_locator(major_datetimes[-1])
+    
+    major_fmt = get_datetime_tick_formats(major_datetimes)
+    minor_fmt = get_datetime_tick_formats(minor_datetimes)
+    
+    if major_locator_function:
+        xaxis.set_major_locator(major_locator_function())
+        
+    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n%b %y'))
+    ax.xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n %H:%M'))
+    
+
+
+
+    
 def plot_DataArray(ax, da,
                    datetime_label = True,
                    title = '', label = ':D',
@@ -381,18 +430,8 @@ def contourf_DataArray(ax, da,
     ax.yaxis.set_tick_params(length = 3, which = 'minor')
 
     ax.set_xlabel('time [{}]'.format(da['time'].units))
-    ax.xaxis.set_major_locator(matplotlib.dates.MonthLocator())
-#    ax.xaxis.set_minor_locator(matplotlib.dates.DayLocator(interval = 2))
-    ax.xaxis.set_minor_locator(matplotlib.ticker.MaxNLocator(10))
-    minorticklocs = [matplotlib.dates.num2date(tickloc)
-                    for tickloc in ax.xaxis.get_minorticklocs()]
-    print('minute:', [tickloc.minute for tickloc in minorticklocs])
-    print('hour:', [tickloc.hour for tickloc in minorticklocs])
-    print('day:', [tickloc.day for tickloc in minorticklocs])
-    print('month:', [tickloc.month for tickloc in minorticklocs])
-    print('year:', [tickloc.year for tickloc in minorticklocs])
-    ax.xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n\n%b %y'))
-    ax.xaxis.set_minor_formatter(matplotlib.dates.DateFormatter('\n %H:%M'))
+    set_xaxis_datetime_ticklocs_ticklabels(ax.xaxis, maxN_minorticks)
+
     ax.xaxis.grid(b = True, which = 'minor')
     ax.xaxis.set_tick_params(length = 6, which = 'major')
     ax.xaxis.set_tick_params(length = 3, which = 'minor')
