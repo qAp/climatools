@@ -264,12 +264,12 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
     xaxis --- an ax.xaxis or ax.yaxis object in matplotlib
     maxN_minorticks --- maximum number of minor ticks along XAXIS
     '''
-    interval_minutes = 20 
-    locators = (matplotlib.dates.YearLocator(),
-                matplotlib.dates.MonthLocator(),
-                matplotlib.dates.DayLocator(),
-                matplotlib.dates.HourLocator(),
-                matplotlib.dates.MinuteLocator(interval = interval_minutes))
+    maxNintervals_minor = 15
+    locators = (matplotlib.dates.YearLocator,
+                matplotlib.dates.MonthLocator,
+                matplotlib.dates.DayLocator,
+                matplotlib.dates.HourLocator,
+                matplotlib.dates.MinuteLocator)
     timescales = ('year', 'month', 'day', 'hour', 'minute',)
 #    directives = ('%Y', '%m', '%d', '%H', '%M')    
     
@@ -278,20 +278,24 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
                                           pd.Timedelta(days = 30),
                                           pd.Timedelta(days = 1),
                                           pd.Timedelta(hours = 1),
-                                          pd.Timedelta(minutes = interval_minutes)]]
+                                          pd.Timedelta(minutes = 1)]]
     print(N_of_timescales)
+
+    info_major, info_minor = [{'locator': locator, 'Nintervals': n, 'timescale': timescale}
+                                      for locator, n, timescale in zip(locators, N_of_timescales, timescales) if n > 1][: 2]
+
+    print('info_major', info_major)
+    print('info_minor', info_minor)
+    major_locator = info_major['locator'](interval = int(np.floor(info_major['Nintervals'] / 3)))
+    if info_minor['Nintervals'] > maxNintervals_minor:
+        divisor = maxNintervals_minor
+    else:
+        divisor = 1
+    minor_locator = info_minor['locator'](interval = int(np.floor(info_minor['Nintervals'] / divisor)))
     
-    for idx, N_of_timescale in enumerate(N_of_timescales):
-        if N_of_timescale <= 1:
-            continue
-        else:
-            print(idx, N_of_timescale)
-            minor_locator = locators[idx]
-            major_locator = locators[idx - 1] if idx > 0 else None
-            minor_fmt = get_datetime_tick_formats([timescales[idx]])
-            major_fmt = get_datetime_tick_formats(timescales[: idx])
-            break
-            
+    minor_fmt = get_datetime_tick_formats([info_minor['timescale']])
+    major_fmt = get_datetime_tick_formats(timescales[: timescales.index(info_major['timescale']) + 1])
+
     print('minor_locator', minor_locator)
     print('major_locator', major_locator)
     print('minor_fmt', minor_fmt)
@@ -303,10 +307,10 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
         
     xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n' + major_fmt))
     xaxis.set_minor_formatter(matplotlib.dates.DateFormatter(minor_fmt))
-    if 10 <= len(xaxis.get_minorticklabels()) < 20:
-        plt.setp(xaxis.get_minorticklabels(), rotation = 5)
-    elif len(xaxis.get_minorticklabels()) > 20:
-        plt.setp(xaxis.get_minorticklabels(), rotation = 90)
+#    if 10 <= len(xaxis.get_minorticklabels()) < 20:
+#        plt.setp(xaxis.get_minorticklabels(), rotation = 5)
+#    elif len(xaxis.get_minorticklabels()) > 20:
+#        plt.setp(xaxis.get_minorticklabels(), rotation = 90)
     
 
 
