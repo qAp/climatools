@@ -1,4 +1,5 @@
 import sys
+import random
 import numpy as np
 import pandas as pd
 
@@ -257,60 +258,94 @@ def get_datetime_tick_formats(timescales):
 
 
 def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days = 1)):
-    '''
-    Set tick locations and labels on an xaxis (ax.axis for example)
-    given a maximum number of minor ticks along the xaxis.
-    INPUT:
-    xaxis --- an ax.xaxis or ax.yaxis object in matplotlib
-    maxN_minorticks --- maximum number of minor ticks along XAXIS
-    '''
-    maxNintervals_minor = 15
-    locators = (matplotlib.dates.YearLocator,
-                matplotlib.dates.MonthLocator,
-                matplotlib.dates.DayLocator,
-                matplotlib.dates.HourLocator,
+
+    maxN_major, maxN_minor = 5, 18
+
+    timescales = ('year', 'month', 'day', 'hour', 'minute')
+
+    locators = (matplotlib.dates.YearLocator, matplotlib.dates.MonthLocator,
+                matplotlib.dates.DayLocator, matplotlib.dates.HourLocator,
                 matplotlib.dates.MinuteLocator)
-    timescales = ('year', 'month', 'day', 'hour', 'minute',)
-#    directives = ('%Y', '%m', '%d', '%H', '%M')    
+
+    bylocators = (
+        lambda x: matplotlib.dates.YearLocator(x),
+        lambda x: matplotlib.dates.MonthLocator(bymonth = range(1, 13, x)),
+        lambda x: matplotlib.dates.DayLocator(bymonthday = range(1, 32, x)),
+        lambda x: matplotlib.dates.HourLocator(byhour = range(0, 24, x)),
+        lambda x: matplotlib.dates.MinuteLocator(byminute = range(0, 60, x))
+        )
+
+    timedeltafuncs = (lambda x: pd.Timedelta(years = x),
+                      lambda x: pd.Timedelta(months = x),
+                      lambda x: pd.Timedelta(days = x),
+                      lambda x: pd.Timedelta(hours = x),
+                      lambda x: pd.Timedelta(minutes = x))
+
+    timedeltas = (pd.Timedelta(days = 365), pd.Timedelta(days = 30),
+                  pd.Timedelta(days = 1), pd.Timedelta(hours = 1),
+                  pd.Timedelta(minutes = 1))
+
+    # get number of timescales in duration
+    N_of_timescales = [duration / timedelta for timedelta in  timedeltas]
+
+    # choose which timescales to be major and minor
+    # get the index
+    gr8r_than_1 = [n > 1 for n in N_of_timescales]
     
-    N_of_timescales = [duration / timescale
-                       for timescale in  [pd.Timedelta(days = 365),
-                                          pd.Timedelta(days = 30),
-                                          pd.Timedelta(days = 1),
-                                          pd.Timedelta(hours = 1),
-                                          pd.Timedelta(minutes = 1)]]
-    print(N_of_timescales)
-
-    info_major, info_minor = [{'locator': locator, 'Nintervals': n, 'timescale': timescale}
-                                      for locator, n, timescale in zip(locators, N_of_timescales, timescales) if n > 1][: 2]
-
-    print('info_major', info_major)
-    print('info_minor', info_minor)
-    major_locator = info_major['locator'](interval = int(np.floor(info_major['Nintervals'] / 3)))
-    if info_minor['Nintervals'] > maxNintervals_minor:
-        divisor = maxNintervals_minor
+    if not any(gr8r_than_1):
+        indx_major, idx_minor = -1, None
+    elif all(gr8r_than_1):
+        if N_of_timescales[0] > maxN_major:
+            indx_major, indx_minor = None, 0
+        else:
+            index_major, indx_minor = 0, 1
     else:
-        divisor = 1
-    minor_locator = info_minor['locator'](interval = int(np.floor(info_minor['Nintervals'] / divisor)))
-    
-    minor_fmt = get_datetime_tick_formats([info_minor['timescale']])
-    major_fmt = get_datetime_tick_formats(timescales[: timescales.index(info_major['timescale']) + 1])
+        print(':D')
+        indx = gr8r_than_1.index(True)
+        if N_of_timescales[indx] > maxN_major:
+            indx_major, indx_minor = indx - 1, indx
+        else:
+            indx_major, indx_minor = indx, indx + 1
 
-    print('minor_locator', minor_locator)
-    print('major_locator', major_locator)
-    print('minor_fmt', minor_fmt)
-    print('major_fmt', major_fmt)
-            
-    xaxis.set_minor_locator(minor_locator)
-    if major_locator:
-        xaxis.set_major_locator(major_locator)
-        
-    xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n' + major_fmt))
-    xaxis.set_minor_formatter(matplotlib.dates.DateFormatter(minor_fmt))
-#    if 10 <= len(xaxis.get_minorticklabels()) < 20:
-#        plt.setp(xaxis.get_minorticklabels(), rotation = 5)
-#    elif len(xaxis.get_minorticklabels()) > 20:
-#        plt.setp(xaxis.get_minorticklabels(), rotation = 90)
+
+    # create major dates locator
+    if indx_major:
+        locator_major = locators[indx_major]()
+
+    # create major tick label formatters
+    if indx_major:
+        fmt_major = get_datetime_tick_formats(timescales[: indx_major + 1])
+
+    # create major ticks and labels
+    if indx_major:
+        xaxis.set_major_locator(locator_major)
+        xaxis.set_major_formatter(matplotlib.dates.DateFormatter('\n' + fmt_major))
+
+                                             
+    # create minor dates locator
+    if indx_minor:
+        if N_of_timescales[indx_minor] <= maxN_minor:
+            locator_minor = locators[indx_minor]()
+        else:
+            N_to_group = int(np.ceil(N_of_timescales[indx_minor] / maxN_minor))
+            timedelta_group = timedeltafuncs[indx_minor](N_to_group)
+            N_tscale_per_larger_tscale = int(timedeltas[indx_minor - 1] / timedelta_group)
+            print('N_to_group', N_to_group)
+            print('timedelta_group', timedelta_group)
+            print('N_tscale_per_larger_tscale', N_tscale_per_larger_tscale)
+            locator_minor = bylocators[indx_minor](N_to_group)
+
+    # create minor tick formatters
+    if indx_minor:
+        fmt_minor = get_datetime_tick_formats([timescales[indx_minor]])
+
+    # create minor ticks and labels
+    if indx_minor:
+        xaxis.set_minor_locator(locator_minor)
+        xaxis.set_minor_formatter(matplotlib.dates.DateFormatter(fmt_minor))
+
+    
+    
     
 
 
