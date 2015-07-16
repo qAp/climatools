@@ -258,14 +258,24 @@ def get_datetime_tick_formats(timescales):
 
 
 def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days = 1)):
-
+    '''
+    Set major and minor tick locations and labels
+    INPUT:
+    xaxis --- matplotlib.axis.xaxis/yaxis on which ticks and ticklabels are to be set
+    duration --- duration which the axis spans in pandas.Timedelta 
+    '''
+    # maximum allowed major and minor intervals
     maxN_major, maxN_minor = 5, 18
 
     timescales = ('year', 'month', 'day', 'hour', 'minute')
 
-    locators = (matplotlib.dates.YearLocator, matplotlib.dates.MonthLocator,
-                matplotlib.dates.DayLocator, matplotlib.dates.HourLocator,
-                matplotlib.dates.MinuteLocator)
+    locators = (
+        matplotlib.dates.YearLocator,
+        matplotlib.dates.MonthLocator,
+        matplotlib.dates.DayLocator,
+        matplotlib.dates.HourLocator,
+        matplotlib.dates.MinuteLocator,
+        )
 
     bylocators = (
         lambda x: matplotlib.dates.YearLocator(x),
@@ -275,34 +285,30 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
         lambda x: matplotlib.dates.MinuteLocator(byminute = range(0, 60, x))
         )
 
-    timedeltafuncs = (lambda x: pd.Timedelta(years = x),
-                      lambda x: pd.Timedelta(months = x),
-                      lambda x: pd.Timedelta(days = x),
-                      lambda x: pd.Timedelta(hours = x),
-                      lambda x: pd.Timedelta(minutes = x))
-
-    timedeltas = (pd.Timedelta(days = 365), pd.Timedelta(days = 30),
-                  pd.Timedelta(days = 1), pd.Timedelta(hours = 1),
+    timedeltas = (pd.Timedelta(days = 365),
+                  pd.Timedelta(days = 30),
+                  pd.Timedelta(days = 1),
+                  pd.Timedelta(hours = 1),
                   pd.Timedelta(minutes = 1))
 
     # get number of timescales in duration
-    N_of_timescales = [duration / timedelta for timedelta in  timedeltas]
+    N_tscales = [duration / timedelta for timedelta in  timedeltas]
 
     # choose which timescales to be major and minor
     # get the index
-    gr8r_than_1 = [n > 1 for n in N_of_timescales]
-    
+    # essentially the rule is that the number of major intervals cannot
+    # exceed maxN_major
+    gr8r_than_1 = [n > 1 for n in N_tscales]
     if not any(gr8r_than_1):
         indx_major, idx_minor = -1, None
     elif all(gr8r_than_1):
-        if N_of_timescales[0] > maxN_major:
+        if N_tscales[0] > maxN_major:
             indx_major, indx_minor = None, 0
         else:
             index_major, indx_minor = 0, 1
     else:
-        print(':D')
         indx = gr8r_than_1.index(True)
-        if N_of_timescales[indx] > maxN_major:
+        if N_tscales[indx] > maxN_major:
             indx_major, indx_minor = indx - 1, indx
         else:
             indx_major, indx_minor = indx, indx + 1
@@ -324,15 +330,11 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
                                              
     # create minor dates locator
     if indx_minor:
-        if N_of_timescales[indx_minor] <= maxN_minor:
+        if N_tscales[indx_minor] <= maxN_minor:
             locator_minor = locators[indx_minor]()
         else:
-            N_to_group = int(np.ceil(N_of_timescales[indx_minor] / maxN_minor))
-            timedelta_group = timedeltafuncs[indx_minor](N_to_group)
-            N_tscale_per_larger_tscale = int(timedeltas[indx_minor - 1] / timedelta_group)
-            print('N_to_group', N_to_group)
-            print('timedelta_group', timedelta_group)
-            print('N_tscale_per_larger_tscale', N_tscale_per_larger_tscale)
+            # scale down the number of minor ticks if there are too many
+            N_to_group = int(np.ceil(N_tscales[indx_minor] / maxN_minor))
             locator_minor = bylocators[indx_minor](N_to_group)
 
     # create minor tick formatters
@@ -347,7 +349,6 @@ def set_xaxis_datetime_ticklocs_ticklabels(xaxis, duration = pd.Timedelta(days =
     
     
     
-
 
 
     
@@ -540,15 +541,11 @@ def contourf_DataArray(ax, da,
     ax.yaxis.set_tick_params(length = 3, which = 'minor')
 
     ax.set_xlabel('time [{}]'.format(da['time'].units))
-    print(pd.Timedelta(x[-1] - x[0]))
     set_xaxis_datetime_ticklocs_ticklabels(ax.xaxis,
                                            duration = pd.Timedelta(x[-1] - x[0]))
-
-
     ax.xaxis.grid(b = True, which = 'minor')
     ax.xaxis.set_tick_params(length = 6, which = 'major')
     ax.xaxis.set_tick_params(length = 3, which = 'minor')
-    
     return ax
 
 
