@@ -200,6 +200,8 @@ def get_datetime_major_locator(xlist):
                 return locators[k]
             return None
 
+
+
 def get_N_unique_datetimeperiod_labels(ticklocs):
     '''
     Return  number of unique datetime labels for periods
@@ -683,7 +685,22 @@ def get_nicenround_steps(cmap_limits, Nsteps = 10):
             # align the bottom
             nice_cmap_max = cmap_min + cmap_Nsteps * nice_cmap_step
             return (extend, cmap_min, nice_cmap_max, nice_cmap_step)
-        
+
+
+
+def get_suitable_cmap(cmap_levels):
+    '''
+    Selects a divergent colormap if the colormap levels
+    are positive and negative.
+    INPUT:
+    cmap_levels --- tuple (extend, cmap_min, cmap_max, cmap_step)
+                    where extend is either \'min\', \'max\' or \'both\'.
+    '''
+    extend = cmap_levels[0]
+    if extend == 'both':
+        return plt.get_cmap('bwr')
+    else:
+        return plt.get_cmap('PuBuGn')
             
 
 def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
@@ -707,6 +724,8 @@ def contourf_interest_for_all_cases(d3sets, interest = 'CLOUD',
 
     common_cmap_levels = get_common_cmap_levels(cmap_levels, Nsteps = Nsteps)
 
+    if cmap == 'auto-select':
+        cmap = get_suitable_cmap(common_cmap_levels)
 
     Nplots = len(cases)
     
