@@ -59,3 +59,10 @@ def convert_units(datasets, ilev, lev, datetimes):
                 ds[k] *= 1e6
                 ds[k].attrs['units'] = 'mg/kg'
     return datasets
+
+
+def wavenumber_to_nanometres(v):
+    '''
+    Convert cm-1 to nm
+    '''
+    return 10**7 / v
