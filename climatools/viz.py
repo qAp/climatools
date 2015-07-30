@@ -767,7 +767,10 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
         x, y = vspair
         
         for model in vspair:
-            da = dates.average_over_time(d3sets[model][interest])
+            if interest in ['AREI', 'AREL']:
+                da = dates.average_over_time(d3sets[model][interest], key = lambda x: x > 0)
+            else:
+                da = dates.average_over_time(d3sets[model][interest])
             
             # plot each member in the comparison pair
             ax = plot_vertical_profile(ax, da,
@@ -782,7 +785,9 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
         # plot difference on twiny
         diff_colour = (0.929, 0.329, 0.972)
         ax2 = ax.twiny()
+        
         da = dates.average_over_time(diff_d3sets[' - '.join(vspair)][interest])
+            
         ax2 = plot_vertical_profile(ax2, da,
                                     label = 'difference',
                                     colour = diff_colour, linestyle = '-',
