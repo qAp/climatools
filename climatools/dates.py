@@ -113,12 +113,19 @@ def UTC_to_local_datetime_countrywise(datetime_UTC, longitude = 0.1275, latitude
 
 
     
-def average_over_time(da):
+def average_over_time(da, key = None):
     '''
     Average over time dimension of DA, while
     retaining its units and long_name attributes
     '''
-    avgda = da.mean(dim = 'time')
+    if key:
+        bool = key(da)
+        avgda = (da * bool).sum(dim = 'time') / bool.sum(dim = 'time')
+    else:
+        avgda = da.mean(dim = 'time')
+        
     avgda.attrs['units'] = da.attrs['units']
     avgda.attrs['long_name'] = da.attrs['long_name']
     return avgda
+
+
