@@ -799,6 +799,7 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
         
         [ticklabel.set_color(diff_colour) for ticklabel in ax2.xaxis.get_ticklabels()]
         ax2 = axes_beyond_ticks(ax2, which = 'x')
+        ax2.axvline(x = 0, color = 'r', alpha = .5)
         
         handles1, labels1 = ax.get_legend_handles_labels()
         handles2, labels2 = ax.get_legend_handles_labels()
