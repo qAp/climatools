@@ -447,19 +447,20 @@ def plot_vertical_profile(ax, da,
     # x-axis
     if xlabel:
         ax.set_xlabel(xlabel)
-    ax.set_xlim(xlim)
     ax.set_xscale(xscale)
     ax.xaxis.grid(b = True, which = 'major')
 
-    xticklocs = ax.xaxis.get_majorticklocs()
-    xtick_interval = xticklocs[1] - xticklocs[0]
-    xaxis_pow = muths.pow_base10_for_decimal(xtick_interval, decimal = 1)
-    ax.xaxis_pow = xaxis_pow
-    ax.xaxis.set_major_formatter(
-        matplotlib.ticker.FuncFormatter(lambda x, pos: '{:.1f}'.\
-                                        format(10**xaxis_pow * x)))
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
-
+    if xlim:
+        ax.set_xlim(xlim)
+    else:
+        xticklocs = ax.xaxis.get_majorticklocs()
+        xtick_interval = xticklocs[1] - xticklocs[0]
+        xaxis_pow = muths.pow_base10_for_decimal(xtick_interval, decimal = 1)
+        ax.xaxis_pow = xaxis_pow
+        ax.xaxis.set_major_formatter(
+            matplotlib.ticker.FuncFormatter(lambda x, pos: '{:.1f}'.\
+                                            format(10**xaxis_pow * x)))
+        plt.setp(ax.xaxis.get_majorticklabels(), rotation = xlabels_rotate)
 
     return ax
 
@@ -778,7 +779,8 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
                                        colour = linestyles[model]['colour'],
                                        linestyle = linestyles[model]['linestyle'],
                                        xscale = xscale, xlabels_rotate = bot_xlabels_rotate,
-                                       yscale = yscale)
+                                       yscale = yscale,
+                                       xlim = bot_xlim)
             
         ax = axes_beyond_ticks(ax, which = 'x')
 
@@ -792,7 +794,9 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
                                     label = 'difference',
                                     colour = diff_colour, linestyle = '-',
                                     xscale = xscale, xlabels_rotate = top_xlabels_rotate,
-                                    yscale = yscale)
+                                    yscale = yscale,
+                                    xlim = top_xlim)
+        
         [ticklabel.set_color(diff_colour) for ticklabel in ax2.xaxis.get_ticklabels()]
         ax2 = axes_beyond_ticks(ax2, which = 'x')
         
@@ -812,9 +816,10 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
     
     plt.figtext(x = 0.02, y = .5, s = 'lev [mbar]', rotation = 90.)
     plt.figtext(x = .45, y = 0.08, s = '{} [{}]'.format(interest, da.units))
-    plt.figtext(x = .9, y = 0.08, s = '1e{}'.format(- ax.xaxis_pow))
     plt.figtext(x = .7, y = .91, s = 'difference')
-    plt.figtext(x = .9, y = .91, s = '1e{}'.format(- ax2.xaxis_pow))
+    if hasattr(ax2, 'xaxis_pow'):
+        plt.figtext(x = .9, y = 0.08, s = '1e{}'.format(- ax.xaxis_pow))
+        plt.figtext(x = .9, y = .91, s = '1e{}'.format(- ax2.xaxis_pow))
     plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
     return fig
 
