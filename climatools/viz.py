@@ -806,7 +806,7 @@ def plotVS_timeaveraged_interest_for_all_cases(d3sets, diff_d3sets,
     uhandles, ulabels = zip(*sorted(zip(uhandles, ulabels), key = lambda x: x[1]))
     fig.legend(uhandles, ulabels,
                loc = 'center', ncol = 3,
-               bbox_to_anchor = (.35, .91), prop = {'size': 12})
+               bbox_to_anchor = (.35, .91), prop = {'size': 14})
     
     fig.suptitle(da.attrs['long_name'])
     
