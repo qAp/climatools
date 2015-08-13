@@ -427,7 +427,7 @@ def plot_vertical_profile(ax, da,
     x = da[{'lon': 0, 'lat': 0}].values
     
     ax.plot(x, y,
-            label = label, color = colour, linestyle = linestyle, linewidth = 1.5)
+            label = label, color = colour, linestyle = linestyle, linewidth = 2.3)
     
     if title:
         ax.set_title(title)
