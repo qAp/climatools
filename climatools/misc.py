@@ -92,4 +92,20 @@ def Fortran_subroutine_dict_childs(fortran_subroutine):
 
 
 
+def Fortran_subroutine_dict_parents(subr_childs_list):
+    '''
+    INPUT:
+    subr_childs_list --- a list of dictionaries of subroutines and their child subroutines
+    OUTPUT:
+    subr_parents_dict --- dictionary of subroutines and their parent subroutines
+    '''
+    subr_childs_dict = {}
+    [subr_childs_dict.update(subr) for subr in subr_childs_list]
     
+    subr_parents_dict = {}
+    for name in subr_childs_dict.keys():
+        subr_parents_dict[name] = []
+        for potential_parent, childs in subr_childs_dict.items():
+            if name in childs:
+                subr_parents_dict[name].append(potential_parent)
+    return subr_parents_dict
