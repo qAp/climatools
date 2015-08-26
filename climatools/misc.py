@@ -73,3 +73,23 @@ def get_called_Fortran_subroutine_names(fortran):
     '''
     regex = re.compile(r'\n\s*call\s+(\w+)\s*&?\s*\(')
     return set(regex.findall(fortran))
+
+
+
+def Fortran_subroutine_dict_childs(fortran_subroutine):
+    '''
+    Returns a dictionary where the only key is the name of
+    subroutine, and the value is a list of nested subroutines,
+    one-level down.
+    INPUT:
+    fortran_subroutine --- string. Fortran subroutine.
+    OUTPUT:
+    dict of {name of subroutine: list of nested subroutines}
+    '''
+    name = get_Fortran_subroutine_name(fortran_subroutine)
+    childs = get_called_Fortran_subroutine_names(fortran_subroutine)
+    return {name: list(childs)}
+
+
+
+    
