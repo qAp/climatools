@@ -76,11 +76,11 @@ def get_called_Fortran_subroutine_names(fortran):
 
 
 
-def Fortran_subroutine_dict_childs(fortran_subroutine):
+def Fortran_subroutine_to_dict(fortran_subroutine):
     '''
     Returns a dictionary where the only key is the name of
     subroutine, and the value is a list of nested subroutines,
-    one-level down.
+    one-level down. This applies to only ONE subroutine.
     INPUT:
     fortran_subroutine --- string. Fortran subroutine.
     OUTPUT:
@@ -92,16 +92,26 @@ def Fortran_subroutine_dict_childs(fortran_subroutine):
 
 
 
-def Fortran_subroutine_dict_parents(subr_childs_list):
+def Fortran_subroutine_childs_dict(subr_childs_list):
     '''
     INPUT:
     subr_childs_list --- a list of dictionaries of subroutines and their child subroutines
     OUTPUT:
-    subr_parents_dict --- dictionary of subroutines and their parent subroutines
+    subr_childs_dict --- dictionary of subroutines and their child subroutines
     '''
     subr_childs_dict = {}
     [subr_childs_dict.update(subr) for subr in subr_childs_list]
-    
+    return subr_childs_dict
+
+
+
+def Fortran_subroutine_parents_dict(subr_childs_dict):
+    '''
+    INPUT:
+    subr_childs_dict --- dictionary of subroutines and their child subroutines
+    OUTPUT:
+    subr_parents_dict --- dictionary of subroutines and their parent subroutines
+    '''
     subr_parents_dict = {}
     for name in subr_childs_dict.keys():
         subr_parents_dict[name] = []
@@ -109,3 +119,18 @@ def Fortran_subroutine_dict_parents(subr_childs_list):
             if name in childs:
                 subr_parents_dict[name].append(potential_parent)
     return subr_parents_dict
+
+
+
+def Fortran_subroutine_parents_childs_dict(childs = None, parents = None):
+    '''
+    INPUT:
+    childs --- dictionary of subroutines and their child subroutines
+    parents --- dictionary of subroutines and their parent subroutines
+    OUTPUT:
+    d --- dictionary of subroutines and their child and parent subroutines
+    '''
+    d = {name: {'childs': childs[name] if name in childs else [],
+                'parents': parents[name] if name in parents else []}\
+         for name in (set(childs.keys()) | set(parents.keys()))}
+    return d
