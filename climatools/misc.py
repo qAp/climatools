@@ -134,3 +134,54 @@ def Fortran_subroutine_parents_childs_dict(childs = None, parents = None):
                 'parents': parents[name] if name in parents else []}\
          for name in (set(childs.keys()) | set(parents.keys()))}
     return d
+
+
+
+def read_subroutines_from_file(fpath):
+    '''
+    Returns a list of strings each of which is the Fortran for a subroutine
+    defined in the Fortran file at FPATH
+    INPUT:
+    fpath --- file path to Fortran file
+    OUTPUT:
+    subroutines --- list of strings each of which is the Fortran for a subroutine
+    defined in the Fortran file at FPATH
+    '''
+    with open(fpath, mode = 'r', encoding = 'utf-8') as file:
+        code = file.read()
+    subroutines = get_subroutine_bodies_from_Fortran(code)
+    return subroutines
+
+
+def get_subroutines_from_file(fpath):
+    '''
+    Returns a list of dictionaries, one for each subroutine in FPATH.
+    Each dictionary contains a list of child subroutines.
+    INPUT:
+    fpath --- file path to Fortran file
+    OUTPUT:
+    list of dictionaries each of which corresponds to a subroutine, and whose value
+    is a list of child subroutines for that subroutine.
+    '''
+    subroutines = read_subroutines_from_file(fpath)
+    return [Fortran_subroutine_to_dict(subr) for subr in subroutines]
+
+
+
+def Fortran_subroutine_relations_from_files(paths_fortran = None):
+    '''
+    INPUT:
+    paths_fortran --- list of file paths of fortran files
+    OUTPUT:
+    d_subr_childs_parents --- dictionary of subroutines in all input fortran files
+                              and their child and parent subroutines
+    '''
+    list_subrs = []
+    for fpath in paths_fortran:
+        list_subrs.extend(get_subroutines_from_file(fpath))
+        
+        d_subr_childs = Fortran_subroutine_childs_dict(list_subrs)
+        d_subr_parents = Fortran_subroutine_parents_dict(d_subr_childs)
+        d_subr_childs_parents = Fortran_subroutine_parents_childs_dict(childs = d_subr_childs,
+                                                                       parents = d_subr_parents)
+    return d_subr_childs_parents
