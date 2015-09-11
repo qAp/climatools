@@ -570,7 +570,7 @@ def daytime_nighttime_shading(ax, dts,
         x, hour_daystart = hour_daystart,
         hour_nightstart = hour_nightstart))
 
-    # Find and sort the boundries, datetimes at which each day-teim
+    # Find and sort the boundries, datetimes at which each day-time
     # and night-time period starts.  This includes incomplete periods
     # at either ends
     DNbndries = sorted([dts[0]] + \
