@@ -4,7 +4,7 @@ Often the data output from climate models are stored in netCDF or HDF files.  Th
 [xray][xray] to import and manipulate these data, 
 and [matplotlib][matplotlib] module to make various different types of plots of these data.
 
-Examples of usage can be found in most of the [IPython][ipython] notebooks [here][scam_notebooks], where the data
+Examples of usage can be found in most of the IPython notebooks [here][scam_notebooks], where the data
 are from runs of the Single-column Community Atmosphere Model ([SCAM][scam]).
 
 
