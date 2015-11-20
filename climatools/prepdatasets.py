@@ -35,6 +35,44 @@ def convert_pressure_time_units(cases):
     return cases
     
 
+
+
+def extract_additional_RTM(ds, RTM_label = 'RTM1'):
+    '''
+    returns CAM history of original model, along with that of
+    an additional radiative tranfer model that was run along the
+    original model.
+    INPUT:
+    ds --- xray Dataset loaded from CAM history\'s netCDF file
+    RTM_label --- a string that identifies which fields in DS belong
+                  to the additional radiative tranfer model.
+                  This would be the character variable defined
+                  in radiation_init() and radiation_tend().
+    '''
+    names_all = set(list(ds))
+    names_rtmx = set(name for name in names_all if ('_' + RTM_label) in name)
+    names_rtm0 = set(name.split('_')[0] for name in names_rtmx)
+    names_common = set(name \
+                       for name in (names_all - names_rtmx - names_rtm0) \
+                       if not name.startswith(tuple(names_rtm0)))
+
+    
+    ds_rtm0, ds_rtmx = xray.Dataset(), xray.Dataset()
+    
+    ds_rtm0.update(
+    ds[list(names_common | names_rtm0)].copy(deep = True), inplace = True)
+
+    ds_rtmx.update(
+    ds[list(names_common | names_rtmx)].copy(deep = True), inplace = True)
+    ds_rtmx.rename({name: name.split('_')[0] for name in names_rtmx}, inplace = True)
+
+    return ds_rtm0, ds_rtmx
+        
+
+    
+    
+
+
 def gather_interests_from_cases(cases, interests):
     '''
     Creates a dictionary with keys being the cases.
