@@ -1,5 +1,6 @@
 import re
-
+import os
+import fnmatch
 
 
 def any_unique_labels(levels, labels):
@@ -185,3 +186,15 @@ def Fortran_subroutine_relations_from_files(paths_fortran = None):
         d_subr_childs_parents = Fortran_subroutine_parents_childs_dict(childs = d_subr_childs,
                                                                        parents = d_subr_parents)
     return d_subr_childs_parents
+
+
+
+def findalldir(topdir, pattern):
+    '''
+    find all directories under TOPDIR, whose name matches PATTERN
+    '''
+    for path, dirnames, filenames in os.walk(topdir):
+        for dirname in dirnames:
+            if fnmatch.fnmatch(dirname, pattern):
+                yield os.path.join(path, dirname)
+                
