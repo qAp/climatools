@@ -1,7 +1,7 @@
 import re
 import os
 import fnmatch
-
+import filecmp
 
 def any_unique_labels(levels, labels):
     '''
@@ -198,3 +198,34 @@ def findalldir(topdir, pattern):
             if fnmatch.fnmatch(dirname, pattern):
                 yield os.path.join(path, dirname)
                 
+
+
+def print_leftright_only(dcmp, leftright = 'left'):
+    '''
+    Takes a Cmpfile.dircmp object and return all files or directories
+    that are under the left (or right) and are not under the right (or left)
+    directory in the comparison.
+    INPUT:
+    dcmp --- Cmpfile.dircmp object that compares two directories
+    leftright --- \'left\' (\'right\') to return files and directories
+                  that are only found under the left (right) directory of dcmp.
+    '''
+    if leftright == 'left':
+        leftrightonlys = dcmp.left_only
+    elif leftright == 'right':
+        leftrightonlys = dcmp.right_only
+    else:
+        raise ValueError('leftright must be either left or right')
+
+
+    for name in leftrightonlys:
+        if leftright == 'left':
+            print()
+            print('{} found in {} but not in {}'.format(name, dcmp.left, dcmp.right))
+        else:
+            print()
+            print('{} found in {} but not in {}'.format(name, dcmp.right, dcmp.left))
+
+
+    for sub_dcmp in dcmp.subdirs.values():
+        print_leftright_only(sub_dcmp, leftright = leftright)
