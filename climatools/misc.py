@@ -229,3 +229,19 @@ def print_leftright_only(dcmp, leftright = 'left'):
 
     for sub_dcmp in dcmp.subdirs.values():
         print_leftright_only(sub_dcmp, leftright = leftright)
+
+
+
+def print_diff_files(dcmp):
+    '''
+    Prints out all common files that are different between
+    the 2 compared directories of DCMP (filecmp.dircmp)
+    INPUT:
+    dcmp --- filecmp.dircmp object (that compares two directories)
+    '''
+    for name in dcmp.diff_files:
+        print()
+        print('diff_file {} found in {} and {}'.format(name, dcmp.left, dcmp.right))
+        
+    for sub_dcmp in dcmp.subdirs.values():
+        print_diff_files(sub_dcmp)
