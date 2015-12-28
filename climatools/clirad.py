@@ -46,7 +46,7 @@ def midband_wavenumbers(region = 'sw'):
     Returns the wavenumber in the middle of each spectral band
     Units: cm^{-1}
     '''
-    wavebands = wavenumber_bands(region = 'sw')
+    wavebands = wavenumber_bands(region = region)
     midband_numbers = [.5 * sum(limit) for iband, limits in wavebands.items() \
                        for limit in limits]
     return sorted(midband_numbers)
