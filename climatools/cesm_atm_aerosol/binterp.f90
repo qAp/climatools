@@ -20,15 +20,15 @@
    10     ix(ic)=max0(i-1,1)
           ip1=min(ix(ic)+1,im)
           dx=(xtab(ip1)-xtab(ix(ic)))
-          if(abs(dx).gt.1.e-20_r8)then
+          if(abs(dx).gt.1.e-20)then
              t(ic)=(x(ic)-xtab(ix(ic)))/dx
           else
-             t(ic)=0._r8
+             t(ic)=0.
           endif
         end do
       else
         ix(:ncol)=1
-        t(:ncol)=0._r8
+        t(:ncol)=0.
       endif
       if(jm.gt.1)then
         do ic=1,ncol
@@ -38,24 +38,24 @@
    20     jy(ic)=max0(j-1,1)
           jp1=min(jy(ic)+1,jm)
           dy=(ytab(jp1)-ytab(jy(ic)))
-          if(abs(dy).gt.1.e-20_r8)then
+          if(abs(dy).gt.1.e-20)then
              u(ic)=(y(ic)-ytab(jy(ic)))/dy
-             if(u(ic).lt.0._r8.or.u(ic).gt.1._r8)then
+             if(u(ic).lt.0..or.u(ic).gt.1.)then
                 write(iulog,*) 'u,y,jy,ytab,dy=',u(ic),y(ic),jy(ic),ytab(jy(ic)),dy
              endif
           else
-            u(ic)=0._r8
+            u(ic)=0.
           endif
         end do
       else
         jy(:ncol)=1
-        u(:ncol)=0._r8
+        u(:ncol)=0.
       endif
    30 continue
       do ic=1,ncol
          tu(ic)=t(ic)*u(ic)
          tuc(ic)=t(ic)-tu(ic)
-         tcuc(ic)=1._r8-tuc(ic)-u(ic)
+         tcuc(ic)=1.-tuc(ic)-u(ic)
          tcu(ic)=u(ic)-tu(ic)
          jp1=min(jy(ic)+1,jm)
          ip1=min(ix(ic)+1,im)
