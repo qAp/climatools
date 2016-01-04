@@ -3,11 +3,11 @@
 !     bilinear interpolation of table                                                                                 
 !                                                                                                                     
       implicit none
-      integer, parameter :: pcols = 10  
+      integer, parameter :: pcols = 1  
       integer im,jm,km,ncol
-      real(r8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
+      real(kind = 8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
       integer i,ix(pcols),ip1,j,jy(pcols),jp1,k,ic
-      real(r8) x(pcols),dx,t(pcols),y(pcols),dy,u(pcols), &
+      real(kind = 8) x(pcols),dx,t(pcols),y(pcols),dy,u(pcols), &
              tu(pcols),tuc(pcols),tcu(pcols),tcuc(pcols)
 
 
@@ -41,7 +41,7 @@
           if(abs(dy).gt.1.e-20)then
              u(ic)=(y(ic)-ytab(jy(ic)))/dy
              if(u(ic).lt.0..or.u(ic).gt.1.)then
-                write(iulog,*) 'u,y,jy,ytab,dy=',u(ic),y(ic),jy(ic),ytab(jy(ic)),dy
+                write(*,*) 'u,y,jy,ytab,dy=',u(ic),y(ic),jy(ic),ytab(jy(ic)),dy
              endif
           else
             u(ic)=0.

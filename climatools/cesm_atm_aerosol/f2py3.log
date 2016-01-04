@@ -1,0 +1,65 @@
+running build
+running config_cc
+unifing config_cc, config, build_clib, build_ext, build commands --compiler options
+running config_fc
+unifing config_fc, config, build_clib, build_ext, build commands --fcompiler options
+running build_src
+build_src
+building extension "binterp" sources
+f2py options: []
+f2py:> /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.c
+creating /tmp/tmp0gp1yyji/src.linux-x86_64-3.4
+Reading fortran codes...
+	Reading file 'binterp.f90' (format:free)
+Post-processing...
+	Block: binterp
+			Block: binterp
+Post-processing (stage 2)...
+Building modules...
+	Building module "binterp"...
+		Constructing wrapper function "binterp"...
+		  binterp(table,ncol,x,y,xtab,ytab,ix,jy,t,u,out,[km,im,jm])
+	Wrote C/API module "binterp" to file "/tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.c"
+  adding '/tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.c' to sources.
+  adding '/tmp/tmp0gp1yyji/src.linux-x86_64-3.4' to include_dirs.
+copying /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/f2py/src/fortranobject.c -> /tmp/tmp0gp1yyji/src.linux-x86_64-3.4
+copying /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/f2py/src/fortranobject.h -> /tmp/tmp0gp1yyji/src.linux-x86_64-3.4
+build_src: building npy-pkg config files
+running build_ext
+customize UnixCCompiler
+customize UnixCCompiler using build_ext
+customize Gnu95FCompiler
+Found executable /usr/bin/gfortran
+customize Gnu95FCompiler
+customize Gnu95FCompiler using build_ext
+building 'binterp' extension
+compiling C sources
+C compiler: gcc -pthread -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -fPIC
+
+creating /tmp/tmp0gp1yyji/tmp
+creating /tmp/tmp0gp1yyji/tmp/tmp0gp1yyji
+creating /tmp/tmp0gp1yyji/tmp/tmp0gp1yyji/src.linux-x86_64-3.4
+compile options: '-I/tmp/tmp0gp1yyji/src.linux-x86_64-3.4 -I/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include -I/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/include/python3.4m -c'
+gcc: /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.c
+In file included from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/ndarraytypes.h:1781,
+                 from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.h:13,
+                 from /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.c:2:
+/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION"
+gcc: /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.c
+In file included from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/ndarraytypes.h:1781,
+                 from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/ndarrayobject.h:18,
+                 from /nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/arrayobject.h:4,
+                 from /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.h:13,
+                 from /tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.c:19:
+/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include/numpy/npy_1_7_deprecated_api.h:15:2: warning: #warning "Using deprecated NumPy API, disable it by " "#defining NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION"
+/tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.c:113: warning: ‘f2py_size’ defined but not used
+compiling Fortran sources
+Fortran f77 compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -fPIC -O2
+Fortran f90 compiler: /usr/bin/gfortran -Wall -g -fno-second-underscore -fPIC -O2
+Fortran fix compiler: /usr/bin/gfortran -Wall -g -ffixed-form -fno-second-underscore -Wall -g -fno-second-underscore -fPIC -O2
+compile options: '-I/tmp/tmp0gp1yyji/src.linux-x86_64-3.4 -I/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib/python3.4/site-packages/numpy/core/include -I/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/include/python3.4m -c'
+gfortran:f90: binterp.f90
+/usr/bin/gfortran -Wall -g -Wall -g -shared -Wl,-gc-sections -Wl,-s /tmp/tmp0gp1yyji/tmp/tmp0gp1yyji/src.linux-x86_64-3.4/binterpmodule.o /tmp/tmp0gp1yyji/tmp/tmp0gp1yyji/src.linux-x86_64-3.4/fortranobject.o /tmp/tmp0gp1yyji/binterp.o -L/nuwa_cluster/home/jackyu/locally_installed_python_pacakges/anaconda3/lib -lpython3.4m -lgfortran -o ./binterp.cpython-34m.so
+Removing build directory /tmp/tmp0gp1yyji
