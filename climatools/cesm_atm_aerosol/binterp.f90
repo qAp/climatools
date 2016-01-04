@@ -3,6 +3,7 @@
 !     bilinear interpolation of table                                                                                 
 !                                                                                                                     
       implicit none
+      integer, parameter :: pcols = 10  
       integer im,jm,km,ncol
       real(r8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
       integer i,ix(pcols),ip1,j,jy(pcols),jp1,k,ic
