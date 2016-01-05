@@ -1,4 +1,4 @@
- modal_aero_sw(state, pbuf, nnite, idxnite, &
+subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
                          tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
