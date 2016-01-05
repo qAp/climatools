@@ -14,59 +14,59 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
-   real(r8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
-   real(r8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
-   real(r8), intent(out) :: ga(pcols,0:pver,nswbands)     ! asymmetry factor
-   real(r8), intent(out) :: fa(pcols,0:pver,nswbands)     ! forward scattered fraction
+   real(kind = 8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
+   real(kind = 8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
+   real(kind = 8), intent(out) :: ga(pcols,0:pver,nswbands)     ! asymmetry factor
+   real(kind = 8), intent(out) :: fa(pcols,0:pver,nswbands)     ! forward scattered fraction
 
    ! Local variables
    integer :: i, ifld, isw, k, l, m, nc, ns
    integer :: lchnk                    ! chunk id
    integer :: ncol                     ! number of active columns in the chunk
 
-   real(r8), pointer :: dgnumwet(:,:,:)     ! number mode diameter
-   real(r8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
+   real(kind = 8), pointer :: dgnumwet(:,:,:)     ! number mode diameter
+   real(kind = 8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
 
-   real(r8) :: mass(pcols,pver)        ! layer mass
-   real(r8) :: air_density(pcols,pver) ! (kg/m3)
+   real(kind = 8) :: mass(pcols,pver)        ! layer mass
+   real(kind = 8) :: air_density(pcols,pver) ! (kg/m3)
 
-   real(r8),        allocatable :: specdens(:,:) ! species density (kg/m3)
+   real(kind = 8),        allocatable :: specdens(:,:) ! species density (kg/m3)
 
-   real(r8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
-   real(r8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
-   real(r8), pointer :: cheb(:,:,:,:)
+   real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
+   real(kind = 8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
+   real(kind = 8), pointer :: cheb(:,:,:,:)
 
    complex  :: crefin(pcols)   ! complex refractive index
-   real(r8) :: refr(pcols)     ! real part of refractive index
-   real(r8) :: refi(pcols)     ! imaginary part of refractive index
+   real(kind = 8) :: refr(pcols)     ! real part of refractive index
+   real(kind = 8) :: refi(pcols)     ! imaginary part of refractive index
 
-   real(r8) :: vol(pcols)      ! volume concentration of aerosol specie (m3/kg)
-   real(r8) :: dryvol(pcols)   ! volume concentration of aerosol mode (m3/kg)
-   real(r8) :: watervol(pcols) ! volume concentration of water in each mode (m3/kg)
-   real(r8) :: wetvol(pcols)   ! volume concentration of wet mode (m3/kg)
+   real(kind = 8) :: vol(pcols)      ! volume concentration of aerosol specie (m3/kg)
+   real(kind = 8) :: dryvol(pcols)   ! volume concentration of aerosol mode (m3/kg)
+   real(kind = 8) :: watervol(pcols) ! volume concentration of water in each mode (m3/kg)
+   real(kind = 8) :: wetvol(pcols)   ! volume concentration of wet mode (m3/kg)
 
    integer  :: itab(pcols), jtab(pcols)
-   real(r8) :: ttab(pcols), utab(pcols)
-   real(r8) :: cext(pcols,ncoef), cabs(pcols,ncoef), casm(pcols,ncoef)
-   real(r8) :: pext(pcols)     ! parameterized specific extinction (m2/kg)
-   real(r8) :: specpext(pcols) ! specific extinction (m2/kg)
-   real(r8) :: dopaer(pcols)   ! aerosol optical depth in layer
-   real(r8) :: pabs(pcols)     ! parameterized specific absorption (m2/kg)
-   real(r8) :: pasm(pcols)     ! parameterized asymmetry factor
-   real(r8) :: palb(pcols)     ! parameterized single scattering albedo
+   real(kind = 8) :: ttab(pcols), utab(pcols)
+   real(kind = 8) :: cext(pcols,ncoef), cabs(pcols,ncoef), casm(pcols,ncoef)
+   real(kind = 8) :: pext(pcols)     ! parameterized specific extinction (m2/kg)
+   real(kind = 8) :: specpext(pcols) ! specific extinction (m2/kg)
+   real(kind = 8) :: dopaer(pcols)   ! aerosol optical depth in layer
+   real(kind = 8) :: pabs(pcols)     ! parameterized specific absorption (m2/kg)
+   real(kind = 8) :: pasm(pcols)     ! parameterized asymmetry factor
+   real(kind = 8) :: palb(pcols)     ! parameterized single scattering albedo
 
    ! Diagnostics output for visible band only
-   real(r8) :: dustvol(pcols)              ! volume concentration of dust in aerosol mode (m3/kg)
-   real(r8), pointer :: aodmode(:,:)
-   real(r8), pointer :: dustaodmode(:,:)   ! dust aod in aerosol mode
-   real(r8), pointer :: burden(:,:)
-   real(r8), pointer :: colext(:,:)
+   real(kind = 8) :: dustvol(pcols)              ! volume concentration of dust in aerosol mode (m3/kg)
+   real(kind = 8), pointer :: aodmode(:,:)
+   real(kind = 8), pointer :: dustaodmode(:,:)   ! dust aod in aerosol mode
+   real(kind = 8), pointer :: burden(:,:)
+   real(kind = 8), pointer :: colext(:,:)
 
 
    ! debug output
    integer, parameter :: nerrmax_dopaer=1000
    integer  :: nerr_dopaer = 0
-   real(r8) :: volf            ! volume fraction of insoluble aerosol
+   real(kind = 8) :: volf            ! volume fraction of insoluble aerosol
    character(len=*), parameter :: subname = 'modal_aero_sw'
    !----------------------------------------------------------------------------
 
@@ -98,16 +98,16 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    call modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
 
    ! initialize output variables
-   tauxar(:ncol,:,:) = 0._r8
-   wa(:ncol,:,:)     = 0._r8
-   ga(:ncol,:,:)     = 0._r8
-   fa(:ncol,:,:)     = 0._r8
+   tauxar(:ncol,:,:) = 0.
+   wa(:ncol,:,:)     = 0.
+   ga(:ncol,:,:)     = 0.
+   fa(:ncol,:,:)     = 0.
 
    ! zero'th layer does not contain aerosol
-   tauxar(1:ncol,0,:)  = 0._r8
-   wa(1:ncol,0,:)      = 0.925_r8
-   ga(1:ncol,0,:)      = 0.850_r8
-   fa(1:ncol,0,:)      = 0.7225_r8
+   tauxar(1:ncol,0,:)  = 0.
+   wa(1:ncol,0,:)      = 0.925
+   ga(1:ncol,0,:)      = 0.850
+   fa(1:ncol,0,:)      = 0.7225
 
    mass(:ncol,:)        = state%pdeldry(:ncol,:)*rga
    air_density(:ncol,:) = state%pmid(:ncol,:)/(rair*state%t(:ncol,:))
@@ -136,9 +136,9 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
          do k = 1, pver
 
             ! form bulk refractive index
-            crefin(:ncol) = 0._r8
-            dryvol(:ncol) = 0._r8
-            dustvol(:ncol) = 0._r8
+            crefin(:ncol) = 0.
+            dryvol(:ncol) = 0.
+            dustvol(:ncol) = 0.
 
             ! aerosol species loop
             do l = 1, nspec_amode(m)
@@ -154,19 +154,19 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
             do i = 1, ncol
                watervol(i) = qaerwat(i,k,m)/rhoh2o
                wetvol(i) = watervol(i) + dryvol(i)
-               if (watervol(i) < 0._r8) then
+               if (watervol(i) < 0.) then
                   if (abs(watervol(i)) .gt. 1.e-1*wetvol(i)) then
                      write(iulog,'(a,4e10.2,a)') 'watervol,wetvol=', &
                         watervol(i), wetvol(i), ' in '//subname
                      !  call endrun()
                   end if
-                  watervol(i) = 0._r8
+                  watervol(i) = 0.
                   wetvol(i) = dryvol(i)
                end if
 
                ! volume mixing
                crefin(i) = crefin(i) + watervol(i)*crefwsw(isw)
-               crefin(i) = crefin(i)/max(wetvol(i),1.e-60_r8)
+               crefin(i) = crefin(i)/max(wetvol(i),1.e-60)
                refr(i)   = real(crefin(i))
                refi(i)   = abs(aimag(crefin(i)))
             end do
@@ -192,30 +192,30 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
             do i=1,ncol
 
                if (logradsurf(i,k,m) .le. xrmax) then
-                  pext(i) = 0.5_r8*cext(i,1)
+                  pext(i) = 0.5*cext(i,1)
                   do nc = 2, ncoef
                      pext(i) = pext(i) + cheb(nc,m,i,k)*cext(i,nc)
                   enddo
                   pext(i) = exp(pext(i))
                else
-                  pext(i) = 1.5_r8/(radsurf(i,k,m)*rhoh2o) ! geometric optics
+                  pext(i) = 1.5/(radsurf(i,k,m)*rhoh2o) ! geometric optics
                endif
 
                ! convert from m2/kg water to m2/kg aerosol
                specpext(i) = pext(i)
                pext(i) = pext(i)*wetvol(i)*rhoh2o
-               pabs(i) = 0.5_r8*cabs(i,1)
-               pasm(i) = 0.5_r8*casm(i,1)
+               pabs(i) = 0.5*cabs(i,1)
+               pasm(i) = 0.5*casm(i,1)
                do nc = 2, ncoef
                   pabs(i) = pabs(i) + cheb(nc,m,i,k)*cabs(i,nc)
                   pasm(i) = pasm(i) + cheb(nc,m,i,k)*casm(i,nc)
                enddo
                pabs(i) = pabs(i)*wetvol(i)*rhoh2o
-               pabs(i) = max(0._r8,pabs(i))
+               pabs(i) = max(0.,pabs(i))
                pabs(i) = min(pext(i),pabs(i))
 
-               palb(i) = 1._r8-pabs(i)/max(pext(i),1.e-40_r8)
-               palb(i) = 1._r8-pabs(i)/max(pext(i),1.e-40_r8)
+               palb(i) = 1.-pabs(i)/max(pext(i),1.e-40)
+               palb(i) = 1.-pabs(i)/max(pext(i),1.e-40)
 
                dopaer(i) = pext(i)*mass(i,k)
             end do
