@@ -114,15 +114,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    mass(:ncol,:)        = state%pdeldry(:ncol,:)*rga
    air_density(:ncol,:) = state%pmid(:ncol,:)/(rair*state%t(:ncol,:))
 
-   ! diagnostics for visible band
-   extinct(1:ncol,:)     = 0.0_r8
-   absorb(1:ncol,:)      = 0.0_r8
-   aodvis(1:ncol)        = 0.0_r8
-   aodabs(1:ncol)        = 0.0_r8
-   ssavis(1:ncol)        = 0.0_r8
-   aodmode(1:ncol,:)     = 0.0_r8
-   dustaodmode(1:ncol,:) = 0.0_r8
-   burden(:ncol,:ntot_amode) = 0._r8
 
    ! access the mixing ratio and properties of the modal species
    allocate( &
@@ -142,7 +133,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    do m = 1, ntot_amode
 
       do isw = 1, nswbands
-         savaervis = isw .eq. idx_sw_diag
 
 
          do k = 1, pver
@@ -159,21 +149,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
                   dryvol(i)   = dryvol(i) + vol(i)
                   crefin(i)   = crefin(i) + vol(i)*specrefindex(l,m)%val(isw)
                end do
-
-               ! compute some diagnostics for visible band only
-               if (savaervis) then
-
-                  do i = 1, ncol
-                     burden(i,m) = burden(i,m) + specmmr(l,m)%val(i,k)*mass(i,k)
-                  end do
-
-                  if (trim(xname_spectype(l,m)) == 'dust') then
-                     do i = 1, ncol
-                        dustvol(i) = specmmr(l,m)%val(i,k)/specdens(l,m)
-                     end do
-                  end if
-
-               end if
 
             end do ! species loop
 
@@ -247,22 +222,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
                dopaer(i) = pext(i)*mass(i,k)
             end do
 
-            ! Save aerosol optical depth at longest visible wavelength
-            ! sum over layers
-            if (savaervis) then
-               ! aerosol extinction (/m)
-               do i = 1, ncol
-                  extinct(i,k) = extinct(i,k) + dopaer(i)*air_density(i,k)/mass(i,k)
-                  absorb(i,k)  = absorb(i,k) + pabs(i)*air_density(i,k)
-                  aodvis(i)    = aodvis(i) + dopaer(i)
-                  aodabs(i)    = aodabs(i) + pabs(i)*mass(i,k)
-                  aodmode(i,m) = aodmode(i,m) + dopaer(i)
-                  if (wetvol(i) > 1.e-40_r8) then
-                     dustaodmode(i,m) = dustaodmode(i,m) + dopaer(i)*dustvol(i)/wetvol(i)
-                  endif
-                  ssavis(i) = ssavis(i) + dopaer(i)*palb(i)
-               end do
-            endif
+
 
             do i = 1, ncol
 
@@ -305,56 +265,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
    end do ! ntot_amode
 
-   ! Output visible band diagnostics
-   do i = 1, ncol
-      if (aodvis(i) > 1.e-10) then
-         ssavis(i) = ssavis(i)/aodvis(i)
-      else
-         ssavis(i) = 0.925_r8
-      endif
-      do m = 1, ntot_amode
-         colext(i,m) = 0.001*aodmode(i,m)/burden(i,m)
-         ! if (aodmode(i,m) .gt. 1.) write(iulog,*) 'm,burden,tau,ext=', m, &
-         !    burden(i,m), aodmode(i,m), colext(i,m)
-      end do
-   end do
 
-   do i = 1, nnite
-      extinct(idxnite(i),:) = fillvalue
-      absorb(idxnite(i),:)  = fillvalue
-      aodvis(idxnite(i))    = fillvalue
-      aodabs(idxnite(i))    = fillvalue
-      aodmode(idxnite(i),:) = fillvalue
-      dustaodmode(idxnite(i),:) = fillvalue
-      burden(idxnite(i),:)  = fillvalue
-      ssavis(idxnite(i))    = fillvalue
-   end do
-
-   call outfld('EXTINCT',  extinct,          pcols, lchnk)
-   call outfld('ABSORB',   absorb,           pcols, lchnk)
-   call outfld('AODVIS',   aodvis,           pcols, lchnk)
-   call outfld('AODABS',   aodabs,           pcols, lchnk)
-   call outfld('AODMODE1', aodmode(:,1),     pcols, lchnk)
-   call outfld('AODMODE2', aodmode(:,2),     pcols, lchnk)
-   call outfld('AODMODE3', aodmode(:,3),     pcols, lchnk)
-   call outfld('AODDUST1', dustaodmode(:,1), pcols, lchnk)
-   call outfld('AODDUST2', dustaodmode(:,2), pcols, lchnk)
-   call outfld('AODDUST3', dustaodmode(:,3), pcols, lchnk)
-   call outfld('BURDEN1',  burden(:,1),      pcols, lchnk)
-   call outfld('BURDEN2',  burden(:,2),      pcols, lchnk)
-   call outfld('BURDEN3',  burden(:,3),      pcols, lchnk)
-   call outfld('SSAVIS',   ssavis,           pcols, lchnk)
-
-   if (cam_chempkg_is('trop_mam7')) then
-      call outfld('AODMODE4', aodmode(:,4), pcols, lchnk)
-      call outfld('AODMODE5', aodmode(:,5), pcols, lchnk)
-      call outfld('AODMODE6', aodmode(:,6), pcols, lchnk)
-      call outfld('AODMODE7', aodmode(:,7), pcols, lchnk)
-      call outfld('BURDEN4',  burden(:,4),  pcols, lchnk)
-      call outfld('BURDEN5',  burden(:,5),  pcols, lchnk)
-      call outfld('BURDEN6',  burden(:,6),  pcols, lchnk)
-      call outfld('BURDEN7',  burden(:,7),  pcols, lchnk)
-   end if
 
    ! deallocate local storage
    deallocate( &
