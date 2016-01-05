@@ -3,8 +3,14 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
    ! calculates aerosol sw radiative properties
 
-   type(physics_state), intent(in) :: state          ! state variables
-   type(pbuf_fld),      intent(in) :: pbuf(:)        ! physics buffer
+  integer, parameter :: pcols = 1
+  integer, parameter :: pver = 30
+  integer, parameter :: ncoef = 5
+  integer, parameter :: prefr = 7
+  integer, parameter :: prefi = 10
+  integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
+  
+
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -24,9 +30,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(r8) :: mass(pcols,pver)        ! layer mass
    real(r8) :: air_density(pcols,pver) ! (kg/m3)
 
-   type(r_ptr2d_t), allocatable :: specmmr(:,:) ! species mass mixing ratio
    real(r8),        allocatable :: specdens(:,:) ! species density (kg/m3)
-   type(c_ptr1d_t), allocatable :: specrefindex(:,:) ! species refractive index
 
    real(r8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
    real(r8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
@@ -52,18 +56,12 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(r8) :: palb(pcols)     ! parameterized single scattering albedo
 
    ! Diagnostics output for visible band only
-   real(r8) :: extinct(pcols,pver)
-   real(r8) :: absorb(pcols,pver)
-   real(r8) :: aodvis(pcols)               ! extinction optical depth
-   real(r8) :: aodabs(pcols)               ! absorption optical depth
-   real(r8) :: ssavis(pcols)
    real(r8) :: dustvol(pcols)              ! volume concentration of dust in aerosol mode (m3/kg)
    real(r8), pointer :: aodmode(:,:)
    real(r8), pointer :: dustaodmode(:,:)   ! dust aod in aerosol mode
    real(r8), pointer :: burden(:,:)
    real(r8), pointer :: colext(:,:)
 
-   logical :: savaervis ! true if visible wavelength (0.55 micron)
 
    ! debug output
    integer, parameter :: nerrmax_dopaer=1000
