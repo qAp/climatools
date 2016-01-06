@@ -11,7 +11,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
   integer, parameter :: prefi = 10
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
   
-
+   real(kind = 8), intent(in) :: mass(pcols,pver)        ! layer mass
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -28,7 +28,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(kind = 8), pointer :: dgnumwet(:,:,:)     ! number mode diameter
    real(kind = 8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
 
-   real(kind = 8) :: mass(pcols,pver)        ! layer mass
+
    real(kind = 8) :: air_density(pcols,pver) ! (kg/m3)
 
    real(kind = 8),        allocatable :: specdens(:,:) ! species density (kg/m3)
@@ -109,7 +109,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    ga(1:ncol,0,:)      = 0.850
    fa(1:ncol,0,:)      = 0.7225
 
-   mass(:ncol,:)        = state%pdeldry(:ncol,:)*rga
    air_density(:ncol,:) = state%pmid(:ncol,:)/(rair*state%t(:ncol,:))
 
 
