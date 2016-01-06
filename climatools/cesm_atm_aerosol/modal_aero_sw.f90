@@ -35,12 +35,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    ! Local variables
    integer :: i, ifld, isw, k, l, m, nc, ns
    integer :: lchnk                    ! chunk id
-   integer :: ncol                     ! number of active columns in the chunk
-
-
-
-
-
 
 
    real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
