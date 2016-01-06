@@ -34,7 +34,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
    ! Local variables
    integer :: i, ifld, isw, k, l, m, nc, ns
-   integer :: lchnk                    ! chunk id
+   integer, parameter :: lchnk  = 1                  ! chunk id
 
 
    real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
@@ -75,7 +75,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    character(len=*), parameter :: subname = 'modal_aero_sw'
    !----------------------------------------------------------------------------
 
-   lchnk = state%lchnk
+
 
    ! allocate local storage
    allocate( &
