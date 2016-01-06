@@ -4,6 +4,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    ! calculates aerosol sw radiative properties
 
   integer, parameter :: pcols = 1
+  integer, parameter :: ncol = 1
   integer, parameter :: pver = 30
   integer, parameter :: ncoef = 5
   integer, parameter :: prefr = 7
@@ -71,7 +72,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    !----------------------------------------------------------------------------
 
    lchnk = state%lchnk
-   ncol  = state%ncol
 
    ! allocate local storage
    allocate( &
