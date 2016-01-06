@@ -19,6 +19,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    type(r_ptr2d_t), allocatable, intent(in) :: specmmr(:,:) ! species mass mixing ratio
    real(kind = 8), intent(in) :: dgnumwet(:,:,:)            ! number mode diameter
    real(kind = 8), intent(in) :: qaerwat(:,:,:)             ! aerosol water (g/g)
+   real(kind = 8), intent(in) :: specdens(:,:) ! species density (kg/m3)
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -36,7 +37,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
 
 
-   real(kind = 8),        allocatable :: specdens(:,:) ! species density (kg/m3)
+
 
    real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
    real(kind = 8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
@@ -116,7 +117,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
    do m = 1, ntot_amode
       do l = 1, nspec_amode(m)
-         call rad_cnst_get_aer_props(0, spec_idx(l,m), density_aer=specdens(l,m), &
+         call rad_cnst_get_aer_props(0, spec_idx(l,m), &
                                      refindex_aer_sw=specrefindex(l,m)%val)
       end do
    end do
