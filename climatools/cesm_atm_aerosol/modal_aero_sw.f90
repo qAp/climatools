@@ -18,6 +18,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(kind = 8), intent(in) :: mass(pcols,pver)        ! layer mass
    type(r_ptr2d_t), allocatable, intent(in) :: specmmr(:,:) ! species mass mixing ratio
    real(kind = 8), intent(in) :: dgnumwet(:,:,:)            ! number mode diameter
+   real(kind = 8), intent(in) :: qaerwat(:,:,:)             ! aerosol water (g/g)
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -32,7 +33,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    integer :: ncol                     ! number of active columns in the chunk
 
 
-   real(kind = 8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
+
 
 
    real(kind = 8),        allocatable :: specdens(:,:) ! species density (kg/m3)
@@ -88,12 +89,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
       colext(pcols,ntot_amode))
 
 
-   ifld = pbuf_get_fld_idx('QAERWAT')
-   if (associated(pbuf(ifld)%fld_ptr)) then
-      qaerwat => pbuf(ifld)%fld_ptr(1,:,:,lchnk,:)
-   else
-      call endrun(subname//': pbuf for QAERWAT not allocated')
-   end if
 
    ! calc size parameter for all columns
    call modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
