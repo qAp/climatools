@@ -17,6 +17,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
   
    real(kind = 8), intent(in) :: mass(pcols,pver)        ! layer mass
    type(r_ptr2d_t), allocatable, intent(in) :: specmmr(:,:) ! species mass mixing ratio
+   real(kind = 8), intent(in) :: dgnumwet(:,:,:)            ! number mode diameter
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -30,7 +31,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    integer :: lchnk                    ! chunk id
    integer :: ncol                     ! number of active columns in the chunk
 
-   real(kind = 8), pointer :: dgnumwet(:,:,:)     ! number mode diameter
+
    real(kind = 8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
 
 
@@ -86,9 +87,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
       burden(pcols,ntot_amode),          &
       colext(pcols,ntot_amode))
 
-   ! pointers to physics buffer
-   ifld = pbuf_get_fld_idx('DGNUMWET')
-   dgnumwet => pbuf(ifld)%fld_ptr(1,:,:,lchnk,:)
 
    ifld = pbuf_get_fld_idx('QAERWAT')
    if (associated(pbuf(ifld)%fld_ptr)) then
