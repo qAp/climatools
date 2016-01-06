@@ -10,8 +10,13 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
   integer, parameter :: prefr = 7
   integer, parameter :: prefi = 10
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
+
+  type r_ptr2d_t
+     real(kind = 8), pointer :: val(:,:)
+  end type r_ptr2d_t
   
    real(kind = 8), intent(in) :: mass(pcols,pver)        ! layer mass
+   type(r_ptr2d_t), allocatable, intent(in) :: specmmr(:,:) ! species mass mixing ratio
    integer,             intent(in) :: nnite          ! number of night columns
    integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
@@ -118,7 +123,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
    do m = 1, ntot_amode
       do l = 1, nspec_amode(m)
-         call rad_cnst_get_aer_mmr(0, spec_idx(l,m),  state, pbuf, specmmr(l,m)%val)
          call rad_cnst_get_aer_props(0, spec_idx(l,m), density_aer=specdens(l,m), &
                                      refindex_aer_sw=specrefindex(l,m)%val)
       end do
