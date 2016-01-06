@@ -29,8 +29,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(kind = 8), pointer :: qaerwat(:,:,:)      ! aerosol water (g/g)
 
 
-   real(kind = 8) :: air_density(pcols,pver) ! (kg/m3)
-
    real(kind = 8),        allocatable :: specdens(:,:) ! species density (kg/m3)
 
    real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
@@ -109,7 +107,7 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    ga(1:ncol,0,:)      = 0.850
    fa(1:ncol,0,:)      = 0.7225
 
-   air_density(:ncol,:) = state%pmid(:ncol,:)/(rair*state%t(:ncol,:))
+
 
 
    ! access the mixing ratio and properties of the modal species
