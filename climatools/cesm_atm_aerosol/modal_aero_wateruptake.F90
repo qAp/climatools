@@ -14,6 +14,11 @@
    implicit none
    private
    save
+
+   real (kind = 8), parameter :: pi = 3.14159265
+   real (kind = 8), parameter :: rhoh2o = 1000.
+
+
                                                                                                                              
 !  !PUBLIC MEMBER FUNCTIONS:
    public modal_aero_wateruptake_sub
