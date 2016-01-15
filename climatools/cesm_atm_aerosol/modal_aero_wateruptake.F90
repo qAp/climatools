@@ -80,21 +80,21 @@
       logical,  intent(inout)::dotend(pcnst)
                                ! identifies species for which tendencies are computed
 
-      real(r8), intent(in)  :: deltat             ! time step (s)
-      real(r8), intent(in)  :: h2ommr(pcols,pver) ! layer specific humidity
-      real(r8), intent(in)  :: t(pcols,pver)      ! layer temperatures (K)
-      real(r8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
-      real(r8), intent(in)  :: pdel(pcols,pver)   ! layer pressure thickness (Pa)
-      real(r8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
-      real(r8), intent(in)  :: raer(pcols,pver,pcnst)
+      real(kind = 8), intent(in)  :: deltat             ! time step (s)
+      real(kind = 8), intent(in)  :: h2ommr(pcols,pver) ! layer specific humidity
+      real(kind = 8), intent(in)  :: t(pcols,pver)      ! layer temperatures (K)
+      real(kind = 8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
+      real(kind = 8), intent(in)  :: pdel(pcols,pver)   ! layer pressure thickness (Pa)
+      real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
+      real(kind = 8), intent(in)  :: raer(pcols,pver,pcnst)
                                ! aerosol species MRs (kg/kg and #/kg)
-      real(r8), intent(inout)::raertend(pcols,pver,pcnst)
+      real(kind = 8), intent(inout)::raertend(pcols,pver,pcnst)
                                ! aerosol MR tendencies (kg/kg/s)
                                ! only defined for aerosol water
-      real(r8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
-      real(r8), intent(in)    :: dgncur_a(pcols,pver,ntot_amode)
-      real(r8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
-      real(r8), intent(out)   :: wetdens(pcols,pver,ntot_amode)
+      real(kind = 8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
+      real(kind = 8), intent(in)    :: dgncur_a(pcols,pver,ntot_amode)
+      real(kind = 8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
+      real(kind = 8), intent(out)   :: wetdens(pcols,pver,ntot_amode)
 
 ! following are local for now -- wait and see
 !     real(r8), intent(out) :: maer(pcols,pver,ntot_amode)
@@ -116,30 +116,30 @@
 !     integer lwater ! pointer for water on aerosol
       integer  lat(pcols), lon(pcols)      ! lat,lon indices
 
-      real(r8) density_water                   ! density of water (kg/m3)
-      real(r8) drydens(ntot_amode)   ! dry particle density  (kg/m^3)
-      real(r8) drymass(ntot_amode)   ! single-particle-mean dry mass  (kg)
-      real(r8) dryrad(pcols,pver,ntot_amode) ! dry volume mean radius of aerosol (m)
-      real(r8) dryvol(ntot_amode)    ! single-particle-mean dry volume (m3)
-      real(r8) dryvolmr(ntot_amode)  ! volume MR for aerosol mode (m3/kg)
-      real(r8) duma, dumb
-      real(r8) es(pcols,pver)        ! saturation vapor pressure (Pa)
-      real(r8) hygro(ntot_amode)     ! volume-weighted mean hygroscopicity (--)
-      real(r8) hystfac(ntot_amode)   ! working variable for hysteresis
-      real(r8) pi43
-      real(r8) qs(pcols,pver)        ! saturation specific humidity
-      real(r8) qwater                ! aerosol water MR
-      real(r8) rh(pcols,pver)        ! relative humidity (0-1)
-      real(r8) third
-      real(r8) v2ncur_a(pcols,pver,ntot_amode)
-      real(r8) wtrvol(ntot_amode)    ! single-particle-mean water volume in wet aerosol (m3)
-      real(r8) wetvol(ntot_amode)    ! single-particle-mean wet volume (m3)
+      real(kind = 8) density_water                   ! density of water (kg/m3)
+      real(kind = 8) drydens(ntot_amode)   ! dry particle density  (kg/m^3)
+      real(kind = 8) drymass(ntot_amode)   ! single-particle-mean dry mass  (kg)
+      real(kind = 8) dryrad(pcols,pver,ntot_amode) ! dry volume mean radius of aerosol (m)
+      real(kind = 8) dryvol(ntot_amode)    ! single-particle-mean dry volume (m3)
+      real(kind = 8) dryvolmr(ntot_amode)  ! volume MR for aerosol mode (m3/kg)
+      real(kind = 8) duma, dumb
+      real(kind = 8) es(pcols,pver)        ! saturation vapor pressure (Pa)
+      real(kind = 8) hygro(ntot_amode)     ! volume-weighted mean hygroscopicity (--)
+      real(kind = 8) hystfac(ntot_amode)   ! working variable for hysteresis
+      real(kind = 8) pi43
+      real(kind = 8) qs(pcols,pver)        ! saturation specific humidity
+      real(kind = 8) qwater                ! aerosol water MR
+      real(kind = 8) rh(pcols,pver)        ! relative humidity (0-1)
+      real(kind = 8) third
+      real(kind = 8) v2ncur_a(pcols,pver,ntot_amode)
+      real(kind = 8) wtrvol(ntot_amode)    ! single-particle-mean water volume in wet aerosol (m3)
+      real(kind = 8) wetvol(ntot_amode)    ! single-particle-mean wet volume (m3)
 
-      real(r8) :: maer(pcols,pver,ntot_amode)
+      real(kind = 8) :: maer(pcols,pver,ntot_amode)
                               ! aerosol wet mass MR (including water) (kg/kg-air)
-      real(r8) :: naer(pcols,pver,ntot_amode)
+      real(kind = 8) :: naer(pcols,pver,ntot_amode)
                               ! aerosol number MR (bounded!) (#/kg-air)
-      real(r8) :: wetrad(pcols,pver,ntot_amode)  
+      real(kind = 8) :: wetrad(pcols,pver,ntot_amode)  
                               ! wet radius of aerosol (m)
 
       character(len=3) :: trnum       ! used to hold mode number (as characters)
@@ -337,37 +337,37 @@
 ! arguments
       integer :: im         ! number of grid points to be processed
       integer :: imx        ! dimensioned number of grid points
-      real(r8) :: rdry_in(imx)    ! aerosol dry radius (m)
-      real(r8) :: hygro(imx)      ! aerosol volume-mean hygroscopicity (--)
-      real(r8) :: s(imx)          ! relative humidity (1 = saturated)
-      real(r8) :: rwet_out(imx)   ! aerosol wet radius (m)
+      real(kind = 8) :: rdry_in(imx)    ! aerosol dry radius (m)
+      real(kind = 8) :: hygro(imx)      ! aerosol volume-mean hygroscopicity (--)
+      real(kind = 8) :: s(imx)          ! relative humidity (1 = saturated)
+      real(kind = 8) :: rwet_out(imx)   ! aerosol wet radius (m)
 
 ! local variables
       integer, parameter :: imax=200
       integer :: i, n, nsol
 
-      real(r8) :: a, b
-      real(r8) :: p40(imax),p41(imax),p42(imax),p43(imax) ! coefficients of polynomial
-      real(r8) :: p30(imax),p31(imax),p32(imax) ! coefficients of polynomial
-      real(r8) :: p
-      real(r8) :: r3, r4
-      real(r8) :: r(imx)        ! wet radius (microns)
-      real(r8) :: rdry(imax)    ! radius of dry particle (microns)
-      real(r8) :: ss            ! relative humidity (1 = saturated)
-      real(r8) :: slog(imax)    ! log relative humidity
-      real(r8) :: vol(imax)     ! total volume of particle (microns**3)
-      real(r8) :: xi, xr
+      real(kind = 8) :: a, b
+      real(kind = 8) :: p40(imax),p41(imax),p42(imax),p43(imax) ! coefficients of polynomial
+      real(kind = 8) :: p30(imax),p31(imax),p32(imax) ! coefficients of polynomial
+      real(kind = 8) :: p
+      real(kind = 8) :: r3, r4
+      real(kind = 8) :: r(imx)        ! wet radius (microns)
+      real(kind = 8) :: rdry(imax)    ! radius of dry particle (microns)
+      real(kind = 8) :: ss            ! relative humidity (1 = saturated)
+      real(kind = 8) :: slog(imax)    ! log relative humidity
+      real(kind = 8) :: vol(imax)     ! total volume of particle (microns**3)
+      real(kind = 8) :: xi, xr
 
-      complex(r8) :: cx4(4,imax),cx3(3,imax)
+      complex(kind = 8) :: cx4(4,imax),cx3(3,imax)
 
-      real(r8), parameter :: eps = 1.e-4
-      real(r8), parameter :: mw = 18.
-      real(r8), parameter :: pi = 3.14159
-      real(r8), parameter :: rhow = 1.
-      real(r8), parameter :: surften = 76.
-      real(r8), parameter :: tair = 273.
-      real(r8), parameter :: third = 1./3.
-      real(r8), parameter :: ugascon = 8.3e7
+      real(kind = 8), parameter :: eps = 1.e-4
+      real(kind = 8), parameter :: mw = 18.
+      real(kind = 8), parameter :: pi = 3.14159
+      real(kind = 8), parameter :: rhow = 1.
+      real(kind = 8), parameter :: surften = 76.
+      real(kind = 8), parameter :: tair = 273.
+      real(kind = 8), parameter :: third = 1./3.
+      real(kind = 8), parameter :: ugascon = 8.3e7
 
 
 !     effect of organics on surface tension is neglected
@@ -490,12 +490,12 @@
 !
       integer, parameter :: imx=200
       integer :: im
-      real(r8) :: p0(imx), p1(imx), p2(imx)
-      complex(r8) :: cx(3,imx)
+      real(kind = 8) :: p0(imx), p1(imx), p2(imx)
+      complex(kind = 8) :: cx(3,imx)
 
       integer :: i
-      real(r8) :: eps, q(imx), r(imx), sqrt3, third
-      complex(r8) :: ci, cq, crad(imx), cw, cwsq, cy(imx), cz(imx)
+      real(kind = 8) :: eps, q(imx), r(imx), sqrt3, third
+      complex(kind = 8) :: ci, cq, crad(imx), cw, cwsq, cy(imx), cz(imx)
 
       save eps
       data eps/1.e-20/
@@ -541,12 +541,12 @@
 !
       integer, parameter :: imx=200
       integer :: im
-      real(r8) :: p0(imx), p1(imx), p2(imx), p3(imx)
-      complex(r8) :: cx(4,imx)
+      real(kind = 8) :: p0(imx), p1(imx), p2(imx), p3(imx)
+      complex(kind = 8) :: cx(4,imx)
 
       integer :: i
-      real(r8) :: third, q(imx), r(imx)
-      complex(r8) :: cb(imx), cb0(imx), cb1(imx),   &
+      real(kind = 8) :: third, q(imx), r(imx)
+      complex(kind = 8) :: cb(imx), cb0(imx), cb1(imx),   &
                      crad(imx), cy(imx), czero
 
 
