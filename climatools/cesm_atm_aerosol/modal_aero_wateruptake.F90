@@ -16,7 +16,7 @@
    save
 
    real (kind = 8), parameter :: pi = 3.14159265
-   real (kind = 8), parameter :: rhoh2o = 1000.
+   real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
 
 
                                                                                                                              
@@ -174,7 +174,7 @@
 !           dryrad(i,k,m) = (1.0/v2ncur_a(i,k,m)/pi43)**third
 !    works in all cases
       do m=1,ntot_amode
-           hystfac(m) = 1.0 / max( 1.0e-5_r8,   &
+           hystfac(m) = 1.0 / max( 1.0e-5,   &
                               (rhdeliques_amode(m)-rhcrystal_amode(m)) )
       enddo
 
@@ -191,12 +191,12 @@
          else
             rh(i,k) = h2ommr(i,k)*mwh2o/(mwdry*qs(i,k))
          end if
-         rh(i,k) = max(rh(i,k),0.0_r8)
-         rh(i,k) = min(rh(i,k),0.98_r8)
-         if (cldn(i,k) .lt. 1.0_r8) then
-           rh(i,k) = (rh(i,k) - cldn(i,k)) / (1.0_r8 - cldn(i,k))  ! clear portion
+         rh(i,k) = max(rh(i,k),0.0)
+         rh(i,k) = min(rh(i,k),0.98)
+         if (cldn(i,k) .lt. 1.0) then
+           rh(i,k) = (rh(i,k) - cldn(i,k)) / (1.0 - cldn(i,k))  ! clear portion
          end if
-         rh(i,k) = max(rh(i,k),0.0_r8)
+         rh(i,k) = max(rh(i,k),0.0)
            
 
 !     compute dryvolmr, maer, naer for each mode
@@ -218,7 +218,7 @@
                dryvolmr(m) = dryvolmr(m) + dumb
                hygro(m) = hygro(m) + dumb*spechygro(ltype)
             enddo
-            if (dryvolmr(m) > 1.0e-30_r8) then
+            if (dryvolmr(m) > 1.0e-30) then
                hygro(m) = hygro(m)/dryvolmr(m)
             else
                hygro(m) = spechygro( lspectype_amode(1,m) )
@@ -259,7 +259,7 @@
             wetvol(m) = pi43*wetrad(i,k,m)*wetrad(i,k,m)*wetrad(i,k,m)
             wetvol(m) = max(wetvol(m),dryvol(m))
             wtrvol(m) = wetvol(m) - dryvol(m)
-            wtrvol(m) = max( wtrvol(m), 0.0_r8 )
+            wtrvol(m) = max( wtrvol(m), 0.0 )
 
 !     apply simple treatment of deliquesence/crystallization hysteresis
 !     for rhcrystal < rh < rhdeliques, aerosol water is a fraction of
@@ -267,11 +267,11 @@
             if (rh(i,k) < rhcrystal_amode(m)) then
                wetrad(i,k,m) = dryrad(i,k,m)
                wetvol(m) = dryvol(m)
-               wtrvol(m) = 0.0_r8
+               wtrvol(m) = 0.0
             else if (rh(i,k) < rhdeliques_amode(m)) then
                wtrvol(m) = wtrvol(m)*hystfac(m)   &
                                     *(rh(i,k) - rhcrystal_amode(m))
-               wtrvol(m) = max( wtrvol(m), 0.0_r8 )
+               wtrvol(m) = max( wtrvol(m), 0.0 )
                wetvol(m) = dryvol(m) + wtrvol(m)
                wetrad(i,k,m) = (wetvol(m)/pi43)**third
             end if
@@ -280,10 +280,10 @@
 !     [ either (kg-h2o/kg-air/s) or (mol-h2o/mol-air/s) ]
 !           lwater = lwaterptr_amode(m) - loffset
             if ( aero_mmr_flag ) then
-               duma = 1.0_r8
+               duma = 1.0
             else
 #if (defined MIMIC_CAM3)
-               duma = mwdry/18.0_r8
+               duma = mwdry/18.0
 #else
                duma = mwdry/mwh2o
 #endif
@@ -300,7 +300,7 @@
             qaerwat(i,k,m) = qwater
 
 !     compute aerosol wet density (kg/m3)
-            if (wetvol(m) > 1.0e-30_r8) then
+            if (wetvol(m) > 1.0e-30) then
                wetdens(i,k,m) = (drymass(m) + density_water*wtrvol(m))/wetvol(m)
             else
                wetdens(i,k,m) = specdens_amode( lspectype_amode(1,m) )
@@ -385,7 +385,7 @@
 
 !          quartic
            ss=min(s(i),1.-eps)
-           ss=max(ss,1.e-10_r8)
+           ss=max(ss,1.e-10)
            slog(i)=log(ss)
            p43(i)=-a/slog(i)
            p42(i)=0.
@@ -479,7 +479,7 @@
 
 ! bound and convert from microns to m
       do i=1,im
-         r(i) = min(r(i),30._r8) ! upper bound based on 1 day lifetime
+         r(i) = min(r(i),30.) ! upper bound based on 1 day lifetime
          rwet_out(i) = r(i)*1.e-6
       end do
 
