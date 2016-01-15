@@ -9,9 +9,7 @@
 ! !INTERFACE:
    module modal_aero_wateruptake
 
-! !USES:
-   use shr_kind_mod, only : r8 => shr_kind_r8
-   use cam_logfile,  only: iulog
+
 
    implicit none
    private
@@ -65,20 +63,7 @@
 ! Author:  S. Ghan
 !
 !-----------------------------------------------------------------------
-      use modal_aero_data
 
-      use mo_constants,  only: pi
-      use pmgrid,        only: plat, plon
-      use ppgrid,        only: begchunk, endchunk, pcols, pver
-      use physconst,     only: cpair, epsilo, gravit, mwdry, mwh2o,   &
-                               rair, rga, rhoh2o, rh2o, latvap
-      use constituents,  only: pcnst, qmin
-      use wv_saturation, only: aqsat, qsat_water
-      use phys_grid,     only: get_lat_all_p, get_lon_all_p
-
-      use abortutils,    only : endrun
-      use cam_history,   only : outfld
-      use spmd_utils,    only : masterproc
 
       implicit none
 
