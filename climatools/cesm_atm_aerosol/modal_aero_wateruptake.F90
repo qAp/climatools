@@ -412,12 +412,12 @@
               nsol=n
            end do  
            if(nsol.eq.0)then
-              write(iulog,*)   &
+              write(*,*)   &
                'ccm kohlerc - no real(r8) solution found (quartic)'
-              write(iulog,*)'roots =', (cx4(n,i),n=1,4)
-              write(iulog,*)'p0-p3 =', p40(i), p41(i), p42(i), p43(i)
-              write(iulog,*)'rh=',s(i)
-              write(iulog,*)'setting radius to dry radius=',rdry(i)
+              write(*,*)'roots =', (cx4(n,i),n=1,4)
+              write(*,*)'p0-p3 =', p40(i), p41(i), p42(i), p43(i)
+              write(*,*)'rh=',s(i)
+              write(*,*)'setting radius to dry radius=',rdry(i)
               r(i)=rdry(i)
 !             stop
            endif
@@ -446,12 +446,12 @@
                  nsol=n
               end do  
               if(nsol.eq.0)then
-                 write(iulog,*)   &
+                 write(*,*)   &
                   'ccm kohlerc - no real(r8) solution found (cubic)'
-                 write(iulog,*)'roots =', (cx3(n,i),n=1,3)
-                 write(iulog,*)'p0-p2 =', p30(i), p31(i), p32(i)
-                 write(iulog,*)'rh=',s(i)
-                 write(iulog,*)'setting radius to dry radius=',rdry(i)
+                 write(*,*)'roots =', (cx3(n,i),n=1,3)
+                 write(*,*)'p0-p2 =', p30(i), p31(i), p32(i)
+                 write(*,*)'rh=',s(i)
+                 write(*,*)'setting radius to dry radius=',rdry(i)
                  r(i)=rdry(i)
 !                stop
               endif
