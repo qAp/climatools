@@ -204,12 +204,7 @@
             dryvolmr(m)=0.
             hygro(m)=0.
             do l = 1, nspec_amode(m)
-               ltype = lspectype_amode(l,m)
-               if ( aero_mmr_flag ) then
-                  duma = raer(i,k,l,m)
-               else
-                  duma = raer(i,k,lmass)*(specmw_amode(ltype)/mwdry)
-               end if
+               duma = raer(i,k,l,m)
                maer(i,k,m) = maer(i,k,m) + duma
                dumb = duma/specdens_amode(ltype)
                dryvolmr(m) = dryvolmr(m) + dumb
