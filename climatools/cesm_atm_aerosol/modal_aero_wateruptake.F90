@@ -15,6 +15,10 @@
    private
    save
 
+   integer, parameter :: pcols = 1
+   integer, parameter :: pver  = 30
+
+
    real (kind = 8), parameter :: pi = 3.14159265
    real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
 
