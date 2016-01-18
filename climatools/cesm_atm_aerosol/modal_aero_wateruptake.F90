@@ -58,7 +58,7 @@
                  iwaterup_flag, loffset,                    &
                  aero_mmr_flag, h2o_mmr_flag,               &
                  deltat, h2ommr, t, pmid, pdel, cldn,       &
-                 raer, raertend, dotend, qaerwat,           &
+                 raer, raertend, qaerwat,           &
                  dgncur_a, dgncur_awet, wetdens             &
 #ifdef OBSRH
                  , obsrh                                    &
@@ -90,8 +90,6 @@
       logical,  intent(in)  :: aero_mmr_flag      ! if .true.,  aerosol q are kg/kg-air
                                                   ! if .false., aerosol q are mol/mol-air
       logical,  intent(in)  :: h2o_mmr_flag       ! if .true.,  h2ommr is kg/kg-air
-      logical,  intent(inout)::dotend(pcnst)
-                               ! identifies species for which tendencies are computed
 
       real(kind = 8), intent(in)  :: deltat             ! time step (s)
       real(kind = 8), intent(in)  :: h2ommr(pcols,pver) ! layer specific humidity
@@ -165,11 +163,11 @@
 ! currently, this is one of several routines called from aerosol_wet_intr
 ! so DO NOT re-initialize dotend=.false. and raertend=0.0
 !     dotend(:) = .false.
-      do m=1,ntot_amode
+!      do m=1,ntot_amode
 !        lwater = lwaterptr_amode(m) - loffset
 !        dotend(lwater) = .true.
 !        raertend(1:ncol,:,lwater) = 0.0
-      end do
+!      end do
 
 
       third=1./3.
