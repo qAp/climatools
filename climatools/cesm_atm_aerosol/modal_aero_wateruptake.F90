@@ -62,7 +62,7 @@
                  iwaterup_flag, loffset,                    &
                  aero_mmr_flag, h2o_mmr_flag,               &
                  deltat, h2ommr, t, pmid, pdel, cldn,       &
-                 raer, raertend, qaerwat,           &
+                 raer, qaerwat,           &
                  dgncur_a, dgncur_awet, wetdens             &
 #ifdef OBSRH
                  , obsrh                                    &
@@ -103,9 +103,6 @@
       real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
       real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,maxval(nspec_amode))
                                ! aerosol species MRs (kg/kg and #/kg)
-      real(kind = 8), intent(inout)::raertend(pcols,pver,pcnst)
-                               ! aerosol MR tendencies (kg/kg/s)
-                               ! only defined for aerosol water
       real(kind = 8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
       real(kind = 8), intent(in)    :: dgncur_a(pcols,pver,ntot_amode)
       real(kind = 8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
