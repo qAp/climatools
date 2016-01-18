@@ -18,6 +18,10 @@
    real (kind = 8), parameter :: pi = 3.14159265
    real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
 
+   integer, parameter :: ntot_amode = 3   ! 3 modes in MAM3
+   real(kind = 8), parameter :: rhdeliques_amode(ntot_amode) = (/ 0.800, 0.800, 0.800 /)
+   real(kind = 8), parameter ::     rhcrystal_amode(ntot_amode)  = (/ 0.350, 0.350, 0.350 /)
+
 
                                                                                                                              
 !  !PUBLIC MEMBER FUNCTIONS:
