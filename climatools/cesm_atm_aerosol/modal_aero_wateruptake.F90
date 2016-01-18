@@ -188,13 +188,6 @@
       do k=1,pver
       do i=1,ncol
 
-         qs(i,k)=qsat_water(t(i,k),pmid(i,k))
-
-         if ( h2o_mmr_flag ) then
-            rh(i,k) = h2ommr(i,k)/qs(i,k)
-         else
-            rh(i,k) = h2ommr(i,k)*mwh2o/(mwdry*qs(i,k))
-         end if
          rh(i,k) = max(rh(i,k),0.0)
          rh(i,k) = min(rh(i,k),0.98)
          if (cldn(i,k) .lt. 1.0) then
