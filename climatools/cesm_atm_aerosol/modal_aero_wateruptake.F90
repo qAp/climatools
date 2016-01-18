@@ -274,15 +274,7 @@
 !     compute aer. water tendency = (new_water - old_water)/deltat
 !     [ either (kg-h2o/kg-air/s) or (mol-h2o/mol-air/s) ]
 !           lwater = lwaterptr_amode(m) - loffset
-            if ( aero_mmr_flag ) then
-               duma = 1.0
-            else
-#if (defined MIMIC_CAM3)
-               duma = mwdry/18.0
-#else
-               duma = mwdry/mwh2o
-#endif
-            end if
+            duma = 1.0
             qwater = density_water*naer(i,k,m)*wtrvol(m)*duma
 
 !     old_water (after modal_aero_calcsize) is 
