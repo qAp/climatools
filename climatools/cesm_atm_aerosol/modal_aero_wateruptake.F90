@@ -22,6 +22,8 @@
    integer, parameter :: nspec_amode(ntot_amode) = (/ 6, 3, 3 /) ! number of species in each mode in MAM3
    real(kind = 8), parameter :: rhdeliques_amode(ntot_amode) = (/ 0.800, 0.800, 0.800 /)
    real(kind = 8), parameter ::     rhcrystal_amode(ntot_amode)  = (/ 0.350, 0.350, 0.350 /)
+   real(kind = 8), parameter :: sigmag_amode(ntot_amode) = (/ 1.800, 1.600, 1.800 /)
+   real(kind = 8), parameter :: alnsg_amode(ntot_amode) = log(sigmag_amode)
 
 
                                                                                                                              
