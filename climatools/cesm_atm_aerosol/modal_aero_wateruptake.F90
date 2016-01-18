@@ -96,7 +96,7 @@
       real(kind = 8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
       real(kind = 8), intent(in)  :: pdel(pcols,pver)   ! layer pressure thickness (Pa)
       real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
-      real(kind = 8), intent(in)  :: raer(pcols,pver,pcnst)
+      real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,maxval(nspec_amode))
                                ! aerosol species MRs (kg/kg and #/kg)
       real(kind = 8), intent(inout)::raertend(pcols,pver,pcnst)
                                ! aerosol MR tendencies (kg/kg/s)
@@ -204,16 +204,16 @@
             dryvolmr(m)=0.
             hygro(m)=0.
             do l = 1, nspec_amode(m)
-               duma = raer(i,k,l,m)
+               duma = raer(i,k,m,l)
                maer(i,k,m) = maer(i,k,m) + duma
-               dumb = duma/specdens_amode(ltype)
+               dumb = duma/specdens_amode(m,l)
                dryvolmr(m) = dryvolmr(m) + dumb
-               hygro(m) = hygro(m) + dumb*spechygro(ltype)
+               hygro(m) = hygro(m) + dumb*spechygro(m,l)
             enddo
             if (dryvolmr(m) > 1.0e-30) then
                hygro(m) = hygro(m)/dryvolmr(m)
             else
-               hygro(m) = spechygro( lspectype_amode(1,m) )
+               hygro(m) = spechygro(m,1)
             end if
 
 !     naer = aerosol number (#/kg)
