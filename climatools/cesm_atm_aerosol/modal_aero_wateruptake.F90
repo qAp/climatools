@@ -290,7 +290,7 @@
             if (wetvol(m) > 1.0e-30) then
                wetdens(i,k,m) = (drymass(m) + density_water*wtrvol(m))/wetvol(m)
             else
-               wetdens(i,k,m) = specdens_amode( lspectype_amode(1,m) )
+               wetdens(i,k,m) = specdens_amode(m,1)
             end if
 
          enddo
