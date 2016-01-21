@@ -2,7 +2,7 @@
                                                                                                                              
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
-     lchnk, ncol, nstep,                        &
+     ncol, nstep,                        &
      iwaterup_flag, loffset,                    &
      h2o_mmr_flag,               &
      deltat, h2ommr, t, pmid, pdel, cldn,       &
@@ -46,7 +46,6 @@ subroutine modal_aero_wateruptake_sub(                &
   
   
   
-  integer,  intent(in)  :: lchnk              ! chunk index
   integer,  intent(in)  :: ncol               ! number of columns
   integer,  intent(in)  :: nstep              ! time step
   integer,  intent(in)  :: iwaterup_flag       
