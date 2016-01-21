@@ -3,7 +3,7 @@
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
      ncol,                         &
-     deltat, h2ommr, t, pmid, pdel, cldn,       &
+     h2ommr, t, pmid, pdel, cldn,       &
      raer, qaerwat,           &
      dgncur_a, dgncur_awet, wetdens             )
   
@@ -47,7 +47,6 @@ subroutine modal_aero_wateruptake_sub(                &
   integer,  intent(in)  :: ncol               ! number of columns
   
   ! if .false., aerosol q are mol/mol-air
-  real(kind = 8), intent(in)  :: deltat             ! time step (s)
   real(kind = 8), intent(in)  :: h2ommr(pcols,pver) ! layer specific humidity
   real(kind = 8), intent(in)  :: t(pcols,pver)      ! layer temperatures (K)
   real(kind = 8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
