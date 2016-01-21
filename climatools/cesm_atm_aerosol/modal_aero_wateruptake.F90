@@ -61,10 +61,6 @@ subroutine modal_aero_wateruptake_sub(                &
   integer i,k,m
   integer icol_diag
   integer l ! species index
-  integer lmass ! pointer for aerosol mass
-  integer ltype ! pointer for aerosol type
-  !     integer lwater ! pointer for water on aerosol
-  integer  lat(pcols), lon(pcols)      ! lat,lon indices
   
   real(kind = 8) density_water                   ! density of water (kg/m3)
   real(kind = 8) drydens(ntot_amode)   ! dry particle density  (kg/m^3)
@@ -73,11 +69,9 @@ subroutine modal_aero_wateruptake_sub(                &
   real(kind = 8) dryvol(ntot_amode)    ! single-particle-mean dry volume (m3)
   real(kind = 8) dryvolmr(ntot_amode)  ! volume MR for aerosol mode (m3/kg)
   real(kind = 8) duma, dumb
-  real(kind = 8) es(pcols,pver)        ! saturation vapor pressure (Pa)
   real(kind = 8) hygro(ntot_amode)     ! volume-weighted mean hygroscopicity (--)
   real(kind = 8) hystfac(ntot_amode)   ! working variable for hysteresis
   real(kind = 8) pi43
-  real(kind = 8) qs(pcols,pver)        ! saturation specific humidity
   real(kind = 8) qwater                ! aerosol water MR
   real(kind = 8) rh(pcols,pver)        ! relative humidity (0-1)
   real(kind = 8) third
@@ -93,11 +87,6 @@ subroutine modal_aero_wateruptake_sub(                &
   ! wet radius of aerosol (m)
 
   real(kind = 8) :: dgncur_a(pcols,pver,ntot_amode)
-  
-  character(len=3) :: trnum       ! used to hold mode number (as characters)
-  
-  
-  
   
   !-----------------------------------------------------------------------
   
