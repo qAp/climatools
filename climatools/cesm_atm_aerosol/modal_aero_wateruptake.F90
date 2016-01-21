@@ -3,7 +3,7 @@
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
      ncol,                         &
-     cldn,       &
+     cldn, relative_humidity,      &
      raer, qaerwat,           &
      dgncur_awet, wetdens             )
   
@@ -47,7 +47,7 @@ subroutine modal_aero_wateruptake_sub(                &
   integer,  intent(in)  :: ncol               ! number of columns
   real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
   real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,max_nspec_amode)   ! aerosol species MRs (kg/kg and #/kg)
-  real(kind = 8), intent(in) :: rh(pcols,pver)        ! relative humidity (0-1)
+  real(kind = 8), intent(in) :: relative_humidity(pcols,pver)        ! relative humidity (0-1)
 
   real(kind = 8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
   real(kind = 8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
@@ -71,7 +71,7 @@ subroutine modal_aero_wateruptake_sub(                &
   real(kind = 8) hystfac(ntot_amode)   ! working variable for hysteresis
   real(kind = 8) pi43
   real(kind = 8) qwater                ! aerosol water MR
-
+  real(kind = 8) :: rh(pcols,pver)        ! relative humidity (0-1)
   real(kind = 8) third
   real(kind = 8) v2ncur_a(pcols,pver,ntot_amode)
   real(kind = 8) wtrvol(ntot_amode)    ! single-particle-mean water volume in wet aerosol (m3)
@@ -89,7 +89,7 @@ subroutine modal_aero_wateruptake_sub(                &
   !-----------------------------------------------------------------------
   
   
-  
+  rh(:, :) = relative_humidity(:, :)  
   
   alnsg_amode = log(sigmag_amode)
   third=1./3.
