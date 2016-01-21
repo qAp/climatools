@@ -1,47 +1,3 @@
-! modal_aero_wateruptake.F90
-
-
-!----------------------------------------------------------------------
-!BOP
-!
-! !MODULE: modal_aero_wateruptake --- modal aerosol mode merging (renaming)
-!
-! !INTERFACE:
-
-
-
-
-
-!   private
-!   save
-
-
-   
-  
-
-                                                                                                                             
-!  !PUBLIC MEMBER FUNCTIONS:
-!   public modal_aero_wateruptake_sub
-                                                                                                                             
-! !PUBLIC DATA MEMBERS:
-!  currently none
-
-                                                                                                                             
-! !DESCRIPTION: This module implements ...
-!
-! !REVISION HISTORY:
-!
-!   RCE 07.04.13:  Adapted from MIRAGE2 code
-!
-!EOP
-!----------------------------------------------------------------------
-!BOC
-! list private module data here
-!EOC
-!----------------------------------------------------------------------
-                                                                                                                             
-                                                                                                                             
-
                                                                                                                              
                                                                                                                              
 !----------------------------------------------------------------------
@@ -52,18 +8,7 @@
                  deltat, h2ommr, t, pmid, pdel, cldn,       &
                  raer, qaerwat,           &
                  dgncur_a, dgncur_awet, wetdens             )
-! following are local for now -- wait and see
-!                maer, naer, wetrad, density                )
 
-!-----------------------------------------------------------------------
-!
-! Purpose: Compute aerosol wet radius
-!
-! Method:  Kohler theory
-!
-! Author:  S. Ghan
-!
-!-----------------------------------------------------------------------
 
 
       implicit none
@@ -125,17 +70,6 @@
       real(kind = 8), intent(out)   :: wetdens(pcols,pver,ntot_amode)
 
 
-
-! following are local for now -- wait and see
-!     real(r8), intent(out) :: maer(pcols,pver,ntot_amode)
-!                              ! aerosol wet mass MR (including water) (kg/kg-air)
-!     real(r8), intent(out) :: naer(pcols,pver,ntot_amode)
-!                              ! aerosol number MR (bounded!) (#/kg-air)
-!     real(r8), intent(out) :: wetrad(pcols,pver,ntot_amode)  
-!                              ! wet radius of aerosol (m)
-!     real(r8), intent(out) :: density(pcols,pver,ntot_amode)
-!                              ! wet mean density of aerosol (kg/m3)
-
 !     local variables
 
       integer i,k,m
@@ -181,26 +115,13 @@
 
 
 
-! set the dotend's
-! currently, this is one of several routines called from aerosol_wet_intr
-! so DO NOT re-initialize dotend=.false. and raertend=0.0
-!     dotend(:) = .false.
-!      do m=1,ntot_amode
-!        lwater = lwaterptr_amode(m) - loffset
-!        dotend(lwater) = .true.
-!        raertend(1:ncol,:,lwater) = 0.0
-!      end do
 
       alnsg_amode = log(sigmag_amode)
       third=1./3.
       pi43 = pi*4.0/3.0
       density_water = rhoh2o   ! is (kg/m3)
 
-! compute size-related factors
-!    when numptr_amode(m)=0, earlier code set dryrad = prescribed volume.
-!    this is no longer needed because
-!           dryrad(i,k,m) = (1.0/v2ncur_a(i,k,m)/pi43)**third
-!    works in all cases
+
       do m=1,ntot_amode
            hystfac(m) = 1.0 / max( 1.0e-5,   &
                               (rhdeliques_amode(m)-rhcrystal_amode(m)) )
@@ -208,7 +129,7 @@
 
 ! main loops over i, k
 
-!     call aqsat( t, pmid, es, qs, pcols, ncol, pver, 1, pver )
+
       do k=1,pver
       do i=1,ncol
 
