@@ -7,39 +7,15 @@
 ! !MODULE: modal_aero_wateruptake --- modal aerosol mode merging (renaming)
 !
 ! !INTERFACE:
-   module modal_aero_wateruptake
 
 
 
-   implicit none
+
+
 !   private
 !   save
 
-   integer, parameter :: pcols = 1
-   integer, parameter :: pver  = 30
 
-
-   real (kind = 8), parameter :: pi = 3.14159265 
-   real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
-
-   integer, parameter :: ntot_amode = 3   ! 3 modes in MAM3
-   integer, parameter :: nspec_amode(ntot_amode) = (/ 6, 3, 3 /) ! number of species in each mode in MAM3
-   integer, parameter :: max_nspec_amode = 6 ! maximum number of species in a mode
-   real(kind = 8), parameter :: rhdeliques_amode(ntot_amode) = (/ 0.800, 0.800, 0.800 /) ! from modal_aero_data.F90
-   real(kind = 8), parameter :: rhcrystal_amode(ntot_amode)  = (/ 0.350, 0.350, 0.350 /) ! from modal_aero_data.F90
-   real(kind = 8), parameter :: sigmag_amode(ntot_amode) = (/ 1.800, 1.600, 1.800 /) ! from modal_aero_data.F90
-   real(kind = 8), parameter :: alnsg_amode(ntot_amode) = log(sigmag_amode) 
-
-   ! material density of aerosol (from physprop)
-   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: & 
-        specdens_amode = (/ (/ 1770.0, 1000.0, 1000.0, 1700.0, 2600.0, 1900.0 /), &
-                            (/ 1770.0, 1000.0, 1900.0, -9999, -9999, -9999 /), &
-                            (/ 2600.0, 1900.0, 1770.0, -9999, -9999, -9999 /) /)
-   ! hygroscopicity of aerosol (from physprop)
-   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: &
-        spechygro = (/ (/ 0.507, 0.10000000010000001, 0.14, 1.000000013351432e-10, 0.068, 1.16 /), &
-                       (/ 0.507, 0.14, 1.16, -9999, -9999, -9999 /), &
-                       (/ 0.068, 1.16, 0.507, -9999, -9999, -9999 /) /)
    
   
 
@@ -65,21 +41,17 @@
 !----------------------------------------------------------------------
                                                                                                                              
                                                                                                                              
-   contains
+
                                                                                                                              
                                                                                                                              
 !----------------------------------------------------------------------
       subroutine modal_aero_wateruptake_sub(                &
                  lchnk, ncol, nstep,                        &
                  iwaterup_flag, loffset,                    &
-                 aero_mmr_flag, h2o_mmr_flag,               &
+                 h2o_mmr_flag,               &
                  deltat, h2ommr, t, pmid, pdel, cldn,       &
                  raer, qaerwat,           &
-                 dgncur_a, dgncur_awet, wetdens             &
-#ifdef OBSRH
-                 , obsrh                                    &
-#endif
-                                                            )
+                 dgncur_a, dgncur_awet, wetdens             )
 ! following are local for now -- wait and see
 !                maer, naer, wetrad, density                )
 
@@ -96,6 +68,39 @@
 
       implicit none
 
+
+   integer, parameter :: pcols = 1
+   integer, parameter :: pver  = 30
+
+
+   real (kind = 8), parameter :: pi = 3.14159265 
+   real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
+
+   integer, parameter :: ntot_amode = 3   ! 3 modes in MAM3
+   integer, parameter :: nspec_amode(ntot_amode) = (/ 6, 3, 3 /) ! number of species in each mode in MAM3
+   integer, parameter :: max_nspec_amode = 6 ! maximum number of species in a mode
+   real(kind = 8), parameter :: rhdeliques_amode(ntot_amode) = (/ 0.800, 0.800, 0.800 /) ! from modal_aero_data.F90
+   real(kind = 8), parameter :: rhcrystal_amode(ntot_amode)  = (/ 0.350, 0.350, 0.350 /) ! from modal_aero_data.F90
+   real(kind = 8), parameter :: sigmag_amode(ntot_amode) = (/ 1.800, 1.600, 1.800 /) ! from modal_aero_data.F90
+
+
+   ! material density of aerosol (from physprop)
+   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: & 
+        specdens_amode = reshape((/ 1770.0, 1000.0, 1000.0, 1700.0, 2600.0, 1900.0, &
+                                    1770.0, 1000.0, 1900.0, -9999., -9999., -9999., &
+                                    2600.0, 1900.0, 1770.0, -9999., -9999., -9999. /), &
+                                    (/ ntot_amode, max_nspec_amode /))
+   ! hygroscopicity of aerosol (from physprop)
+   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: &
+        spechygro = reshape((/ 0.507, 0.10000000010000001, 0.14, 1.000000013351432e-10, 0.068, 1.16, &
+                               0.507, 0.14, 1.16, -9999., -9999., -9999., &
+                               0.068, 1.16, 0.507, -9999., -9999., -9999. /), &
+                               (/ ntot_amode, max_nspec_amode /))
+
+   real(kind = 8) :: alnsg_amode(ntot_amode)
+
+
+
       integer,  intent(in)  :: lchnk              ! chunk index
       integer,  intent(in)  :: ncol               ! number of columns
       integer,  intent(in)  :: nstep              ! time step
@@ -103,7 +108,6 @@
                                ! identifies call location from typhysbc (1,2)
       integer,  intent(in)  :: loffset            ! offset applied to modal aero "pointers"
 
-      logical,  intent(in)  :: aero_mmr_flag      ! if .true.,  aerosol q are kg/kg-air
                                                   ! if .false., aerosol q are mol/mol-air
       logical,  intent(in)  :: h2o_mmr_flag       ! if .true.,  h2ommr is kg/kg-air
 
@@ -113,12 +117,14 @@
       real(kind = 8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
       real(kind = 8), intent(in)  :: pdel(pcols,pver)   ! layer pressure thickness (Pa)
       real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
-      real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,maxval(nspec_amode))
+      real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,max_nspec_amode)
                                ! aerosol species MRs (kg/kg and #/kg)
       real(kind = 8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
       real(kind = 8), intent(in)    :: dgncur_a(pcols,pver,ntot_amode)
       real(kind = 8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
       real(kind = 8), intent(out)   :: wetdens(pcols,pver,ntot_amode)
+
+
 
 ! following are local for now -- wait and see
 !     real(r8), intent(out) :: maer(pcols,pver,ntot_amode)
@@ -168,6 +174,9 @@
 
       character(len=3) :: trnum       ! used to hold mode number (as characters)
 
+
+
+
 !-----------------------------------------------------------------------
 
 
@@ -182,7 +191,7 @@
 !        raertend(1:ncol,:,lwater) = 0.0
 !      end do
 
-
+      alnsg_amode = log(sigmag_amode)
       third=1./3.
       pi43 = pi*4.0/3.0
       density_water = rhoh2o   ! is (kg/m3)
@@ -599,6 +608,6 @@
 
 !----------------------------------------------------------------------
 
-   end module modal_aero_wateruptake
+
 
 
