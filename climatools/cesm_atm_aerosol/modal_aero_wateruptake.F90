@@ -320,15 +320,6 @@
       end do   ! "k=1,pver"
 
 
-! output to history
-      do m = 1, ntot_amode
-         write( trnum, '(i3.3)' ) m
-         call outfld( 'wat_a'//trnum(3:3),  qaerwat(:,:,m),     pcols, lchnk)
-! note - eventually we should change these from "dgnd_a0N" to "dgnd_aN"
-         call outfld( 'dgnd_a'//trnum(2:3), dgncur_a(:,:,m),    pcols, lchnk)
-         call outfld( 'dgnw_a'//trnum(2:3), dgncur_awet(:,:,m), pcols, lchnk)
-      end do
-
 
       return
       end subroutine modal_aero_wateruptake_sub
