@@ -5,7 +5,7 @@ subroutine modal_aero_wateruptake_sub(                &
      ncol,                         &
      cldn,       &
      raer, qaerwat,           &
-     dgncur_a, dgncur_awet, wetdens             )
+     dgncur_awet, wetdens             )
   
   
   
@@ -25,7 +25,7 @@ subroutine modal_aero_wateruptake_sub(                &
   real(kind = 8), parameter :: rhdeliques_amode(ntot_amode) = (/ 0.800, 0.800, 0.800 /) ! from modal_aero_data.F90
   real(kind = 8), parameter :: rhcrystal_amode(ntot_amode)  = (/ 0.350, 0.350, 0.350 /) ! from modal_aero_data.F90
   real(kind = 8), parameter :: sigmag_amode(ntot_amode) = (/ 1.800, 1.600, 1.800 /) ! from modal_aero_data.F90
-  
+  real(kind = 8), parameter :: dgnum_amode(ntot_amode)   = (/ 0.1100e-6, 0.0260e-6, 2.000e-6 /)  
   
   ! material density of aerosol (from physprop)
   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: & 
@@ -51,7 +51,7 @@ subroutine modal_aero_wateruptake_sub(                &
   real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,max_nspec_amode)
   ! aerosol species MRs (kg/kg and #/kg)
   real(kind = 8), intent(out)   :: qaerwat(pcols,pver,ntot_amode)
-  real(kind = 8), intent(in)    :: dgncur_a(pcols,pver,ntot_amode)
+
   real(kind = 8), intent(out)   :: dgncur_awet(pcols,pver,ntot_amode)
   real(kind = 8), intent(out)   :: wetdens(pcols,pver,ntot_amode)
   
@@ -91,6 +91,8 @@ subroutine modal_aero_wateruptake_sub(                &
   ! aerosol number MR (bounded!) (#/kg-air)
   real(kind = 8) :: wetrad(pcols,pver,ntot_amode)  
   ! wet radius of aerosol (m)
+
+  real(kind = 8) :: dgncur_a(pcols,pver,ntot_amode)
   
   character(len=3) :: trnum       ! used to hold mode number (as characters)
   
@@ -108,6 +110,14 @@ subroutine modal_aero_wateruptake_sub(                &
   density_water = rhoh2o   ! is (kg/m3)
   
   
+  do i = 1, pcols
+     do k = 1, pver
+        dgncur_a(i, k, :) = dgnum_amode(:)
+     end do
+  end do
+  
+
+
   do m=1,ntot_amode
      hystfac(m) = 1.0 / max( 1.0e-5,   &
           (rhdeliques_amode(m)-rhcrystal_amode(m)) )
