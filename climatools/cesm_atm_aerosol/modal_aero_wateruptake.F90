@@ -3,7 +3,6 @@
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
      ncol,                         &
-     loffset,                    &
      h2o_mmr_flag,               &
      deltat, h2ommr, t, pmid, pdel, cldn,       &
      raer, qaerwat,           &
@@ -47,8 +46,6 @@ subroutine modal_aero_wateruptake_sub(                &
   
   
   integer,  intent(in)  :: ncol               ! number of columns
-  ! identifies call location from typhysbc (1,2)
-  integer,  intent(in)  :: loffset            ! offset applied to modal aero "pointers"
   
   ! if .false., aerosol q are mol/mol-air
   logical,  intent(in)  :: h2o_mmr_flag       ! if .true.,  h2ommr is kg/kg-air
