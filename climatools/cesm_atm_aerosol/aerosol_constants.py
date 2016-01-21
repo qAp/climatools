@@ -71,5 +71,17 @@ def get_physprop(mode=1, species=1, property='density'):
 
 
 if __name__ == '__main__':
-    da = get_physprop(mode=1, species=6, property='density')
-    print(da)
+    print('Aeosol density')
+    for mode, speciess in MAM3_SPECIES.items():
+        print('mode {:f}'.format(mode))
+        print([float(get_physprop(mode=mode, species=species, property='density').values)
+               for species in sorted(speciess.keys())])
+
+    print()
+
+    print('Aeosol hygroscopicity')
+    for mode, speciess in MAM3_SPECIES.items():
+        print('mode {}'.format(mode))
+        print([float(get_physprop(mode=mode, species=species, property='hygroscopicity').values)
+               for species in sorted(speciess.keys())])
+
