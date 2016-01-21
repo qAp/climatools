@@ -3,7 +3,7 @@
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
      ncol,                         &
-     pmid, pdel, cldn,       &
+     pdel, cldn,       &
      raer, qaerwat,           &
      dgncur_a, dgncur_awet, wetdens             )
   
@@ -47,7 +47,6 @@ subroutine modal_aero_wateruptake_sub(                &
   integer,  intent(in)  :: ncol               ! number of columns
   
   ! if .false., aerosol q are mol/mol-air
-  real(kind = 8), intent(in)  :: pmid(pcols,pver)   ! layer pressure (Pa)
   real(kind = 8), intent(in)  :: pdel(pcols,pver)   ! layer pressure thickness (Pa)
   real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
   real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,max_nspec_amode)
