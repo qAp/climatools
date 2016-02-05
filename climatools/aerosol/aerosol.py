@@ -13,7 +13,7 @@ import climatools.aerosol.aerosol_constants as aeroconst
 
 
 
-def get_raer(ds, lon=0, lat=0, time=0):
+def get_raer_column(ds, lon=0, lat=0, time=0):
     '''
     Returns mass mixing ratio of aerosol species in MAM3,
     in a numpy array of the shape required by modal_aero_wateruptake_sub().
@@ -56,7 +56,7 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
     try:
         relative_humidity = ds['RELHUM'].isel(**args_isel)
         cloud_fraction = ds['CLOUD'].isel(**args_isel)
-        species_mmr = get_raer(ds, **args_isel)
+        species_mmr = get_raer_column(ds, **args_isel)
     
         relative_humidity = relative_humidity.values.reshape((pcols, pver))
         cloud_fraction = cloud_fraction.values.reshape((pcols, pver))
