@@ -2,7 +2,7 @@
                                                                                                                              
 !----------------------------------------------------------------------
 subroutine modal_aero_wateruptake_sub(                &
-     ncol,                         &
+     pcols,                         &
      cldn, relative_humidity,      &
      raer, qaerwat,           &
      dgncur_awet, wetdens             )
@@ -12,9 +12,7 @@ subroutine modal_aero_wateruptake_sub(                &
   implicit none
   
   
-  integer, parameter :: pcols = 1
   integer, parameter :: pver  = 30
-  
   
   real (kind = 8), parameter :: pi = 3.14159265 
   real (kind = 8), parameter :: rhoh2o = 1000.  ! density of water = 1000 kg/m3
@@ -44,7 +42,7 @@ subroutine modal_aero_wateruptake_sub(                &
   
   
   
-  integer,  intent(in)  :: ncol               ! number of columns
+  integer,  intent(in)  :: pcols               ! number of columns
   real(kind = 8), intent(in)  :: cldn(pcols,pver)   ! layer cloud fraction (0-1)
   real(kind = 8), intent(in)  :: raer(pcols,pver,ntot_amode,max_nspec_amode)   ! aerosol species MRs (kg/kg and #/kg)
   real(kind = 8), intent(in) :: relative_humidity(pcols,pver)        ! relative humidity (0-1)
@@ -114,7 +112,7 @@ subroutine modal_aero_wateruptake_sub(                &
 
   
   do k=1,pver
-     do i=1,ncol
+     do i=1,pcols
         
         rh(i,k) = max(rh(i,k),0.0)
         rh(i,k) = min(rh(i,k),0.98)
@@ -220,7 +218,7 @@ subroutine modal_aero_wateruptake_sub(                &
         enddo
         
         
-     end do   ! "i=1,ncol"
+     end do   ! "i=1,pcols"
   end do   ! "k=1,pver"
   
   
