@@ -3,7 +3,7 @@ import sys
 
 import numpy as np
 import pandas as pd
-import xray
+import xarray
 
 import climatools.aerosol.f2py3_modal_aero_wateruptake as aerowateruptake
 import climatools.aerosol.aerosol_constants as aeroconst
@@ -37,12 +37,12 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
     by calling the modal_aero_waterupatke subroutine from
     the chemistry module of CAM.
     INPUT:
-    ds --- CAM history in xray.Dataset
+    ds --- CAM history in xarray.Dataset
     itime --- time index
     ilon --- longitude index
     ilat --- latitude index
     OUTPUT:
-    ds --- CAM history in xray.Dataset with the following new fields:
+    ds --- CAM history in xarray.Dataset with the following new fields:
            1. QAERWAT (time, lon, lat, lev, mode)
            2. DGNCUR_AWET (time, lon, lat, lev, mode)
            3. WETDENS (time, lon, lat, lev, mode)
@@ -89,7 +89,7 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
                 # initialise data variables QAERWAT, DGNCUR_AWET and WETDENS
                 ds.update({name: (required_dims, np.zeros(required_shape))})
 
-#            ds[name][dict(**args_isel)] = xray.DataArray(\
+#            ds[name][dict(**args_isel)] = xarray.DataArray(\
 #                data[0,:,:],
 #                dims = ['lev', 'mode'],
 #                coords = [ds.coords['lev'], ds.coords['mode']])
@@ -103,7 +103,7 @@ def wateruptake(ds):
     * modal aerosol water
     * modal aerosol wet radii
     INPUT:
-    ds --- xray.Dataset (typically loaded from CAM history file)
+    ds --- xarray.Dataset (typically loaded from CAM history file)
     OUTPUT:
     None, but ds will be updated with new data arrays for
     modal aerosol water and modal aerosol wet radii
