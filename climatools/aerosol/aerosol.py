@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import xarray
 
-import climatools.aerosol.f2py3_modal_aero_wateruptake as aerowateruptake
+import climatools.aerosol.aerowateruptake as aerowateruptake
 import climatools.aerosol.aerosol_constants as aeroconst
 
 
@@ -128,21 +128,29 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
 
 def wateruptake(ds):
     '''
-    Calculates and adds to ds:
-    * modal aerosol water
-    * modal aerosol wet radii
+    Water uptake by aerosols
     INPUT:
     ds --- xarray.Dataset (typically loaded from CAM history file)
     OUTPUT:
-    None, but ds will be updated with new data arrays for
-    modal aerosol water and modal aerosol wet radii
+    qaerwat --- aerosol water
+    dgncur_awet --- wet radius
+    wetdens --- wet density
     '''
-    for itime, time in enumerate(ds.coords['time']):
-        for ilon, lon in enumerate(ds.coords['lon']):
-            for ilat, lat in enumerate(ds.coords['lat']):
-                ds = wateruptake_column(ds, itime=itime, ilon=ilon, ilat=ilat)
+    ds = get_raer(ds)
 
-    return ds
+    stackdims = ('time', 'lat', 'lon')
+
+    pcols = np.prod([ds.coords[dim].shape[0] for dim in stackdims])
+    cldn = ds['CLOUD'].stack(pcols=stackdims).transpose('pcols', 'lev')
+    rh = ds['RELHUM'].stack(pcols=stackdims).transpose('pcols', 'lev')
+    raer = ds['aerosol_species_mmr'].stack(pcols=stackdims)\
+               .transpose('pcols', 'lev', 'mode', 'species')
+
+    qaerwat, dgncur_awet, wetdens = aerowateruptake.\
+        modal_aero_wateruptake_sub(pcols=pcols, cldn=cldn, \
+                                   relative_humidity=rh, raer=raer)
+    
+    return qaerwat, dgncur_awet, wetdens
 
                 
                 
