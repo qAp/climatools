@@ -36,7 +36,28 @@ def get_raer_column(ds, lon=0, lat=0, time=0):
 
 
 def get_raer(ds):
-    pass
+    ntot_amode = len(aeroconst.MAM3_SPECIES.keys())
+    max_nspec_amode = max(len(dict_mode.keys())
+                          for mode, dict_mode in aeroconst.MAM3_SPECIES.items())
+
+    modes = range(1, ntot_amode + 1)
+    species = range(1, max_nspec_amode + 1)
+
+    ds.coords['mode'] = ('mode', modes)
+    ds.coords['species'] = ('species', species)
+
+    arr_dims = ('time', 'lev', 'lat', 'lon', 'mode', 'species')
+    arr_shape = [len(ds.coords[dim]) for dim in arr_dims]
+
+    ds.update({'aerosol_species_mmr':
+               (arr_dims, np.full(arr_shape, np.nan))})
+
+    for mode, dict_mode in aeroconst.MAM3_SPECIES.items():
+        for species, name in dict_mode.items():
+            name_mmr = get_mmr_name_CAMhist(name, mode)
+            ds['aerosol_species_mmr'].\
+                loc[dict(mode=mode, species=species)] = ds[name_mmr]
+    return ds
 
 
 def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
