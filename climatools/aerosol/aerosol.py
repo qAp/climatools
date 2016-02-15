@@ -11,6 +11,10 @@ import climatools.aerosol.aerosol_constants as aeroconst
 
 
 
+def get_mmr_name_CAMhist(name, mode):
+    name_mmr = aeroconst.SPECIES_MMR[name]
+    name_camhist = name_mmr + '_a{:d}'.format(mode)
+    return name_camhist
 
 
 def get_raer_column(ds, lon=0, lat=0, time=0):
@@ -29,6 +33,10 @@ def get_raer_column(ds, lon=0, lat=0, time=0):
             name_camhist = name_mmr + '_a{:d}'.format(mode)
             raer[:, :, imode, ispecies] = ds[name_camhist].isel(**args_isel).values
     return raer
+
+
+def get_raer(ds):
+    pass
 
 
 def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
