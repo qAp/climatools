@@ -11,19 +11,12 @@ subroutine modal_aero_sw(state, pbuf, &
   integer, parameter :: prefi = 10
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
 
-  type r_ptr2d_t
-     real(kind = 8), pointer :: val(:,:)
-  end type r_ptr2d_t
-  type c_ptr1d_t
-     complex, pointer :: val(:)
-  end type c_ptr1d_t
-  
-   real(kind = 8), intent(in) :: mass(pcols,pver)        ! layer mass
-   type(r_ptr2d_t), allocatable, intent(in) :: specmmr(:,:) ! species mass mixing ratio
-   real(kind = 8), intent(in) :: dgnumwet(:,:,:)            ! number mode diameter
-   real(kind = 8), intent(in) :: qaerwat(:,:,:)             ! aerosol water (g/g)
-   real(kind = 8), intent(in) :: specdens(:,:) ! species density (kg/m3)
-   type(c_ptr1d_t), allocatable, intent(in) :: specrefindex(:,:) ! species refractive index
+   real(kind=8), intent(in) :: mass(pcols,pver)                          ! layer mass
+   real(kind=8), intent(in) :: specmmr(nspec_max,ntot_amode, ncol, pver) ! species mass mixing ratio
+   real(kind=8), intent(in) :: dgnumwet(ncol,pver,ntot_amode)            ! number mode diameter
+   real(kind=8), intent(in) :: qaerwat(ncol,pver,ntot_amode)             ! aerosol water (g/g)
+   real(kind=8), intent(in) :: specdens(nspec_max,ntot_amode)            ! species density (kg/m3)
+   real(kind=8), intent(in) :: specrefindex(nspec_max,ntot_amode)        ! species refractive index
 
    real(kind = 8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
    real(kind = 8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
@@ -33,9 +26,9 @@ subroutine modal_aero_sw(state, pbuf, &
    ! Local variables
    integer :: i, isw, k, l, m, nc, ns
 
-   real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
-   real(kind = 8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
-   real(kind = 8), pointer :: cheb(:,:,:,:)
+   real(kind = 8), intent(in) :: radsurf(pcols,pver,ntot_amode)    ! aerosol surface mode radius
+   real(kind = 8), intent(in) :: logradsurf(pcols,pver,ntot_amode)    ! log(aerosol surface mode radius)
+   real(kind = 8), intent(in) :: cheb(ncoef,ntot_amode,pcols,pver)
 
    complex  :: crefin(pcols)   ! complex refractive index
    real(kind = 8) :: refr(pcols)     ! real part of refractive index
@@ -60,15 +53,6 @@ subroutine modal_aero_sw(state, pbuf, &
 
 
 
-   ! allocate local storage
-   allocate( &
-      radsurf(pcols,pver,ntot_amode),    &
-      logradsurf(pcols,pver,ntot_amode), &
-      cheb(ncoef,ntot_amode,pcols,pver))
-
-
-
-
    ! calc size parameter for all columns
    call modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
 
@@ -89,7 +73,7 @@ subroutine modal_aero_sw(state, pbuf, &
 
    ! access the mixing ratio and properties of the modal species
    allocate( &
-      specmmr(nspec_max,ntot_amode),     &
+      ,     &
       specdens(nspec_max,ntot_amode),    &
       specrefindex(nspec_max,ntot_amode) )
 
@@ -109,7 +93,7 @@ subroutine modal_aero_sw(state, pbuf, &
             ! aerosol species loop
             do l = 1, nspec_amode(m)
                do i = 1, ncol
-                  vol(i)      = specmmr(l,m)%val(i,k)/specdens(l,m)
+                  vol(i)      = specmmr(l,m,i,k)/specdens(l,m)
                   dryvol(i)   = dryvol(i) + vol(i)
                   crefin(i)   = crefin(i) + vol(i)*specrefindex(l,m)%val(isw)
                end do
