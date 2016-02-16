@@ -1,4 +1,4 @@
-subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
+subroutine modal_aero_sw(state, pbuf, &
                          tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
@@ -24,8 +24,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
    real(kind = 8), intent(in) :: qaerwat(:,:,:)             ! aerosol water (g/g)
    real(kind = 8), intent(in) :: specdens(:,:) ! species density (kg/m3)
    type(c_ptr1d_t), allocatable, intent(in) :: specrefindex(:,:) ! species refractive index
-   integer,             intent(in) :: nnite          ! number of night columns
-   integer,             intent(in) :: idxnite(nnite) ! local column indices of night columns
 
    real(kind = 8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
    real(kind = 8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
