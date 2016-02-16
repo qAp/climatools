@@ -205,36 +205,6 @@ subroutine modal_aero_sw(state, pbuf, &
                dopaer(i) = pext(i)*mass(i,k)
             end do
 
-
-
-            do i = 1, ncol
-
-               if ((dopaer(i) <= -1.e-10) .or. (dopaer(i) >= 30.)) then
-
-                  write(iulog,*) 'dopaer(', i, ',', k, ',', m, ',', lchnk, ')=', dopaer(i)
-                  ! write(iulog,*) 'itab,jtab,ttab,utab=',itab(i),jtab(i),ttab(i),utab(i)
-                  write(iulog,*) 'k=', k, ' pext=', pext(i), ' specext=', specpext(i)
-                  write(iulog,*) 'wetvol=', wetvol(i), ' dryvol=', dryvol(i), ' watervol=', watervol(i)
-                  ! write(iulog,*) 'cext=',(cext(i,l),l=1,ncoef)
-                  ! write(iulog,*) 'crefin=',crefin(i)
-                  write(iulog,*) 'nspec_amode(m)=', nspec_amode(m)
-                  ! write(iulog,*) 'cheb=', (cheb(nc,m,i,k),nc=2,ncoef)
-                  do l = 1, nspec_amode(m)
-                     volf = specmmr(l,m)%val(i,k)/specdens(l,m)
-                     write(iulog,*) 'l=', l, 'vol(l)=', volf
-                     write(iulog,*) 'isw=', isw, 'specrefindex(isw)=', specrefindex(l,m)%val(isw)
-                     write(iulog,*) 'specdens=', specdens(l,m)
-                  end do
-
-                  nerr_dopaer = nerr_dopaer + 1
-                  if (nerr_dopaer >= nerrmax_dopaer) then
-                     ! write(iulog,*) '*** halting in '//subname//' after nerr_dopaer =', nerr_dopaer
-                     ! call endrun('exit from '//subname)
-                  end if
-
-               end if
-            end do
-
             do i=1,ncol
                tauxar(i,k,isw) = tauxar(i,k,isw) + dopaer(i)
                wa(i,k,isw)     = wa(i,k,isw)     + dopaer(i)*palb(i)
