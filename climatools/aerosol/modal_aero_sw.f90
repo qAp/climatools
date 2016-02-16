@@ -252,19 +252,6 @@ subroutine modal_aero_sw(state, pbuf, nnite, idxnite, &
 
 
 
-   ! deallocate local storage
-   deallocate( &
-      radsurf,     &
-      logradsurf,  &
-      cheb,        &
-      aodmode,     &
-      dustaodmode, &
-      burden,      &
-      colext)
 
-   deallocate( &
-      specmmr,    &
-      specdens,   &
-      specrefindex)
 
 end subroutine modal_aero_sw
