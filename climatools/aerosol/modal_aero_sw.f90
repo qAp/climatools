@@ -31,9 +31,7 @@ subroutine modal_aero_sw(state, pbuf, &
    real(kind = 8), intent(out) :: fa(pcols,0:pver,nswbands)     ! forward scattered fraction
 
    ! Local variables
-   integer :: i, ifld, isw, k, l, m, nc, ns
-   integer, parameter :: lchnk  = 1                  ! chunk id
-
+   integer :: i, isw, k, l, m, nc, ns
 
    real(kind = 8), pointer :: radsurf(:,:,:)    ! aerosol surface mode radius
    real(kind = 8), pointer :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
@@ -58,19 +56,6 @@ subroutine modal_aero_sw(state, pbuf, &
    real(kind = 8) :: pasm(pcols)     ! parameterized asymmetry factor
    real(kind = 8) :: palb(pcols)     ! parameterized single scattering albedo
 
-   ! Diagnostics output for visible band only
-   real(kind = 8) :: dustvol(pcols)              ! volume concentration of dust in aerosol mode (m3/kg)
-   real(kind = 8), pointer :: aodmode(:,:)
-   real(kind = 8), pointer :: dustaodmode(:,:)   ! dust aod in aerosol mode
-   real(kind = 8), pointer :: burden(:,:)
-   real(kind = 8), pointer :: colext(:,:)
-
-
-   ! debug output
-   integer, parameter :: nerrmax_dopaer=1000
-   integer  :: nerr_dopaer = 0
-   real(kind = 8) :: volf            ! volume fraction of insoluble aerosol
-   character(len=*), parameter :: subname = 'modal_aero_sw'
    !----------------------------------------------------------------------------
 
 
@@ -79,11 +64,8 @@ subroutine modal_aero_sw(state, pbuf, &
    allocate( &
       radsurf(pcols,pver,ntot_amode),    &
       logradsurf(pcols,pver,ntot_amode), &
-      cheb(ncoef,ntot_amode,pcols,pver), &
-      aodmode(pcols,ntot_amode),         &
-      dustaodmode(pcols,ntot_amode),     &
-      burden(pcols,ntot_amode),          &
-      colext(pcols,ntot_amode))
+      cheb(ncoef,ntot_amode,pcols,pver))
+
 
 
 
@@ -123,7 +105,6 @@ subroutine modal_aero_sw(state, pbuf, &
             ! form bulk refractive index
             crefin(:ncol) = 0.
             dryvol(:ncol) = 0.
-            dustvol(:ncol) = 0.
 
             ! aerosol species loop
             do l = 1, nspec_amode(m)
@@ -140,11 +121,6 @@ subroutine modal_aero_sw(state, pbuf, &
                watervol(i) = qaerwat(i,k,m)/rhoh2o
                wetvol(i) = watervol(i) + dryvol(i)
                if (watervol(i) < 0.) then
-                  if (abs(watervol(i)) .gt. 1.e-1*wetvol(i)) then
-                     write(iulog,'(a,4e10.2,a)') 'watervol,wetvol=', &
-                        watervol(i), wetvol(i), ' in '//subname
-                     !  call endrun()
-                  end if
                   watervol(i) = 0.
                   wetvol(i) = dryvol(i)
                end if
