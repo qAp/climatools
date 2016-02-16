@@ -11,6 +11,8 @@ subroutine modal_aero_sw(state, pbuf, &
   integer, parameter :: prefi = 10
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
 
+  
+
    real(kind=8), intent(in) :: mass(pcols,pver)                          ! layer mass
    real(kind=8), intent(in) :: specmmr(nspec_max,ntot_amode, ncol, pver) ! species mass mixing ratio
    real(kind=8), intent(in) :: dgnumwet(ncol,pver,ntot_amode)            ! number mode diameter
@@ -26,9 +28,9 @@ subroutine modal_aero_sw(state, pbuf, &
    ! Local variables
    integer :: i, isw, k, l, m, nc, ns
 
-   real(kind = 8), intent(in) :: radsurf(pcols,pver,ntot_amode)    ! aerosol surface mode radius
-   real(kind = 8), intent(in) :: logradsurf(pcols,pver,ntot_amode)    ! log(aerosol surface mode radius)
-   real(kind = 8), intent(in) :: cheb(ncoef,ntot_amode,pcols,pver)
+   real(kind = 8) :: radsurf(pcols,pver,ntot_amode)    ! aerosol surface mode radius
+   real(kind = 8) :: logradsurf(pcols,pver,ntot_amode)    ! log(aerosol surface mode radius)
+   real(kind = 8) :: cheb(ncoef,ntot_amode,pcols,pver)
 
    complex  :: crefin(pcols)   ! complex refractive index
    real(kind = 8) :: refr(pcols)     ! real part of refractive index
