@@ -1,10 +1,8 @@
-subroutine modal_aero_sw(state, pbuf, &
+subroutine modal_aero_sw(pcols, state, pbuf, &
                          tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
 
-  integer, parameter :: pcols = 1
-  integer, parameter :: ncol = 1
   integer, parameter :: pver = 30
   integer, parameter :: ntot_amode = 3  ! there are 3 modes in MAM3
   integer, parameter :: nspec_max = 6   ! maximum number of aerosol species in a mode
@@ -14,11 +12,11 @@ subroutine modal_aero_sw(state, pbuf, &
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
 
   
-
+  real(kind=8), intent(in) :: pcols                                      ! number of columns
    real(kind=8), intent(in) :: mass(pcols,pver)                          ! layer mass
-   real(kind=8), intent(in) :: specmmr(nspec_max,ntot_amode, ncol, pver) ! species mass mixing ratio
-   real(kind=8), intent(in) :: dgnumwet(ncol,pver,ntot_amode)            ! number mode diameter
-   real(kind=8), intent(in) :: qaerwat(ncol,pver,ntot_amode)             ! aerosol water (g/g)
+   real(kind=8), intent(in) :: specmmr(nspec_max,ntot_amode, pcols, pver) ! species mass mixing ratio
+   real(kind=8), intent(in) :: dgnumwet(pcols,pver,ntot_amode)            ! number mode diameter
+   real(kind=8), intent(in) :: qaerwat(pcols,pver,ntot_amode)             ! aerosol water (g/g)
    real(kind=8), intent(in) :: specdens(nspec_max,ntot_amode)            ! species density (kg/m3)
    real(kind=8), intent(in) :: specrefindex(nspec_max,ntot_amode)        ! species refractive index
 
@@ -55,7 +53,7 @@ subroutine modal_aero_sw(state, pbuf, &
 
    !----------------------------------------------------------------------------
 
-
+   ncol = pcols
 
    ! calc size parameter for all columns
    call modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
