@@ -6,6 +6,8 @@ subroutine modal_aero_sw(state, pbuf, &
   integer, parameter :: pcols = 1
   integer, parameter :: ncol = 1
   integer, parameter :: pver = 30
+  integer, parameter :: ntot_amode = 3  ! there are 3 modes in MAM3
+  integer, parameter :: nspec_max = 6   ! maximum number of aerosol species in a mode
   integer, parameter :: ncoef = 5
   integer, parameter :: prefr = 7
   integer, parameter :: prefi = 10
