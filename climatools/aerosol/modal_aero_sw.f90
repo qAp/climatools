@@ -1,5 +1,7 @@
-subroutine modal_aero_sw(pcols, state, pbuf, &
-                         tauxar, wa, ga, fa)
+subroutine modal_aero_sw(pcols, &
+     mass, specmmr, dgnumwet, qaerwat, &
+     specdens, specrefindex, &
+     tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
 
