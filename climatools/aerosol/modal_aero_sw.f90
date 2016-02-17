@@ -1,13 +1,17 @@
+
+
 subroutine modal_aero_sw(pcols, &
      mass, specmmr, dgnumwet, qaerwat, &
      specdens, specrefindex, &
      extpsw, abspsw, asmpsw, &
+     refrtabsw, refitabsw, crefwsw, &
      tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
 
   integer, parameter :: pver = 30
   integer, parameter :: ntot_amode = 3  ! there are 3 modes in MAM3
+  integer, parameter :: nspec_amode(ntot_amode) = (/ 6, 3, 3 /) ! number of species in each mode in MAM3
   integer, parameter :: nspec_max = 6   ! maximum number of aerosol species in a mode
   integer, parameter :: ncoef = 5
   integer, parameter :: prefr = 7
@@ -25,7 +29,9 @@ subroutine modal_aero_sw(pcols, &
    real(kind=8), intent(in) :: extpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific extinction
    real(kind=8), intent(in) :: abspsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific absorption
    real(kind=8), intent(in) :: asmpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! asymmetry factor
-
+   real(kind=8), intent(in) :: refrtabsw(prefr,nswbands)        ! table of real refractive indices for aerosols visible
+   real(kind=8), intent(in) :: refitabsw(prefi,nswbands)        ! table of imag refractive indices for aerosols visible
+   complex, intent(in) :: crefwsw(nswbands) ! complex refractive index for water visible
    
    real(kind = 8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
    real(kind = 8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
