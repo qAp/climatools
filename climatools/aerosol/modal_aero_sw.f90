@@ -19,7 +19,7 @@ subroutine modal_aero_sw(pcols, &
   integer, parameter :: nswbands = 14 ! number of spectral bands in RRTMG-SW
 
   
-  real(kind=8), intent(in) :: pcols                                      ! number of columns
+  integer, intent(in) :: pcols                                      ! number of columns
    real(kind=8), intent(in) :: mass(pcols,pver)                          ! layer mass
    real(kind=8), intent(in) :: specmmr(nspec_max,ntot_amode, pcols, pver) ! species mass mixing ratio
    real(kind=8), intent(in) :: dgnumwet(pcols,pver,ntot_amode)            ! number mode diameter
@@ -194,6 +194,9 @@ end subroutine modal_aero_sw
 
 subroutine modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
 
+  integer, parameter :: ntot_amode = 3  ! there are 3 modes in MAM3
+  real(kind = 8), parameter :: sigmag_amode(ntot_amode) = (/ 1.800, 1.600, 1.800 /) ! from modal_aero_data.F90
+
    integer,  intent(in)  :: ncol
    real(kind=8), intent(in)  :: dgnumwet(:,:,:)   ! aerosol wet number mode diameter (m)
    real(kind=8), intent(out) :: radsurf(:,:,:)    ! aerosol surface mode radius
@@ -203,6 +206,11 @@ subroutine modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
    integer  :: m, i, k, nc
    real(kind=8) :: explnsigma
    real(kind=8) :: xrad(ncol) ! normalized aerosol radius
+
+  real(kind = 8) :: alnsg_amode(ntot_amode)
+
+
+  alnsg_amode = log(sigmag_amode)
 
    do m = 1, ntot_amode
 
