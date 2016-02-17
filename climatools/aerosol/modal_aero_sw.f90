@@ -191,7 +191,7 @@ subroutine modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
 
    integer  :: m, i, k, nc
    real(kind=8) :: explnsigma
-   real(kind=8) :: xrad(pcols) ! normalized aerosol radius
+   real(kind=8) :: xrad(ncol) ! normalized aerosol radius
 
    do m = 1, ntot_amode
 
@@ -227,10 +227,10 @@ subroutine binterp(table,ncol,km,im,jm,x,y,xtab,ytab,ix,jy,t,u,out)
   !
   implicit none
   integer im,jm,km,ncol
-  real(kind=8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
-  integer i,ix(pcols),ip1,j,jy(pcols),jp1,k,ic
-  real(kind=8) x(pcols),dx,t(pcols),y(pcols),dy,u(pcols), &
-       tu(pcols),tuc(pcols),tcu(pcols),tcuc(pcols)
+  real(kind=8) table(km,im,jm),xtab(im),ytab(jm),out(ncol,km)
+  integer i,ix(ncol),ip1,j,jy(ncol),jp1,k,ic
+  real(kind=8) x(ncol),dx,t(ncol),y(ncol),dy,u(ncol), &
+       tu(ncol),tuc(ncol),tcu(ncol),tcuc(ncol)
   
   if(ix(1).gt.0)go to 30
   if(im.gt.1)then
