@@ -1,6 +1,7 @@
 subroutine modal_aero_sw(pcols, &
      mass, specmmr, dgnumwet, qaerwat, &
      specdens, specrefindex, &
+     extpsw, abspsw, asmpsw, &
      tauxar, wa, ga, fa)
 
    ! calculates aerosol sw radiative properties
@@ -20,8 +21,12 @@ subroutine modal_aero_sw(pcols, &
    real(kind=8), intent(in) :: dgnumwet(pcols,pver,ntot_amode)            ! number mode diameter
    real(kind=8), intent(in) :: qaerwat(pcols,pver,ntot_amode)             ! aerosol water (g/g)
    real(kind=8), intent(in) :: specdens(nspec_max,ntot_amode)            ! species density (kg/m3)
-   real(kind=8), intent(in) :: specrefindex(nspec_max,ntot_amode)        ! species refractive index
+   real(kind=8), intent(in) :: specrefindex(nspec_max,ntot_amode,nswbands)        ! species refractive index
+   real(kind=8), intent(in) :: extpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific extinction
+   real(kind=8), intent(in) :: abspsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific absorption
+   real(kind=8), intent(in) :: asmpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! asymmetry factor
 
+   
    real(kind = 8), intent(out) :: tauxar(pcols,0:pver,nswbands) ! layer extinction optical depth
    real(kind = 8), intent(out) :: wa(pcols,0:pver,nswbands)     ! layer single-scatter albedo
    real(kind = 8), intent(out) :: ga(pcols,0:pver,nswbands)     ! asymmetry factor
@@ -90,7 +95,7 @@ subroutine modal_aero_sw(pcols, &
                do i = 1, ncol
                   vol(i)      = specmmr(l,m,i,k)/specdens(l,m)
                   dryvol(i)   = dryvol(i) + vol(i)
-                  crefin(i)   = crefin(i) + vol(i)*specrefindex(l,m)%val(isw)
+                  crefin(i)   = crefin(i) + vol(i)*specrefindex(l,m,isw)
                end do
 
             end do ! species loop
@@ -261,9 +266,6 @@ subroutine binterp(table,ncol,km,im,jm,x,y,xtab,ytab,ix,jy,t,u,out)
         dy=(ytab(jp1)-ytab(jy(ic)))
         if(abs(dy).gt.1.e-20)then
            u(ic)=(y(ic)-ytab(jy(ic)))/dy
-           if(u(ic).lt.0..or.u(ic).gt.1.)then
-              write(iulog,*) 'u,y,jy,ytab,dy=',u(ic),y(ic),jy(ic),ytab(jy(ic)),dy
-           endif
         else
            u(ic)=0.
         endif
