@@ -184,18 +184,18 @@ end subroutine modal_aero_sw
 subroutine modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
 
    integer,  intent(in)  :: ncol
-   real(r8), intent(in)  :: dgnumwet(:,:,:)   ! aerosol wet number mode diameter (m)
-   real(r8), intent(out) :: radsurf(:,:,:)    ! aerosol surface mode radius
-   real(r8), intent(out) :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
-   real(r8), intent(out) :: cheb(:,:,:,:)
+   real(kind=8), intent(in)  :: dgnumwet(:,:,:)   ! aerosol wet number mode diameter (m)
+   real(kind=8), intent(out) :: radsurf(:,:,:)    ! aerosol surface mode radius
+   real(kind=8), intent(out) :: logradsurf(:,:,:) ! log(aerosol surface mode radius)
+   real(kind=8), intent(out) :: cheb(:,:,:,:)
 
    integer  :: m, i, k, nc
-   real(r8) :: explnsigma
-   real(r8) :: xrad(pcols) ! normalized aerosol radius
+   real(kind=8) :: explnsigma
+   real(kind=8) :: xrad(pcols) ! normalized aerosol radius
 
    do m = 1, ntot_amode
 
-      explnsigma = exp(2.0_r8*alnsg_amode(m)*alnsg_amode(m))
+      explnsigma = exp(2.0*alnsg_amode(m)*alnsg_amode(m))
 
       do k = 1, pver
          do i = 1, ncol
@@ -205,12 +205,12 @@ subroutine modal_size_parameters(ncol, dgnumwet, radsurf, logradsurf, cheb)
             ! normalize size parameter
             xrad(i) = max(logradsurf(i,k,m),xrmin)
             xrad(i) = min(xrad(i),xrmax)
-            xrad(i) = (2._r8*xrad(i)-xrmax-xrmin)/(xrmax-xrmin)
+            xrad(i) = (2.*xrad(i)-xrmax-xrmin)/(xrmax-xrmin)
             ! chebyshev polynomials
-            cheb(1,m,i,k) = 1._r8
+            cheb(1,m,i,k) = 1.
             cheb(2,m,i,k) = xrad(i)
             do nc = 3, ncoef
-               cheb(nc,m,i,k) = 2._r8*xrad(i)*cheb(nc-1,m,i,k)-cheb(nc-2,m,i,k)
+               cheb(nc,m,i,k) = 2.*xrad(i)*cheb(nc-1,m,i,k)-cheb(nc-2,m,i,k)
             end do
          end do
       end do
@@ -227,9 +227,9 @@ subroutine binterp(table,ncol,km,im,jm,x,y,xtab,ytab,ix,jy,t,u,out)
   !
   implicit none
   integer im,jm,km,ncol
-  real(r8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
+  real(kind=8) table(km,im,jm),xtab(im),ytab(jm),out(pcols,km)
   integer i,ix(pcols),ip1,j,jy(pcols),jp1,k,ic
-  real(r8) x(pcols),dx,t(pcols),y(pcols),dy,u(pcols), &
+  real(kind=8) x(pcols),dx,t(pcols),y(pcols),dy,u(pcols), &
        tu(pcols),tuc(pcols),tcu(pcols),tcuc(pcols)
   
   if(ix(1).gt.0)go to 30
@@ -241,15 +241,15 @@ subroutine binterp(table,ncol,km,im,jm,x,y,xtab,ytab,ix,jy,t,u,out)
 10      ix(ic)=max0(i-1,1)
         ip1=min(ix(ic)+1,im)
         dx=(xtab(ip1)-xtab(ix(ic)))
-        if(abs(dx).gt.1.e-20_r8)then
+        if(abs(dx).gt.1.e-20)then
            t(ic)=(x(ic)-xtab(ix(ic)))/dx
         else
-           t(ic)=0._r8
+           t(ic)=0.
         endif
      end do
   else
      ix(:ncol)=1
-     t(:ncol)=0._r8
+     t(:ncol)=0.
   endif
   if(jm.gt.1)then
      do ic=1,ncol
@@ -259,24 +259,24 @@ subroutine binterp(table,ncol,km,im,jm,x,y,xtab,ytab,ix,jy,t,u,out)
 20      jy(ic)=max0(j-1,1)
         jp1=min(jy(ic)+1,jm)
         dy=(ytab(jp1)-ytab(jy(ic)))
-        if(abs(dy).gt.1.e-20_r8)then
+        if(abs(dy).gt.1.e-20)then
            u(ic)=(y(ic)-ytab(jy(ic)))/dy
-           if(u(ic).lt.0._r8.or.u(ic).gt.1._r8)then
+           if(u(ic).lt.0..or.u(ic).gt.1.)then
               write(iulog,*) 'u,y,jy,ytab,dy=',u(ic),y(ic),jy(ic),ytab(jy(ic)),dy
            endif
         else
-           u(ic)=0._r8
+           u(ic)=0.
         endif
      end do
   else
      jy(:ncol)=1
-     u(:ncol)=0._r8
+     u(:ncol)=0.
   endif
 30 continue
   do ic=1,ncol
      tu(ic)=t(ic)*u(ic)
      tuc(ic)=t(ic)-tu(ic)
-     tcuc(ic)=1._r8-tuc(ic)-u(ic)
+     tcuc(ic)=1.-tuc(ic)-u(ic)
      tcu(ic)=u(ic)-tu(ic)
      jp1=min(jy(ic)+1,jm)
      ip1=min(ix(ic)+1,im)
