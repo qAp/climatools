@@ -73,15 +73,6 @@ subroutine modal_aero_sw(pcols, &
    fa(1:ncol,0,:)      = 0.7225
 
 
-
-
-   ! access the mixing ratio and properties of the modal species
-   allocate( &
-      ,     &
-      specdens(nspec_max,ntot_amode),    &
-      specrefindex(nspec_max,ntot_amode) )
-
-
    ! loop over all aerosol modes
    do m = 1, ntot_amode
 
