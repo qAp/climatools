@@ -4,6 +4,9 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
+import climatools.rrtmg as rrtmg
+
+
 
 AEROSOL_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/physprops'
 
@@ -113,7 +116,35 @@ def get_specdens():
 
     da = da.transpose('species', 'mode')
     return da
+
+
+def get_specrefindex():
+    '''
+    Get the refractive index of all modes in MAM3.
+    OUTPUT:
+    da --- xarray.DataArray; dims = (species, mode, nswbands)
+    '''
+    ntot_amode = len(MAM3_SPECIES.keys())
+    max_nspec_amode = max(len(dict_mode.keys())
+                          for mode, dict_mode in MAM3_SPECIES.items())
+    nbands = rrtmg.nbands(region='sw')
+
+    modes = range(1, ntot_amode + 1)
+    species = range(1, max_nspec_amode + 1)
+    bands = range(1, nbands + 1)
+
+    da = xr.DataArray(np.full((ntot_amode, max_nspec_amode, nbands), np.nan, dtype='complex'),
+                      dims = ['mode', 'species', 'sw_band'],
+                      coords = [modes, species, bands])
+
+    for mode, dict_mode in MAM3_SPECIES.items():
+        for species in dict_mode.keys():
+            ref_real = get_physprop(mode=mode, species=species, property='refindex_real_aer_sw')
+            ref_imag = get_physprop(mode=mode, species=species, property='refindex_im_aer_sw')
+            da.loc[dict(mode=mode, species=species)] = ref_real + 1j * np.abs(ref_imag)
             
+    da = da.transpose('species', 'mode', 'sw_band')
+    return da
 
 
 
