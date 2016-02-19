@@ -1,6 +1,6 @@
 import os
 
-import xray
+import xarray as xr
 
 
 AEROSOL_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/physprops'
@@ -39,10 +39,23 @@ SPECIES_FILENAMES = {'sulfate': 'sulfate_rrtmg_c080918.nc',
                      'seasalt': 'ssam_rrtmg_c100508.nc',
                      'dust': 'dust4_rrtmg_c090521.nc'}
 
+MODES_FILENAMES = {1: 'mam3_mode1_rrtmg_c110318.nc',
+                   2: 'mam3_mode2_rrtmg_c110318.nc',
+                   3: 'mam3_mode3_rrtmg_c110318.nc'}
+
+
 SPECIES_DATASETS = {}
 for species, filename in SPECIES_FILENAMES.items():
-    with xray.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, filename)) as ds:
-        SPECIES_DATASETS[species] = ds.copy(deep = True)
+    with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, filename),
+                         decode_cf=False) as ds:
+        SPECIES_DATASETS[species] = ds.copy(deep=True)
+
+
+MODES_DATASETS = {}
+for mode, filename in MODES_FILENAMES.items():
+    with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, filename),
+                         decode_cf=False) as ds:
+        MODES_DATASETS[mode] = ds.copy(deep = True)
 
 
 def get_species_name(mode=1, species=1):
@@ -58,15 +71,16 @@ def get_species_name(mode=1, species=1):
     return MAM3_SPECIES[mode][species]
 
 
-def get_physprop(mode=1, species=1, property='density'):
+def get_physprop(mode=1, species=None, property='opticsmethod'):
     '''
     Returns the property PROPERTY of species SPECIES of mode MODE in MAM3.
     '''
-    species_name = get_species_name(mode=mode, species=species)
-    ds = SPECIES_DATASETS[species_name]
-    da = ds[property]
+    if species == None:
+        da = MODES_DATASETS[mode][property]
+    else:
+        species_name = get_species_name(mode=mode, species=species)
+        da = SPECIES_DATASETS[species_name][property]
     return da
-
 
 
 
