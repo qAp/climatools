@@ -1,5 +1,7 @@
 import os
 
+import numpy as np
+import pandas as pd
 import xarray as xr
 
 
@@ -81,6 +83,37 @@ def get_physprop(mode=1, species=None, property='opticsmethod'):
         species_name = get_species_name(mode=mode, species=species)
         da = SPECIES_DATASETS[species_name][property]
     return da
+
+
+def get_specdens():
+    '''
+    Returns aerosol density of all species of all modes in MAM3.
+    This is compatible with modal_aero_sw() in CESM 1.0.3.
+    OUTPUT:
+    da --- xarray.DataArray. aerosol material densities for all modes and species.
+    '''
+    ntot_amode = len(MAM3_SPECIES.keys())
+    max_nspec_amode = max(len(dict_mode.keys())
+                          for mode, dict_mode in MAM3_SPECIES.items())
+
+    modes = range(1, ntot_amode + 1)
+    species = range(1, max_nspec_amode + 1)
+
+    da = xr.DataArray(np.full((ntot_amode, max_nspec_amode), np.nan),
+                      dims = ['mode', 'species'],
+                      coords = [modes, species])
+
+    da.attrs['units'] = 'kg m^-3'
+    da.attrs['long_name'] = 'aerosol material density'
+
+    for mode, dict_mode in MAM3_SPECIES.items():
+        for species in dict_mode.keys():
+            density = get_physprop(mode=mode, species=species, property='density')
+            da.loc[dict(mode=mode, species=species)] = density
+
+    da = da.transpose('species', 'mode')
+    return da
+            
 
 
 
