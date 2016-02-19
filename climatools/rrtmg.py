@@ -2,6 +2,13 @@
 
 
 
+def nbands(region='sw'):
+    if region == 'sw':
+        return 14
+    elif region == 'lw':
+        return 16
+
+
 def wavenumber_bands(region = 'sw'):
     '''
     Returns wavenumber bands used by RRTMG
