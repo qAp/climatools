@@ -46,6 +46,9 @@ SPECIES_FILENAMES = {'sulfate': 'sulfate_rrtmg_c080918.nc',
 
 MODES_FILENAME = 'modal_optics_3mode_c100507.nc'
 
+WATER_FILENAME = 'water_refindex_rrtmg_c080910.nc'
+
+
 SPECIES_DATASETS = {}
 for species, filename in SPECIES_FILENAMES.items():
     with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, filename),
@@ -56,7 +59,13 @@ for species, filename in SPECIES_FILENAMES.items():
 MODES_DATASET = {}
 with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, MODES_FILENAME),
                      decode_cf=False) as ds:
-    MODES_DATASET = ds.copy(deep = True)
+    MODES_DATASET = ds.copy(deep=True)
+
+
+WATER_DATASET = {}
+with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, WATER_FILENAME),
+                     decode_cf=False) as ds:
+    WATER_DATASET = ds.copy(deep=True)
 
 
 def get_species_name(mode=1, species=1):
@@ -171,6 +180,12 @@ def get_refrtabsw():
 def get_refitabsw():
     return MODES_DATASET['refindex_im_sw'].transpose('refindex_im', 'sw_band')
 
+
+def get_crefwsw():
+    crefwsw_real = WATER_DATASET['refindex_real_water_sw']
+    crefwsw_imag = WATER_DATASET['refindex_im_water_sw']
+    crefwsw = crefwsw_real + 1j * np.abs(crefwsw_imag)
+    return crefwsw
 
 
 
