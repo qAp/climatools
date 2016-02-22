@@ -44,10 +44,7 @@ SPECIES_FILENAMES = {'sulfate': 'sulfate_rrtmg_c080918.nc',
                      'seasalt': 'ssam_rrtmg_c100508.nc',
                      'dust': 'dust4_rrtmg_c090521.nc'}
 
-MODES_FILENAMES = {1: 'mam3_mode1_rrtmg_c110318.nc',
-                   2: 'mam3_mode2_rrtmg_c110318.nc',
-                   3: 'mam3_mode3_rrtmg_c110318.nc'}
-
+MODES_FILENAME = 'modal_optics_3mode_c100507.nc'
 
 SPECIES_DATASETS = {}
 for species, filename in SPECIES_FILENAMES.items():
@@ -56,11 +53,10 @@ for species, filename in SPECIES_FILENAMES.items():
         SPECIES_DATASETS[species] = ds.copy(deep=True)
 
 
-MODES_DATASETS = {}
-for mode, filename in MODES_FILENAMES.items():
-    with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, filename),
-                         decode_cf=False) as ds:
-        MODES_DATASETS[mode] = ds.copy(deep = True)
+MODES_DATASET = {}
+with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, MODES_FILENAME),
+                     decode_cf=False) as ds:
+    MODES_DATASET = ds.copy(deep = True)
 
 
 def get_species_name(mode=1, species=1):
@@ -81,7 +77,7 @@ def get_physprop(mode=1, species=None, property='opticsmethod'):
     Returns the property PROPERTY of species SPECIES of mode MODE in MAM3.
     '''
     if species == None:
-        da = MODES_DATASETS[mode][property]
+        da = MODES_DATASET[property].sel(mode=mode - 1)
     else:
         species_name = get_species_name(mode=mode, species=species)
         da = SPECIES_DATASETS[species_name][property]
@@ -145,6 +141,36 @@ def get_specrefindex():
             
     da = da.transpose('species', 'mode', 'sw_band')
     return da
+
+
+def get_extpsw():
+    return MODES_DATASET['extpsw'].transpose('coef_number',
+                                             'refindex_real', 'refindex_im',
+                                             'mode',
+                                             'sw_band')
+
+
+def get_abspsw():
+    return MODES_DATASET['abspsw'].transpose('coef_number',
+                                             'refindex_real', 'refindex_im',
+                                             'mode',
+                                             'sw_band')
+
+
+def get_asmpsw():
+    return MODES_DATASET['asmpsw'].transpose('coef_number',
+                                             'refindex_real', 'refindex_im',
+                                             'mode',
+                                             'sw_band')
+
+
+def get_refrtabsw():
+    return MODES_DATASET['refindex_real_sw'].transpose('refindex_real', 'sw_band')
+
+
+def get_refitabsw():
+    return MODES_DATASET['refindex_im_sw'].transpose('refindex_im', 'sw_band')
+
 
 
 
