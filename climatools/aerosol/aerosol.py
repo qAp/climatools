@@ -35,7 +35,7 @@ def get_raer_column(ds, lon=0, lat=0, time=0):
     return raer
 
 
-def get_raer(ds):
+def aerosol_species_mmr(ds):
     ntot_amode = len(aeroconst.MAM3_SPECIES.keys())
     max_nspec_amode = max(len(dict_mode.keys())
                           for mode, dict_mode in aeroconst.MAM3_SPECIES.items())
@@ -132,12 +132,11 @@ def wateruptake(ds):
     INPUT:
     ds --- xarray.Dataset (typically loaded from CAM history file)
     OUTPUT:
-    qaerwat --- aerosol water
-    dgncur_awet --- wet radius
-    wetdens --- wet density
+    ds ---- as input, with the following additional data variables:
+            qaerwat --- aerosol water (time, lat, lon, lev, mode)
+            dgncur_awet --- wet radius (time, lat, lon, lev, mode)
+            wetdens --- wet density (time, lat, lon, lev, mode)
     '''
-    ds = get_raer(ds)
-
     stackdims = ('time', 'lat', 'lon')
 
     pcols = np.prod([ds.coords[dim].shape[0] for dim in stackdims])
@@ -149,8 +148,15 @@ def wateruptake(ds):
     qaerwat, dgncur_awet, wetdens = aerowateruptake.\
         modal_aero_wateruptake_sub(pcols=pcols, cldn=cldn, \
                                    relative_humidity=rh, raer=raer)
+
+    dims = ('time', 'lat', 'lon', 'lev', 'mode')
+    shape = tuple(ds.dims[dim] for dim in dims)
+
+    ds.update({'qaerwat': (dims, qaerwat.reshape(shape)),
+               'dgncur_awet': (dims, dgncur_awet.reshape(shape)),
+               'wetdens': (dims, wetdens.reshape(shape))})
     
-    return qaerwat, dgncur_awet, wetdens
+    return ds
 
                 
                 
