@@ -222,3 +222,188 @@ def record_3_5_to_3_6s(NMOL = None,
 
 
 
+def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
+    '''
+    Writes INPUT_RRTM file for a column in ds.
+    INPUT:
+    ds --- xarray.Dataset, dataset containing all required variables
+           for RRTMG-SW column model, for all time, latitude and longitude
+    time --- time label of the column. [number of years after the initial time]
+    lat --- latitude of the column. [degrees]
+    lon --- longigutde of the column. [degrees]
+    aerosol --- True or False.  True to include aerosol effects
+    '''
+    content = collections.deque([])
+
+    # record 1.1
+    cxid = 'CXID'
+    content.append(record_1_1(CXID=cxid))
+
+    # record 1.2
+    iaer = 0
+    iatm = 1
+    iscat = 1
+    istrm = None
+    iout = 98
+    imca = 0
+    icld = 0
+    idelm = 0
+    content.append(record_1_2(IAER=iaer,
+                              IATM=iatm,
+                              ISCAT=iscat,
+                              ISTRM=istrm,
+                              IOUT=iout,
+                              IMCA=imca,
+                              ICLD=icld,
+                              IDELM=idelm,
+                              ICOS=icos))
+
+    # record 1.2.1
+    juldat = None
+    sza = 60.
+    isolvar = 0.
+    solvar = None
+    content.append(record_1_2_1(JULDAT=juldat,
+                                SZA=sza,
+                                ISOLVAR=isolvar,
+                                SOLVAR=solvar))
+
+    # record 1.4
+    iemis = 0
+    ireflect = 0
+    semiss = None
+    content.append(record_1_4(IEMIS=iemis,
+                              IREFLECT=ireflect,
+                              SEMISS=semiss))
+    
+    if IATM == 0:
+        raise ValueError('Sorry, IATM=0 option is currently not implemented.')
+        # record 2.1
+        iform = None
+        nlayrs = None
+        nmol = None
+        content.append(record_2_1(IFORM=iform,
+                                  NLAYRS=nlayrs,
+                                  NMOL=nmol))
+        # record 2.1.1 to 2.1.3
+        content.append(record_2_1_1to3(ds=ds))
+
+    if IATM == 1:
+        # record 3.1
+        model = 0
+        ibmax = - ds.dims[ilev]
+        noprnt = 0
+        nmol = 7
+        ipunch = 0
+        munits = None
+        re = None
+        co2mx = None
+        ref_lat = None
+        content.append(record_3_1(MODEL=model,
+                                  IBMAX=ibmax,
+                                  NOPRNT=noprnt,
+                                  NMOL=nmol,
+                                  IPUNCH=ipunch,
+                                  MUNITS=munits,
+                                  RE=re,
+                                  CO2MX=co2mx,
+                                  REF_LAT=ref_lat))
+
+        # record 3.2
+        hbound = 1e-2 * ds['PS'].sel(time=time, lat=lat, lon=lon)
+        htoa = ds['level_pressure'].isel(ilev=0)
+        content.append(record_3_2(HBOUND=hbound, HTOA=htoa))
+            
+        if IBMAX == 0:
+            # record 3.3
+            avtrat = None
+            tdiff1 = None
+            tdiff2 = None
+            altd1 = None
+            altd2 = None
+            conent.append(record_3_3_A(AVTRAT=avtrat,
+                                       TDIFF1=tdiff1,
+                                       TDIFF2=tdiff2,
+                                       ALTD1=altd1,
+                                       ALTD2=altd2))
+            
+        else:
+            # record 3.3.B
+            content.append(record_3_3_B(IBMAX=ibmax, ds=ds))
+            
+        if MODEL == 0:
+            # record 3.4
+            immax = - ds.dims['ilev']
+            hmod = '(lat,lon) = ({}, {})'.format(lat, lon)
+            content.append(record_3_4(IMMAX=immax, HMOD=hmod))
+
+            # record 3.5 to 3.6
+            content.append(
+                record_3_5_to_3_6s(NMOL=nmol, IMMAX=immax, ds=ds))
+            
+    with open('INPUT_RRTM', mode='w', encoding='utf-8') as file:
+        file.write('\n'.join(content))
+    
+        
+def write_in_aer_rrtm(ds, time=181, lat=-90, lon=0):
+    '''
+    Writes IN_AER_RRTM file for a column in ds.
+    INPUT:
+    ds --- xarray.Dataset, dataset containing all required variables
+           for RRTMG-SW column model; to take into account of aerosol effects,
+           , and for all times, latitudes and longitudes
+    time --- time label of the column. [number of years after the initial time]
+    lat --- latitude of the column. [degrees]
+    lon --- longigutde of the column. [degrees]
+    '''
+    content = collections.deque([])
+    
+    # record A1.1
+    naer=1
+    content.append(record_a1_1(naer=1))
+    
+    # record A2.1
+    nlay = ds.dims['lev']
+    iaod = 1
+    issa = 1
+    ipha = 1
+    content.append(record_a2_1(nlay=nlay,
+                               iaod=iaod,
+                               issa=issa,
+                               ipha=ipha))
+    
+    # record A2.1.1 for all layers
+    for lev in ds.coords['lev']:
+        lay = lev2lay(lev)
+        aod = ds['tauxar'].sel(time=time, lat=lat, lon=lon, lev=lev)
+        content.append(record_a2_1_1(lay=lay, aod=aod))
+        
+    # record A2.2
+    ssa = ds['wa'].sel(time=time, lat=lat, lon=lon)
+    content.append(record_a2_2(ssa=ssa))
+    
+    # record A2.3
+    phase = ds['ga'].sel(time=time, lat=lat, lon=lon)
+    content.append(record_a2_3(phase=phase))
+
+    with open('IN_AER_RRTM', mode='w', encoding='utf-8') as file:
+        file.write('\n'.join(content))
+
+        
+def write_sw_inputfiles(ds, time=181, lat=-90, lon=0, aerosol=False):
+    '''
+    Writes INPUT_RRTM and/or IN_AER_RRTM files for a column in ds.
+    INPUT:
+    ds --- xarray.Dataset, dataset containing all required variables
+           for RRTMG-SW column model; to take into account of aerosol effects,
+           , and for all times, latitudes and longitudes
+    time --- time label of the column. [number of years after the initial time]
+    lat --- latitude of the column. [degrees]
+    lon --- longigutde of the column. [degrees]
+    aerosol --- True or False.  True to include aerosol effects,
+                hence writing out IN_AER_RRTM in addition to INPUT_RRTM.
+    '''
+    write_input_rrtm(ds, time=time, lat=lat, lon=lon, aerosol=aerosol)
+    if aerosol:
+        write_in_aer_rrtm(ds, time=time, lat=lat, lon=lon)
+
