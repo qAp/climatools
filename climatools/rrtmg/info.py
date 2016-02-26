@@ -2,6 +2,13 @@
 
 
 
+def nbands(region='sw'):
+    if region == 'sw':
+        return 14
+    elif region == 'lw':
+        return 16
+
+
 def wavenumber_bands(region = 'sw'):
     '''
     Returns wavenumber bands used by RRTMG
@@ -15,10 +22,10 @@ def wavenumber_bands(region = 'sw'):
     elif region == 'lw':
         wavenum1 = [10., 350., 500., 630., 700., 820.,
                     980., 1080., 1180., 1390., 1480., 1800.,
-                    2080., 2250., 2380., 2600.]
+                    2080., 2250., 2390., 2600.]
         wavenum2 = [350.,  500.,  630.,  700.,  820.,  980.,
                     1080., 1180., 1390., 1480., 1800., 2080.,
-                    2250., 2380., 2600., 3250.]
+                    2250., 2390., 2600., 3250.]
     else:
         raise ValueError('region must be either sw for shortwave, or lw for longwave')
     return {k + 1: [(low, high)] for k, (low, high) in enumerate(zip(wavenum1, wavenum2))}
