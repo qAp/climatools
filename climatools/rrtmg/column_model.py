@@ -220,7 +220,46 @@ def record_3_5_to_3_6s(NMOL = None,
             )
     return '\n'.join(lines)
 
+'''
+Records for IN_AER_RRTM
+'''
 
+def record_a1_1(naer=None):
+    notes = ((5, '{:>5d}', naer),)
+
+
+def record_a2_1(nlay=None, iaod=None, issa=None, ipha=None):
+    notes = ((5, '{:>5d}', nlay),
+             (10, '{:>5d}', iaod),
+             (15, '{:>5d}', issa),
+             (20, '{:>5d}', ipha))
+
+
+def record_a2_1_1(iaod=None, lay=None, aod1=None):
+    if iaod != 1:
+        raise ValueError('Sorry, only the iaod=1 option is currently implemented.')
+
+    notes = tuple([(5, '{:>5d}', lay)] +
+                  [(7, '{:>7.4f}', aod1_band)
+                   for aod1_band in aod1])
+
+
+def record_a2_2(issa=None, ssa=None):
+    if issa != 1:
+        raise ValueError('Sorry, only the issa=1 option is currently implemented.')
+
+    notes = tuple((5, '{:>5.2f}', ssa_band)
+                  for ssa_band in ssa)
+
+
+def record_a2_3(ipha=None, phase=None):
+    if ipha != 1:
+        raise ValueError('Sorry, only the ipha=1 option is currently implemented.')
+
+    notes = tuple((5, '{:>5.2f}', phase_band)
+                  for phase_band in phase)
+
+    
 
 def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     '''
