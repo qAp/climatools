@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 
-import climatools.rrtmg as rrtmg
+import climatools.rrtmg.info as rrtmginfo
 
 
 
@@ -132,7 +132,7 @@ def get_specrefindex():
     ntot_amode = len(MAM3_SPECIES.keys())
     max_nspec_amode = max(len(dict_mode.keys())
                           for mode, dict_mode in MAM3_SPECIES.items())
-    nbands = rrtmg.nbands(region='sw')
+    nbands = rrtmginfo.nbands(region='sw')
 
     modes = range(1, ntot_amode + 1)
     species = range(1, max_nspec_amode + 1)
