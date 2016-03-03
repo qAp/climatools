@@ -5,8 +5,12 @@ import numpy as np
 import pandas as pd
 import xarray
 
-import climatools.aerosol.aerowateruptake as aerowateruptake
+
 import climatools.aerosol.aerosol_constants as aeroconst
+
+#f2py3-compiled modules
+import climatools.aerosol.aerowateruptake as aerowateruptake
+import climatools.aerosol.modal_aero_sw as f2py3_modal_aero_sw
 
 
 
@@ -160,11 +164,62 @@ def wateruptake(ds):
 
                 
                 
+def modal_aero_sw(ds):
+    stackdims = ('time', 'lat', 'lon')
+    pcols = np.prod([ds.coords[dim].shape[0] for dim in stackdims])    
 
+    # dynamic input variables
+    mass
+    specmmr = ds['aerosol_species_mmr']\
+              .stack(pcols=stackdims)\
+              .transpose('species', 'mode', 'pcols', 'lev')
+    dgnumwet = ds['dgnumwet']\
+               .stack(pcols=stackdims)\
+               .transpose('pcols', 'lev', 'mode')
+    qaerwat = ds['qaerwat']\
+              .stack(pcols=stackdims)\
+              .transpose('pcols', 'lev', 'mode')
 
+    # aerosol constants
+    specdens = aeroconst.get_specdens()
+    specrefindex = aeroconst.get_specrefindex()
+    extpsw = aeroconst.get_extpsw()
+    abspsw = aeroconst.get_abspws()
+    asmpsw = aeroconst.get_asmpsw()
+    refrtabsw = aeroconst.get_refrtabsw()
+    refitabsw = aeroconst.get_refitabsw()
+    crefwsw = aeroconst.get_crefwsw()
 
+    tauxar, wa, ga, fa = f2py_modal_aero_sw.modal_aero_sw(pcols,
+                                                          mass,
+                                                          specmmr,
+                                                          dgnumwet, qaerwat,
+                                                          specdens,
+                                                          specrefindex,
+                                                          extpsw, abspsw, asmpsw,
+                                                          refrtabsw, refitabsw,
+                                                          crefwsw)
 
+    ds.coords['sw_band'] = ('sw_band', extpsw.coords['sw_band'])
+    
+    dims = stackdims + ['lev', 'sw_band']
+    shape = tuple(ds.dims[dim] for dim in dims)
+    ds.update({'tauxar': (dims,
+                          tauxar.reshape(shape),
+                          {'long_name': 'optical depth'}),
+               'wa': (dims,
+                      wa.reshape(shape),
+                      {'long_name': 'single scattering albedo'}),
+               'ga': (dims,
+                      ga.reshape(shape),
+                      {'long_name': 'asymmetry factor'}),
+               'fa': (dims,
+                      fa.reshape(shape),
+                      {'long_name': 'forward scattering'})
+               })
 
+    return ds
+    
 
 
 
