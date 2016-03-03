@@ -1,20 +1,35 @@
 
 
 
-def hybrid2mbar(ds, level_type = 'lev'):
+def hybrid2mbar(ds):
     '''
-    returns xray DataArray of levels in mbar
+    Get level and layer pressures by converting
+    from hybrid coordinates.
     INPUT:
-    ds --- xray Dataset from .nc open_dataset()
-    level_type --- \'lev\' for layer(level) pressure
-                   \'ilev\' for level(interface) pressure
+    ds --- xray.Dataset containing hybrid layer and level coordinates
+    OUTPUT:
+    ds --- same as input but with additional coordinate variables,
+           pressure and ipressure, for layer pressure
+           and level pressure, respectively. Both are in milibars.
     '''
-    if level_type == 'lev':
-        p = 1e-2 * (ds['hyam'] * ds['P0'] + ds['hybm'] * ds['PS'])
-    elif level_type == 'ilev':
-        p = 1e-2 * (ds['hyai'] * ds['P0'] + ds['hybi'] * ds['PS'])
-    p.attrs['units'] = 'mbar'
-    return p[{'time': 0, 'lat': 0, 'lon': 0}]
+    if 'lev' in ds:
+        layer_pressure = 1e-2 * (ds['hyam'] * ds['P0'] + ds['hybm'] * ds['PS'])
+        ds.coords['pressure'] = (layer_pressure.dims, layer_pressure)
+        ds.coords['pressure']\
+            .attrs.update({'units': 'mbar',
+                           'long_name': 'pressure at mid-points',
+                           'formula': 'hyam * P0 + hybm * PS'})        
+
+    if 'ilev' in ds:
+        level_pressure = 1e-2 * (ds['hyai'] * ds['P0'] + ds['hybi'] * ds['PS'])
+        ds.coords['ipressure'] = (level_pressure.dims, level_pressure)
+        ds.coords['ipressure']\
+            .attrs.update({'units': 'mbar',
+                           'long_name': 'pressure at interfaces',
+                           'formula': 'hyai * P0 + hybi * PS'})
+    return ds
+
+
 
 
 def convert_units(datasets, ilev, lev, datetimes):
