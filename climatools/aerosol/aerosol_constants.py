@@ -9,6 +9,8 @@ import climatools.rrtmg.info as rrtmginfo
 
 
 AEROSOL_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/physprops'
+OZONE_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/ozone'
+
 
 MAM3_SPECIES = {1: {1: 'sulfate',
                     2: 'p-organic',
@@ -48,6 +50,8 @@ MODES_FILENAME = 'modal_optics_3mode_c100507.nc'
 
 WATER_FILENAME = 'water_refindex_rrtmg_c080910.nc'
 
+OZONE_FILENAME = 'ozone_1.9x2.5_L26_1850clim_c090420.nc'
+
 
 SPECIES_DATASETS = {}
 for species, filename in SPECIES_FILENAMES.items():
@@ -66,6 +70,43 @@ WATER_DATASET = {}
 with xr.open_dataset(os.path.join(AEROSOL_DATA_DIRECTORY, WATER_FILENAME),
                      decode_cf=False) as ds:
     WATER_DATASET = ds.copy(deep=True)
+
+
+with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, OZONE_FILENAME),
+                     decode_cf=False) as ds:
+    OZONE_DATASET = ds.copy(deep=True)
+
+
+
+def steal_hybrid_level_coefficients(ds):
+    '''
+    Takes and adds fields necessary in order to convert
+    hybrid levels to milibars.  This function is created
+    because some ozone data files do not have the
+    coefficients necessary to convert surface and reference
+    pressure to level/layer pressures in milibars.  These
+    coefficients will be taken from other .nc files with
+    26 levels.  It is assumed that these are the same 26 levels.
+    INPUT:
+    ds --- xarray.Dataset
+    OUTPUT:
+    ds --- xarray.Dataset with additional fields:
+           hyam --- coefficient A for mid-points
+           hybm --- coefficient B for mid-points
+           PS --- surface pressure
+           P0 --- reference pressure
+    '''
+    filegood = 'ozone_1.9x2.5_L26_1850clim_c091112.nc'
+    with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, filegood),
+                         decode_cf=False) as dsgood:
+        
+        for var in ['hyam', 'hybm', 'P0', 'PS']:
+            newvar = dsgood[var]
+            ds[var] = (newvar.dims, newvar, newvar.attrs)
+            
+    return ds
+        
+        
 
 
 def get_species_name(mode=1, species=1):
