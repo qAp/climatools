@@ -2,8 +2,10 @@ import os
 import sys
 
 import numpy as np
+import scipy.interpolate as interpolate
 import pandas as pd
-import xarray
+import xarray as xr
+
 
 
 import climatools.aerosol.aerosol_constants as aeroconst
@@ -13,6 +15,95 @@ import climatools.aerosol.aerowateruptake as aerowateruptake
 import climatools.aerosol.modal_aero_sw as f2py3_modal_aero_sw
 
 
+
+
+OZONE_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/ozone'
+OZONE_FILENAME = 'ozone_1.9x2.5_L26_1850clim_c090420.nc'
+
+with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, OZONE_FILENAME),
+                     decode_cf=False) as ds:
+    OZONE_DATASET = ds.copy(deep=True)
+
+
+
+def steal_hybrid_level_coefficients(ds):
+    '''
+    Takes and adds fields necessary in order to convert
+    hybrid levels to milibars.  This function is created
+    because some ozone data files do not have the
+    coefficients necessary to convert surface and reference
+    pressure to level/layer pressures in milibars.  These
+    coefficients will be taken from other .nc files with
+    26 levels.  It is assumed that these are the same 26 levels.
+    INPUT:
+    ds --- xarray.Dataset
+    OUTPUT:
+    ds --- xarray.Dataset with additional fields:
+           hyam --- coefficient A for mid-points
+           hybm --- coefficient B for mid-points
+           PS --- surface pressure
+           P0 --- reference pressure
+    '''
+    filegood = 'ozone_1.9x2.5_L26_1850clim_c091112.nc'
+    with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, filegood),
+                         decode_cf=False) as dsgood:
+        
+        for var in ['hyam', 'hybm', 'P0', 'PS']:
+            newvar = dsgood[var]
+            ds[var] = (newvar.dims, newvar, newvar.attrs)
+            
+    return ds
+
+
+OZONE_DATASET = steal_hybrid_level_coefficients(OZONE_DATASET)
+
+
+def get_interpfunc(da=None, dim='time'):
+    '''
+    Linearly interpolates `da` along dimension `dim`.  This function
+    returns a function that evaluates `da` at a set of values along
+    dimension `dim`.
+
+    Parameters
+    ----------
+    da : xarray.DataArray
+    dim : string
+          name of dimension to interpolate along
+    '''
+    
+    x = da.coords[dim]
+    y = da.values
+    axis = da.dims.index(dim)
+    func = interpolate.interp1d(x=x, y=y, axis=axis)
+
+    def callf(coords=None):
+        data = func(coords)
+        dims_interp = da.dims
+        coords_interp = [coords if d == dim else da.coords[d]
+                         for d in dims_interp]
+        da_interp = xr.DataArray(data, dims=dims_interp, coords=coords_interp,
+                                 attrs=da.attrs)
+        return da_interp
+    
+    return callf
+
+
+def get_o3_concentration(ds=None, interpfunc=None):
+    '''
+    Get o3 concentration by interpolating the time dimension
+    of pre-loaded dataset of ozone concentrations.
+    This pre-loaded dataset is defined in aerosol.aerosol_constants
+    module.
+    INPUT:
+    ds --- xarray.Dataset
+    OUTPUT:
+    ds --- xarray.Dataset, with additional data variable O3
+           obtained from pre-loaded dataset. 
+    '''
+    da = interpfunc(coords=ds.coords['time'])
+    ds['O3'] = (da.dims, da, da.attrs)
+    return ds
+    
 
 
 def get_mmr_name_CAMhist(name, mode):
