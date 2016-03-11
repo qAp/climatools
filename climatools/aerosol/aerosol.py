@@ -58,7 +58,8 @@ def steal_hybrid_level_coefficients(ds):
 OZONE_DATASET = steal_hybrid_level_coefficients(OZONE_DATASET)
 
 
-def get_interpfunc(da=None, dim='time'):
+def get_interpfunc(da=None, dim='time',
+                   bounds_error=False, fill_value='extrapolate'):
     '''
     Linearly interpolates `da` along dimension `dim`.  This function
     returns a function that evaluates `da` at a set of values along
@@ -74,13 +75,20 @@ def get_interpfunc(da=None, dim='time'):
     x = da.coords[dim]
     y = da.values
     axis = da.dims.index(dim)
-    func = interpolate.interp1d(x=x, y=y, axis=axis)
+    func = interpolate.interp1d(x=x, y=y, axis=axis,
+                                bounds_error=bounds_error,
+                                fill_value=fill_value)
 
-    def callf(coords=None):
+    def callf(coords=None, name_dim=None):
         data = func(coords)
-        dims_interp = da.dims
+
+        dims_interp = list(da.dims)
         coords_interp = [coords if d == dim else da.coords[d]
                          for d in dims_interp]
+
+        if name_dim:
+            dims_interp[dims_interp.index(dim)] = name_dim
+        
         da_interp = xr.DataArray(data, dims=dims_interp, coords=coords_interp,
                                  attrs=da.attrs)
         return da_interp
