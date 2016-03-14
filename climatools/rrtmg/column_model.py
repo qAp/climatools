@@ -131,20 +131,22 @@ def record_3_3_A(AVTRAT = None,
 
 
 
-def record_3_3_B(IBMAX = None,
-                 PATH_atmpro = None):
+def record_3_3_B(ds=ds, IBMAX=None,
+                 time=None, lat=None, lon=None):
     Nrow, fmtspec = 8, '{:>10.3f}'
-    with pd.get_store(PATH_atmpro) as store:
-        atmpro = store['atmpro']
+
     if IBMAX < 0:
-        name = 'pressure'
+        name = 'ipressure'
     elif IBMAX > 0:
         name = 'altitude'
     else:
         raise ValueError('record_3_3_B is not applicable for IMBAX = 0')
-    totdata = atmpro[name][::-1][: abs(IBMAX)]
+    
+    totdata = (ds[name]
+               .sel(time=time, lat=lat, lon=lon)[::-1][: abs(IBMAX)])
+    
     notes_rows = (
-        ((Nrow, fmtspec, value) for value in row) \
+        ((Nrow, fmtspec, value) for value in row) 
         for row in itertools.zip_longest(*(Nrow * [iter(totdata)]))
         )
     records_rows = (''.join(length * ' ' if value == None\
@@ -165,60 +167,115 @@ def record_3_4(IMMAX = None,
                    for length, fmtspec, value in notes)
 
 
-def record_3_5(NMOL = None,
-               ZM = None,
-               PM = None,
-               TM = None,
-               JCHARP = None,
-               JCHART = None,
-               JCHAR = None):
+def record_3_5(nmol=None,
+               zm=0, pm=0, tm=0,
+               jcharp='A', jchart='A',
+               jchar_h2o='A', jchar_co2='A', jchar_o3='A', jchar_n2o='A',
+               jchar_co='A', jchar_ch4='A', jchar_o2='A'):
+    '''
+    Parameters
+    ----------
+    nmol: number of gases/molecules from the beginning of the molecules
+          list in the documentation
+    zm: altitude
+    pm: pressure. units need to be consistent with `jcharp`
+    tm: temperature. units need to be consistent with `jchart`
+    jcharp: units tag for pressure
+    jchart: units tag for temperature
+    jchar_h2o: units tag for h2o concentration specified in record 3.6
+    jchar_co2: same meaning as for `jchar_h2o`
+    '''
+    maxlist_jchars = [jchar_h2o, jchar_co2, jchar_o3, jchar_n2o,
+                      jchar_co, jchar_ch4, jchar_o2]
+
+    list_jchars = maxlist_jchars[:nmol]
+
     notes = tuple([
-        (10, '{:>10.3e}', ZM),
-        (10, '{:>10.3e}', PM),
-        (10, '{:>10.3e}', TM),
+        (10, '{:>10.3e}', zm),
+        (10, '{:>10.3e}', pm),
+        (10, '{:>10.3e}', tm),
         (5, None, None),
-        (1, '{:s}', JCHARP),
-        (1, '{:s}', JCHART),
-        (3, None, None)] + \
-                  [(1, '{:s}', jch) for jch in JCHAR or NMOL * [None]])
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+        (1, '{:s}', jcharp),
+        (1, '{:s}', jchart),
+        (3, None, None)] + [(1, '{:s}', jch) for jch in list_jchars])
+    try:
+        return ''.join(length * ' ' if value == None
+                       else fmtspec.format(value)
+                       for length, fmtspec, value in notes)
+    except TypeError:
+        zm = float(zm)
+        pm = float(pm)
+        tm = float(tm)
+        return ''.join(length * ' ' if value == None
+                       else fmtspec.format(value)
+                       for length, fmtspec, value in notes)
 
 
+def record_3_6(nmol=None,
+               h2o=0, co2=0, o3=0, n2o=0, co=0, ch4=0, o2=0):
+    '''
+    Parameters
+    ----------
+    nmol: number of gases/molecules from the beginning of the
+          molecules list in the documentation
+    h2o: concentration of h2o. Units should be consistent with tag used
+         record 3.5.
+    co2: same meaning as for h2o.
+    '''
+    maxlist_concs = [h2o, co2, o3, n2o, co, ch4, o2]
+    
+    list_concs = maxlist_concs[:nmol]
+    notes = tuple((10, '{:>10.3e}', value) for value in list_concs)
+    try:
+        return ''.join(length * ' ' if value == None
+                       else fmtspec.format(value)
+                       for length, fmtspec, value in notes)
+    except TypeError:
+        return ''.join(length * ' ' if value == None
+                       else fmtspec.format(float(value))
+                       for length, fmtspec, value in notes)
+                       
 
-def record_3_6(NMOL = None,
-               VMOL = None):
-    if VMOL.shape and len(VMOL) != NMOL:
-        raise InputError('NMOL = {}. \
-        VMOL must have {} values'.format(NMOL, NMOL))
-    notes = tuple((10, '{:>10.3e}', value) for value in VMOL)
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
-
-
-def record_3_5_to_3_6s(NMOL = None,
-                       IMMAX = None,
-                       PATH_atmpro = None):
-    with pd.get_store(PATH_atmpro) as store:
-        atmpro = store['atmpro'].sort_index(ascending = True)
-        
+def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
+                       time=None, lat=None, lon=None):
+    
+    slice = dict(time=time, lat=lat, lon=lon)
+    
     lines = collections.deque([])
-    for indx in atmpro.index[: abs(IMMAX)]:
-        lines.append(
-            record_3_5(ZM = atmpro.loc[indx, 'altitude'],
-                       PM = atmpro.loc[indx, 'pressure'],
-                       TM = atmpro.loc[indx, 'temperature'],
-                       JCHARP = 'A',
-                       JCHART = 'A',
-                       JCHAR = NMOL * ['A'])
-                                                            )
-        lines.append(
-            record_3_6(NMOL = NMOL,
-                       VMOL = atmpro.ix[indx, 3:])
-            )
+
+    for ilev in ds.coords['ilev'][::-1]:
+        slice_ilev = slice.update({'ilev': ilev})
+        
+        record_ilev = record_3_5(nmol=NMOL,
+                                 zm=0.,
+                                 pm=ds['ipressure'].sel(slice_ilev),
+                                 tm=ds['iT'].sel(ilev=ilev),
+                                 jcharp='A',
+                                 jchart='A',
+                                 jchar_h2o='C',
+                                 jchar_co2='A',
+                                 jchar_o3='A',
+                                 jchar_n2o='A',
+                                 jchar_co='A',
+                                 jchar_ch4='A',
+                                 jchar_o2='C')
+
+        lines.append(record_ilev)
+
+        record_ilev = record_3_6(nmol=NMOL,
+                                 h2o=ds['iQ'].sel(slice_ilev),
+                                 co2=ds['co2vmr'],
+                                 o3=ds['iO3'].sel(slice_ilev),
+                                 n2o=ds['n2ovmr'],
+                                 co=0,
+                                 ch4=ds['ch4vmr'],
+                                 o2=ds['o2mmr'])
+        
+        lines.append(record_ilev)
+
     return '\n'.join(lines)
+
+
 
 '''
 Records for IN_AER_RRTM
@@ -279,7 +336,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     content.append(record_1_1(CXID=cxid))
 
     # record 1.2
-    iaer = 0
+    iaer = 0 if aerosol else 10
     iatm = 1
     iscat = 1
     istrm = None
@@ -287,6 +344,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     imca = 0
     icld = 0
     idelm = 0
+    icos = 0
     content.append(record_1_2(IAER=iaer,
                               IATM=iatm,
                               ISCAT=iscat,
@@ -298,7 +356,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                               ICOS=icos))
 
     # record 1.2.1
-    juldat = None
+    juldat = ds.coords['time'].values[0] % 365
     sza = 60.
     isolvar = 0.
     solvar = None
@@ -350,7 +408,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
 
         # record 3.2
         hbound = 1e-2 * ds['PS'].sel(time=time, lat=lat, lon=lon)
-        htoa = ds['level_pressure'].isel(ilev=0)
+        htoa = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=0)
         content.append(record_3_2(HBOUND=hbound, HTOA=htoa))
             
         if IBMAX == 0:
@@ -365,10 +423,10 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                                        TDIFF2=tdiff2,
                                        ALTD1=altd1,
                                        ALTD2=altd2))
-            
         else:
             # record 3.3.B
-            content.append(record_3_3_B(IBMAX=ibmax, ds=ds))
+            content.append(record_3_3_B(ds=ds, IBMAX=ibmax,
+                                        time=time, lat=lat, lon=lon))
             
         if MODEL == 0:
             # record 3.4
@@ -378,7 +436,8 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
 
             # record 3.5 to 3.6
             content.append(
-                record_3_5_to_3_6s(NMOL=nmol, IMMAX=immax, ds=ds))
+                record_3_5_to_3_6s(ds=ds, NMOL=nmol, IMMAX=immax,
+                                   time=time, lat=lat, lon=lon))
             
     with open('INPUT_RRTM', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
