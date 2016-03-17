@@ -111,7 +111,33 @@ def get_o3_concentration(ds=None, interpfunc=None):
     da = interpfunc(coords=ds.coords['time'])
     ds['O3'] = (da.dims, da, da.attrs)
     return ds
+
+
+def interp_layers2levels(ds, vars=None):
+    '''
+    Interpolate layer values to levels.
     
+    Args:
+        ds: xarray.Dataset
+        vars: list of variables in `ds` for which layers values are to be
+              interpolated onto levels. Defaults to an empty list.
+    Returns:
+        ds: xarray.Dataset, with new variable for the level values added
+            for each variable in `vars`
+    '''
+    if not vars:
+        vars = []
+        
+    for var in vars:
+        try:
+            da = ds[var]
+        except KeyError:
+            continue
+        else:
+            interpfunc = get_interpfunc(da, dim='lev')
+            da_interp = interpfunc(coords=ds.coords['ilev'], name_dim='ilev')
+            ds['i' + var] = (da_interp.dims, da_interp, da_interp.attrs)
+    return ds
 
 
 def get_mmr_name_CAMhist(name, mode):
