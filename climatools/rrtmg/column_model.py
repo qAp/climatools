@@ -475,8 +475,8 @@ def write_in_aer_rrtm(ds, time=181, lat=-90, lon=0):
                                ipha=ipha))
     
     # record A2.1.1 for all layers
-    for lev in ds.coords['lev']:
-        lay = lev2lay(lev)
+    for i, lev in enumerate(ds.coords['lev'][::-1]):
+        lay = i + 1
         aod = ds['tauxar'].sel(time=time, lat=lat, lon=lon, lev=lev)
         content.append(record_a2_1_1(lay=lay, aod=aod))
         
