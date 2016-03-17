@@ -1,7 +1,22 @@
 import os
 import itertools
 import collections
+import functools
+
 import pandas as pd
+
+
+
+
+
+def write_record_string(func):
+    @functools.wraps(func)
+    def callf(*args, **kwargs):
+        notes = func(*args, **kwargs)
+        return ''.join(length * ' ' if value == None
+                       else fmtspec.format(value)
+                       for length, fmtspec, value in notes)
+    return callf
 
 
 '''
@@ -18,6 +33,7 @@ def record_1_1(CXID = None):
     return '{0:2}{1:78}'.format('$ ', CXID or '')
 
 
+@write_record_string
 def record_1_2(IAER = None,
                IATM = None,
                ISCAT = None,
@@ -27,58 +43,50 @@ def record_1_2(IAER = None,
                ICLD = None,
                IDELM = None,
                ICOS = None):
-    notes = ((18, None, None),
-             (2, '{:>2d}', IAER),
-             (29, None, None),
-             (1, '{:1d}', IATM),
-             (32, None, None),
-             (1, '{:1d}', ISCAT),
-             (1, None, None),
-             (1, '{:1d}', ISTRM),
-             (2, None, None),
-             (3, '{:>3d}', IOUT),
-             (3, None, None),
-             (1, '{:1d}', IMCA),
-             (1, '{:d}', ICLD),
-             (3, None, None),
-             (1, '{:1d}', IDELM),
-             (1, '{:1d}', ICOS))
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return ((18, None, None),
+            (2, '{:>2d}', IAER),
+            (29, None, None),
+            (1, '{:1d}', IATM),
+            (32, None, None),
+            (1, '{:1d}', ISCAT),
+            (1, None, None),
+            (1, '{:1d}', ISTRM),
+            (2, None, None),
+            (3, '{:>3d}', IOUT),
+            (3, None, None),
+            (1, '{:1d}', IMCA),
+            (1, '{:d}', ICLD),
+            (3, None, None),
+            (1, '{:1d}', IDELM),
+            (1, '{:1d}', ICOS))
 
 
+@write_record_string
 def record_1_2_1(JULDAT = None,
                  SZA = None,
                  ISOLVAR = None,
                  SOLVAR = None):
-    notes = tuple([(12, None, None),
-                   (3, '{:>3d}', JULDAT),
-                   (3, None, None),
-                   (7, '{:>7.4f}', SZA),
-                   (4, None, None),
-                   (1, None, None)] + 
-                  [(5, '{:>5.3f}', sv) for sv in SOLVAR or 14 * [None]])
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return tuple([(12, None, None),
+                  (3, '{:>3d}', JULDAT),
+                  (3, None, None),
+                  (7, '{:>7.4f}', SZA),
+                  (4, None, None),
+                  (1, None, None)] + 
+                 [(5, '{:>5.3f}', sv) for sv in SOLVAR or 14 * [None]])
 
 
-
+@write_record_string
 def record_1_4(IEMIS = None,
                IREFLECT = None,
                SEMISS = None):
-    notes = tuple([(11, None, None),
-                   (1, '{:d}', IEMIS),
-                   (2, None, None),
-                   (1, '{:d}', IREFLECT)] +
-                  [(5, '{:>5.3f}', sm) for sm in SEMISS or 14 * [None]])
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return tuple([(11, None, None),
+                  (1, '{:d}', IEMIS),
+                  (2, None, None),
+                  (1, '{:d}', IREFLECT)] +
+                 [(5, '{:>5.3f}', sm) for sm in SEMISS or 14 * [None]])
 
 
-
+@write_record_string
 def record_3_1(MODEL = None,
                IBMAX = None,
                NOPRNT = None,
@@ -88,50 +96,38 @@ def record_3_1(MODEL = None,
                RE = None,
                CO2MX = None,
                REF_LAT = None):
-    notes = (
-        (5, '{:>5d}', MODEL),
-        (5, None, None),
-        (5, '{:>5d}', IBMAX),
-        (5, None, None),
-        (5, '{:>5d}', NOPRNT),
-        (5, '{:>5d}', NMOL),
-        (5, '{:>5d}', IPUNCH),
-        (3, None, None),
-        (2, '{:>2d}', MUNITS),
-        (10, '{:>10.3f}', RE),
-        (20, None, None),
-        (10, '{:10.3f}', CO2MX)
-        )
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return ((5, '{:>5d}', MODEL),
+            (5, None, None),
+            (5, '{:>5d}', IBMAX),
+            (5, None, None),
+            (5, '{:>5d}', NOPRNT),
+            (5, '{:>5d}', NMOL),
+            (5, '{:>5d}', IPUNCH),
+            (3, None, None),
+            (2, '{:>2d}', MUNITS),
+            (10, '{:>10.3f}', RE),
+            (20, None, None),
+            (10, '{:10.3f}', CO2MX))
 
 
+@write_record_string
 def record_3_2(HBOUND = None,
                HTOA = None):
-    notes = (
-        (10, '{:>10.3f}', HBOUND),
-        (10, '{:>10.3f}', HTOA)
-        )
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return ((10, '{:>10.3f}', HBOUND),
+            (10, '{:>10.3f}', HTOA))
 
 
+@write_record_string
 def record_3_3_A(AVTRAT = None,
                  TDIFF1 = None,
                  TDIFF2 = None,
                  ALTD1 = None,
                  ALTD2 = None):
-    notes = tuple((10, '{:10.3f}', value) \
-                  for value in [AVTRAT, TDIFF1, TDIFF2, ALTD1, ALTD2])
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return tuple((10, '{:10.3f}', value)
+                 for value in [AVTRAT, TDIFF1, TDIFF2, ALTD1, ALTD2])
 
 
-
-def record_3_3_B(ds=ds, IBMAX=None,
+def record_3_3_B(ds=None, IBMAX=None,
                  time=None, lat=None, lon=None):
     Nrow, fmtspec = 8, '{:>10.3f}'
 
@@ -156,15 +152,11 @@ def record_3_3_B(ds=ds, IBMAX=None,
     return '\n'.join(records_rows)
 
 
+@write_record_string
 def record_3_4(IMMAX = None,
                HMOD = None):
-    notes = (
-        (5, '{:>5d}', IMMAX),
-        (24, '{:>24s}', HMOD)
-        )
-    return ''.join(length * ' ' if value == None\
-                   else fmtspec.format(value)\
-                   for length, fmtspec, value in notes)
+    return ((5, '{:>5d}', IMMAX),
+            (24, '{:>24s}', HMOD))
 
 
 def record_3_5(nmol=None,
@@ -277,21 +269,29 @@ def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
 
 
 
+
+
 '''
 Records for IN_AER_RRTM
 '''
 
+
+
+
+@write_record_string
 def record_a1_1(naer=None):
-    notes = ((5, '{:>5d}', naer),)
+    return ((5, '{:>5d}', naer),)
 
 
+@write_record_string
 def record_a2_1(nlay=None, iaod=None, issa=None, ipha=None):
-    notes = ((5, '{:>5d}', nlay),
-             (10, '{:>5d}', iaod),
-             (15, '{:>5d}', issa),
-             (20, '{:>5d}', ipha))
+    return ((5, '{:>5d}', nlay),
+            (10, '{:>5d}', iaod),
+            (15, '{:>5d}', issa),
+            (20, '{:>5d}', ipha))
 
 
+@write_record_string
 def record_a2_1_1(iaod=None, lay=None, aod1=None):
     if iaod != 1:
         raise ValueError('Sorry, only the iaod=1 option is currently implemented.')
@@ -299,23 +299,27 @@ def record_a2_1_1(iaod=None, lay=None, aod1=None):
     notes = tuple([(5, '{:>5d}', lay)] +
                   [(7, '{:>7.4f}', aod1_band)
                    for aod1_band in aod1])
+    return notes
 
 
+@write_record_string
 def record_a2_2(issa=None, ssa=None):
     if issa != 1:
         raise ValueError('Sorry, only the issa=1 option is currently implemented.')
 
     notes = tuple((5, '{:>5.2f}', ssa_band)
                   for ssa_band in ssa)
+    return notes
 
 
+@write_record_string
 def record_a2_3(ipha=None, phase=None):
     if ipha != 1:
         raise ValueError('Sorry, only the ipha=1 option is currently implemented.')
 
     notes = tuple((5, '{:>5.2f}', phase_band)
                   for phase_band in phase)
-
+    return notes
     
 
 def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
