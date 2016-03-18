@@ -327,7 +327,7 @@ def modal_aero_sw(ds):
     specmmr = ds['aerosol_species_mmr']\
               .stack(pcols=stackdims)\
               .transpose('species', 'mode', 'pcols', 'lev')
-    dgnumwet = ds['dgnumwet']\
+    dgnumwet = ds['dgncur_awet']\
                .stack(pcols=stackdims)\
                .transpose('pcols', 'lev', 'mode')
     qaerwat = ds['qaerwat']\
@@ -338,37 +338,48 @@ def modal_aero_sw(ds):
     specdens = aeroconst.get_specdens()
     specrefindex = aeroconst.get_specrefindex()
     extpsw = aeroconst.get_extpsw()
-    abspsw = aeroconst.get_abspws()
+    abspsw = aeroconst.get_abspsw()
     asmpsw = aeroconst.get_asmpsw()
     refrtabsw = aeroconst.get_refrtabsw()
     refitabsw = aeroconst.get_refitabsw()
     crefwsw = aeroconst.get_crefwsw()
 
-    tauxar, wa, ga, fa = f2py_modal_aero_sw.modal_aero_sw(pcols,
-                                                          mass,
-                                                          specmmr,
-                                                          dgnumwet, qaerwat,
-                                                          specdens,
-                                                          specrefindex,
-                                                          extpsw, abspsw, asmpsw,
-                                                          refrtabsw, refitabsw,
-                                                          crefwsw)
+    print('pcols', pcols)
+    print('mass', mass.shape, mass.values.dtype)
+    print('specmmr', specmmr.shape, specmmr.values.dtype)
 
+    tauxar, wa, ga, fa = f2py3_modal_aero_sw.\
+                         modal_aero_sw(pcols=pcols,
+                                       mass=mass,
+                                       specmmr=specmmr,
+                                       dgnumwet=dgnumwet,
+                                       qaerwat=qaerwat,
+                                       specdens=specdens,
+                                       specrefindex=specrefindex,
+                                       extpsw=extpsw,
+                                       abspsw=abspsw,
+                                       asmpsw=asmpsw,
+                                       refrtabsw=refrtabsw,
+                                       refitabsw=refitabsw,
+                                       crefwsw=crefwsw)
+    
     ds.coords['sw_band'] = ('sw_band', extpsw.coords['sw_band'])
     
-    dims = stackdims + ['lev', 'sw_band']
+    dims = stackdims + ('lev', 'sw_band')
     shape = tuple(ds.dims[dim] for dim in dims)
+    print('shape', shape)
+    print('tauxar', tauxar.shape)
     ds.update({'tauxar': (dims,
-                          tauxar.reshape(shape),
+                          tauxar[:,1:,:].reshape(shape),
                           {'long_name': 'optical depth'}),
                'wa': (dims,
-                      wa.reshape(shape),
+                      wa[:,1:,:].reshape(shape),
                       {'long_name': 'single scattering albedo'}),
                'ga': (dims,
-                      ga.reshape(shape),
+                      ga[:,1:,:].reshape(shape),
                       {'long_name': 'asymmetry factor'}),
                'fa': (dims,
-                      fa.reshape(shape),
+                      fa[:,1:,:].reshape(shape),
                       {'long_name': 'forward scattering'})
                })
 
