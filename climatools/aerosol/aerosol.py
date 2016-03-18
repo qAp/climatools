@@ -287,6 +287,32 @@ def wateruptake(ds):
     
     return ds
 
+
+def get_pressure_difference(ds=None):
+    '''
+    Get layer pressure difference
+    Args:
+        ds: xarray.Dataset containing level pressure (`ipressure`)
+    Returns:
+        ds: xarray.Dataset with
+            layer pressure difference (`dpressure`) added as a field
+    Raises:
+        KeyError: when there is no `ipressure` field
+    '''
+    if 'ipressure' not in ds:
+        raise KeyError('No level pressures in input dataset.')
+
+    upper_levels = range(0, ds.dims['ilev'] - 1)
+    lower_levels = range(1, ds.dims['ilev'])
+
+    upper_pres = ds.coords['ipressure'].isel(ilev=upper_levels).values
+    lower_pres = ds.coords['ipressure'].isel(ilev=lower_levels).values
+    
+    ds['dpressure'] = (ds.coords['pressure'].dims,
+                       lower_pres - upper_pres,
+                       ds.coords['pressure'].attrs)
+    ds['dpressure'].attrs['long_name'] = 'layer pressure difference'
+    return ds
                 
                 
 def modal_aero_sw(ds):
@@ -294,7 +320,10 @@ def modal_aero_sw(ds):
     pcols = np.prod([ds.coords[dim].shape[0] for dim in stackdims])    
 
     # dynamic input variables
-    mass
+    mass = (ds['dpressure']
+            .stack(pcols=stackdims)
+            .transpose('pcols', 'lev')) / 9.8
+    
     specmmr = ds['aerosol_species_mmr']\
               .stack(pcols=stackdims)\
               .transpose('species', 'mode', 'pcols', 'lev')
