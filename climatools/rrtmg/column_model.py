@@ -360,7 +360,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                               ICOS=icos))
 
     # record 1.2.1
-    juldat = ds.coords['time'].values[0] % 365
+    juldat = int(ds.coords['time'].values[0] % 365)
     sza = 60.
     isolvar = 0.
     solvar = None
