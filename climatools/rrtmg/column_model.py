@@ -377,7 +377,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                               IREFLECT=ireflect,
                               SEMISS=semiss))
     
-    if IATM == 0:
+    if iatm == 0:
         raise ValueError('Sorry, IATM=0 option is currently not implemented.')
         # record 2.1
         iform = None
@@ -389,7 +389,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
         # record 2.1.1 to 2.1.3
         content.append(record_2_1_1to3(ds=ds))
 
-    if IATM == 1:
+    if iatm == 1:
         # record 3.1
         model = 0
         ibmax = - ds.dims[ilev]
@@ -415,7 +415,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
         htoa = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=0)
         content.append(record_3_2(HBOUND=hbound, HTOA=htoa))
             
-        if IBMAX == 0:
+        if ibmax == 0:
             # record 3.3
             avtrat = None
             tdiff1 = None
