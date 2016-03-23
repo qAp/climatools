@@ -392,7 +392,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     if iatm == 1:
         # record 3.1
         model = 0
-        ibmax = - ds.dims[ilev]
+        ibmax = - ds.dims['ilev']
         noprnt = 0
         nmol = 7
         ipunch = 0
