@@ -11,7 +11,7 @@ import xarray as xr
 import climatools.aerosol.aerosol_constants as aeroconst
 
 #f2py3-compiled modules
-import climatools.aerosol.aerowateruptake as aerowateruptake
+import climatools.aerosol.aerowateruptake as f2py3_aerowateruptake
 import climatools.aerosol.modal_aero_sw as f2py3_modal_aero_sw
 
 
@@ -219,7 +219,7 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
         relative_humidity = relative_humidity.values.reshape((pcols, pver))
         cloud_fraction = cloud_fraction.values.reshape((pcols, pver))
         
-        qaerwat, dgncur_awet, wetdens = aerowateruptake.\
+        qaerwat, dgncur_awet, wetdens = f2py3_aerowateruptake.\
                                         modal_aero_wateruptake_sub(
             ncol=1,
             cldn=cloud_fraction,
@@ -274,7 +274,7 @@ def wateruptake(ds):
     raer = ds['aerosol_species_mmr'].stack(pcols=stackdims)\
                .transpose('pcols', 'lev', 'mode', 'species')
 
-    qaerwat, dgncur_awet, wetdens = aerowateruptake.\
+    qaerwat, dgncur_awet, wetdens = f2py3_aerowateruptake.\
         modal_aero_wateruptake_sub(pcols=pcols, cldn=cldn, \
                                    relative_humidity=rh, raer=raer)
 
@@ -344,10 +344,6 @@ def modal_aero_sw(ds):
     refitabsw = aeroconst.get_refitabsw()
     crefwsw = aeroconst.get_crefwsw()
 
-    print('pcols', pcols)
-    print('mass', mass.shape, mass.values.dtype)
-    print('specmmr', specmmr.shape, specmmr.values.dtype)
-
     tauxar, wa, ga, fa = f2py3_modal_aero_sw.\
                          modal_aero_sw(pcols=pcols,
                                        mass=mass,
@@ -362,13 +358,12 @@ def modal_aero_sw(ds):
                                        refrtabsw=refrtabsw,
                                        refitabsw=refitabsw,
                                        crefwsw=crefwsw)
-    
+
     ds.coords['sw_band'] = ('sw_band', extpsw.coords['sw_band'])
     
     dims = stackdims + ('lev', 'sw_band')
     shape = tuple(ds.dims[dim] for dim in dims)
-    print('shape', shape)
-    print('tauxar', tauxar.shape)
+
     ds.update({'tauxar': (dims,
                           tauxar[:,1:,:].reshape(shape),
                           {'long_name': 'optical depth'}),
