@@ -25,7 +25,7 @@ subroutine modal_aero_sw(pcols, &
    real(kind=8), intent(in) :: dgnumwet(pcols,pver,ntot_amode)            ! number mode diameter
    real(kind=8), intent(in) :: qaerwat(pcols,pver,ntot_amode)             ! aerosol water (g/g)
    real(kind=8), intent(in) :: specdens(nspec_max,ntot_amode)            ! species density (kg/m3)
-   real(kind=8), intent(in) :: specrefindex(nspec_max,ntot_amode,nswbands)        ! species refractive index
+   complex,      intent(in) :: specrefindex(nspec_max,ntot_amode,nswbands)        ! species refractive index
    real(kind=8), intent(in) :: extpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific extinction
    real(kind=8), intent(in) :: abspsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! specific absorption
    real(kind=8), intent(in) :: asmpsw(ncoef,prefr,prefi,ntot_amode,nswbands)      ! asymmetry factor
@@ -105,7 +105,6 @@ subroutine modal_aero_sw(pcols, &
                end do
 
             end do ! species loop
-
 
             do i = 1, ncol
                watervol(i) = qaerwat(i,k,m)/rhoh2o
