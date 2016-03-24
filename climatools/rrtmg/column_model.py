@@ -113,8 +113,8 @@ def record_3_1(MODEL = None,
 @write_record_string
 def record_3_2(HBOUND = None,
                HTOA = None):
-    return ((10, '{:>10.3f}', HBOUND),
-            (10, '{:>10.3f}', HTOA))
+    return ((10, '{:>10.3f}', float(HBOUND)),
+            (10, '{:>10.3f}', float(HTOA)))
 
 
 @write_record_string
