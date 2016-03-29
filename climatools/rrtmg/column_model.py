@@ -432,7 +432,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
             content.append(record_3_3_B(ds=ds, IBMAX=ibmax,
                                         time=time, lat=lat, lon=lon))
             
-        if MODEL == 0:
+        if model == 0:
             # record 3.4
             immax = - ds.dims['ilev']
             hmod = '(lat,lon) = ({}, {})'.format(lat, lon)
