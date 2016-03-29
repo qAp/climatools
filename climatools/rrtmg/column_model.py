@@ -139,8 +139,8 @@ def record_3_3_B(ds=None, IBMAX=None,
         raise ValueError('record_3_3_B is not applicable for IMBAX = 0')
     
     totdata = (ds[name]
-               .sel(time=time, lat=lat, lon=lon)[::-1][: abs(IBMAX)])
-    
+               .sel(time=time, lat=lat, lon=lon)[::-1][: abs(IBMAX)].values)
+
     notes_rows = (
         ((Nrow, fmtspec, value) for value in row) 
         for row in itertools.zip_longest(*(Nrow * [iter(totdata)]))
