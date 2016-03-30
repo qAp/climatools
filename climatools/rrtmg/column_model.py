@@ -192,7 +192,7 @@ def record_3_5(nmol=None,
         (3, None, None)] + [(1, '{:s}', jch) for jch in list_jchars])
     
     try:
-        return ''.join(length * ' ' if value == None
+        return ''.join(length * ' ' if value is None
                        else fmtspec.format(value)
                        for length, fmtspec, value in notes)
     except TypeError:
@@ -207,9 +207,10 @@ def record_3_5(nmol=None,
             (5, None, None),
             (1, '{:s}', jcharp),
             (1, '{:s}', jchart),
-            (3, None, None)] + [(1, '{:s}', jch) for jch in list_jchars])
+            (3, None, None)]
+        + [(1, '{:s}', jch) for jch in list_jchars])
         
-        return ''.join(length * ' ' if value == None
+        return ''.join(length * ' ' if value is None
                        else fmtspec.format(value)
                        for length, fmtspec, value in notes)
 
@@ -230,11 +231,11 @@ def record_3_6(nmol=None,
     list_concs = maxlist_concs[:nmol]
     notes = tuple((10, '{:>10.3e}', value) for value in list_concs)
     try:
-        return ''.join(length * ' ' if value == None
+        return ''.join(length * ' ' if value is None
                        else fmtspec.format(value)
                        for length, fmtspec, value in notes)
     except TypeError:
-        return ''.join(length * ' ' if value == None
+        return ''.join(length * ' ' if value is None
                        else fmtspec.format(float(value))
                        for length, fmtspec, value in notes)
                        
