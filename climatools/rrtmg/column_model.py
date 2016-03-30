@@ -266,9 +266,9 @@ def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
         lines.append(record_ilev)
 
         record_ilev = record_3_6(nmol=NMOL,
-                                 h2o=ds['iQ'].sel(slice_ilev),
+                                 h2o=ds['iQ'].sel(**slice_ilev),
                                  co2=ds['co2vmr'],
-                                 o3=ds['iO3'].sel(slice_ilev),
+                                 o3=ds['iO3'].sel(**slice_ilev),
                                  n2o=ds['n2ovmr'],
                                  co=0,
                                  ch4=ds['ch4vmr'],
