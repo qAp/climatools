@@ -190,6 +190,7 @@ def record_3_5(nmol=None,
         (1, '{:s}', jcharp),
         (1, '{:s}', jchart),
         (3, None, None)] + [(1, '{:s}', jch) for jch in list_jchars])
+    
     try:
         return ''.join(length * ' ' if value == None
                        else fmtspec.format(value)
@@ -198,6 +199,16 @@ def record_3_5(nmol=None,
         zm = float(zm)
         pm = float(pm)
         tm = float(tm)
+
+        notes = tuple([
+            (10, '{:>10.3e}', zm),
+            (10, '{:>10.3e}', pm),
+            (10, '{:>10.3e}', tm),
+            (5, None, None),
+            (1, '{:s}', jcharp),
+            (1, '{:s}', jchart),
+            (3, None, None)] + [(1, '{:s}', jch) for jch in list_jchars])
+        
         return ''.join(length * ' ' if value == None
                        else fmtspec.format(value)
                        for length, fmtspec, value in notes)
@@ -232,16 +243,16 @@ def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
                        time=None, lat=None, lon=None):
     
     slice = dict(time=time, lat=lat, lon=lon)
-    
+
     lines = collections.deque([])
 
-    for ilev in ds.coords['ilev'][::-1]:
-        slice_ilev = slice.update({'ilev': ilev})
+    for ilev in ds.coords['ilev'].values[::-1]:
+        slice_ilev = dict(ilev=ilev, **slice)
         
         record_ilev = record_3_5(nmol=NMOL,
                                  zm=0.,
-                                 pm=ds['ipressure'].sel(slice_ilev),
-                                 tm=ds['iT'].sel(ilev=ilev),
+                                 pm=ds['ipressure'].sel(**slice_ilev),
+                                 tm=ds['iT'].sel(**slice_ilev),
                                  jcharp='A',
                                  jchart='A',
                                  jchar_h2o='C',
