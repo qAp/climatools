@@ -113,6 +113,18 @@ def get_o3_concentration(ds=None, interpfunc=None):
     return ds
 
 
+def get_o2_concentration(ds=None):
+    '''
+    Add data variable for O2 concentration.
+    Value found in physics/cam/chem_surfvals.f90
+    '''
+    name = 'o2mmr'
+    long_name = 'o2 mass mixing ratio'
+    ds[name] = 0.23143
+    ds[name].attrs['long_name'] = long_name
+    return ds
+
+
 def interp_layers2levels(ds, vars=None):
     '''
     Interpolate layer values to levels.
