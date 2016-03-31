@@ -304,20 +304,22 @@ def record_a2_1(nlay=None, iaod=None, issa=None, ipha=None):
 
 
 @write_record_string
-def record_a2_1_1(iaod=None, lay=None, aod1=None):
+def record_a2_1_1(iaod=None, lay=None, aod=None):
     if iaod != 1:
-        raise ValueError('Sorry, only the iaod=1 option is currently implemented.')
+        raise ValueError('Sorry, only the iaod=1 option \
+        is currently implemented.')
 
     notes = tuple([(5, '{:>5d}', lay)] +
-                  [(7, '{:>7.4f}', aod1_band)
-                   for aod1_band in aod1])
+                  [(7, '{:>7.4f}', aod_band)
+                   for aod_band in aod])
     return notes
 
 
 @write_record_string
 def record_a2_2(issa=None, ssa=None):
     if issa != 1:
-        raise ValueError('Sorry, only the issa=1 option is currently implemented.')
+        raise ValueError('Sorry, only the issa=1 option \
+        is currently implemented.')
 
     notes = tuple((5, '{:>5.2f}', ssa_band)
                   for ssa_band in ssa)
@@ -489,16 +491,16 @@ def write_in_aer_rrtm(ds, time=181, lat=-90, lon=0):
     # record A2.1.1 for all layers
     for i, lev in enumerate(ds.coords['lev'][::-1]):
         lay = i + 1
-        aod = ds['tauxar'].sel(time=time, lat=lat, lon=lon, lev=lev)
-        content.append(record_a2_1_1(lay=lay, aod=aod))
+        aod = 1e-22 * ds['tauxar'].sel(time=time, lat=lat, lon=lon, lev=lev).values
+        content.append(record_a2_1_1(iaod=iaod, lay=lay, aod=aod))
         
     # record A2.2
-    ssa = ds['wa'].sel(time=time, lat=lat, lon=lon)
-    content.append(record_a2_2(ssa=ssa))
+    ssa = 1e-22 * ds['wa'].sel(time=time, lat=lat, lon=lon).isel(lev=0).values
+    content.append(record_a2_2(issa=issa, ssa=ssa))
     
     # record A2.3
-    phase = ds['ga'].sel(time=time, lat=lat, lon=lon)
-    content.append(record_a2_3(phase=phase))
+    phase = 1e-22 * ds['ga'].sel(time=time, lat=lat, lon=lon).isel(lev=0).values
+    content.append(record_a2_3(ipha=ipha, phase=phase))
 
     with open('IN_AER_RRTM', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
