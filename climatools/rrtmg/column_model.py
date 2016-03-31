@@ -354,7 +354,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     content.append(record_1_1(CXID=cxid))
 
     # record 1.2
-    iaer = 0 if aerosol else 10
+    iaer = 10 if aerosol else 0
     iatm = 1
     iscat = 1
     istrm = None
@@ -449,7 +449,7 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
         if model == 0:
             # record 3.4
             immax = - ds.dims['ilev']
-            hmod = '(lat,lon) = ({}, {})'.format(lat, lon)
+            hmod = '({}, {})'.format(lat, lon)
             content.append(record_3_4(IMMAX=immax, HMOD=hmod))
 
             # record 3.5 to 3.6
@@ -522,4 +522,6 @@ def write_sw_inputfiles(ds, time=181, lat=-90, lon=0, aerosol=False):
     write_input_rrtm(ds, time=time, lat=lat, lon=lon, aerosol=aerosol)
     if aerosol:
         write_in_aer_rrtm(ds, time=time, lat=lat, lon=lon)
+
+
 
