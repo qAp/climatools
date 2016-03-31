@@ -524,4 +524,8 @@ def write_sw_inputfiles(ds, time=181, lat=-90, lon=0, aerosol=False):
         write_in_aer_rrtm(ds, time=time, lat=lat, lon=lon)
 
 
-
+def create_rrtmg_symlink():
+    path_rrtmg = '/nuwa_cluster/home/jackyu/radiation/rrtmg/SW/rrtmg_sw_v3.9/column_model/build/rrtmg_sw_v3.9_linux_pgi'
+    name_link = 'rrtmg.exe'
+    command = 'ln -s {source} {destination}'
+    os.system(command.format(source=path_rrtmg, destination=name_link))
