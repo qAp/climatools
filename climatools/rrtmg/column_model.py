@@ -243,17 +243,17 @@ def record_3_6(nmol=None,
 def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
                        time=None, lat=None, lon=None):
     
-    slice = dict(time=time, lat=lat, lon=lon)
+    surface = dict(time=time, lat=lat, lon=lon)
 
     lines = collections.deque([])
 
     for ilev in ds.coords['ilev'].values[::-1]:
-        slice_ilev = dict(ilev=ilev, **slice)
+        surface_ilev = dict(ilev=ilev, **surface)
         
         record_ilev = record_3_5(nmol=NMOL,
                                  zm=0.,
-                                 pm=ds['ipressure'].sel(**slice_ilev),
-                                 tm=ds['iT'].sel(**slice_ilev),
+                                 pm=ds['ipressure'].sel(**surface_ilev),
+                                 tm=ds['iT'].sel(**surface_ilev),
                                  jcharp='A',
                                  jchart='A',
                                  jchar_h2o='C',
@@ -267,9 +267,9 @@ def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
         lines.append(record_ilev)
 
         record_ilev = record_3_6(nmol=NMOL,
-                                 h2o=ds['iQ'].sel(**slice_ilev),
+                                 h2o=ds['iQ'].sel(**surface_ilev),
                                  co2=ds['co2vmr'],
-                                 o3=ds['iO3'].sel(**slice_ilev),
+                                 o3=ds['iO3'].sel(**surface_ilev),
                                  n2o=ds['n2ovmr'],
                                  co=0,
                                  ch4=ds['ch4vmr'],
