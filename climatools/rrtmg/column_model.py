@@ -245,13 +245,16 @@ def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
     
     surface = dict(time=time, lat=lat, lon=lon)
 
+    # surface altitude in km (used repeatedly for all levels)
+    zm0 = ds['PHIS'].sel(**surface) / 9.8 * 1e-3 
+
     lines = collections.deque([])
 
     for ilev in ds.coords['ilev'].values[::-1]:
         surface_ilev = dict(ilev=ilev, **surface)
         
         record_ilev = record_3_5(nmol=NMOL,
-                                 zm=0.,
+                                 zm=zm0,
                                  pm=ds['ipressure'].sel(**surface_ilev),
                                  tm=ds['iT'].sel(**surface_ilev),
                                  jcharp='A',
