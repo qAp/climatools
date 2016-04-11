@@ -87,6 +87,110 @@ def record_1_4(IEMIS = None,
 
 
 @write_record_string
+def record_2_1(iform=None, nlayrs=None, nmol=None):
+    '''
+    Parameters
+    ----------
+    iform: column amount format flag. 0 or 1
+           0: read read PAVE, WKL(M,L), WBROADL(L)
+              in F10.4, E10.3, E10.3 formats (default)
+           1: read PAVE, WKL(M,L), WBROADL(L) in E15.7 format
+    nlayrs: number of layers (maximum of 200)
+    nmol: value of highest molecule number used (default=7; maximum of 35)
+    '''
+    return ((1, None, None),
+            (1, '{:d}', iform),
+            (3, '{:>3d}', nlayrs),
+            (5, '{:>5d}', nmol))
+
+
+@write_record_string
+def record_2_1_1(pave=None, pz_bot=None, pz_top=None,
+                 tave=None, tz_bot=None, tz_top=None):
+    '''
+    Parameters
+    ----------
+    pave: average pressure of layer [millibars]
+          (**If IFORM=1, then PAVE in E15.7 format**)
+    pz_bot: pressure at bottom of layer L
+    pz_top: pressure at top of layer L
+    tave: average temperature of layer [K]
+    tz_bot: temperature at bottom of layer L
+    tz_top: temperature at top of layer L
+    '''
+    return ((10, '{:>10.4f}', pave),
+            (10, '{:>10.4f}', tave),
+            (23, None, None),
+            (8, '{:>8.3f}', pz_bot),
+            (7, '{:>7.2f}', tz_bot),
+            (7, None, None),
+            (8, '{:>8.3f}', pz_top),
+            (7, '{:>7.2f}', tz_top))
+
+
+def record_2_1_2(iform=0, wkl=None, wbroadl=None):
+    '''
+    Parameters
+    ----------
+    iform: column amount format flag. 0 or 1
+           0: read read PAVE, WKL(M,L), WBROADL(L)
+              in F10.4, E10.3, E10.3 formats (default)
+           1: read PAVE, WKL(M,L), WBROADL(L) in E15.7 format
+    wkl: column densities for 7 molecular species [molecules/cm**2]
+    wbroadl: column density for broadening gases [molecules/cm**2]
+             If iform=1, then wkl and wbroadl are in 8E15.7 format
+    '''
+    try:
+        assert len(wkl) == 7
+    except:
+        print('wkl needs to be an iterable of length 7')
+
+    if iform == 0:
+        span, fmt = 10, '{:>10.3f}'
+    elif iform == 1:
+        span, fmt = 15, '{:>15.7f}'
+    else:
+        raise ValueError('iform must be either 0 or 1')
+
+    notes = [(span, fmt, density) for density in wkl]
+    notes.append((span, fmt, wbroadl))
+    return tuple(notes)
+    
+
+def record_2_1_3(nmol=7, wkl=None, iform=0):
+    '''
+    Parameters
+    ----------
+    iform: column amount format flag. 0 or 1
+           0: read read PAVE, WKL(M,L), WBROADL(L)
+              in F10.4, E10.3, E10.3 formats (default)
+           1: read PAVE, WKL(M,L), WBROADL(L) in E15.7 format
+    wkl: column densities for additional molecules
+    '''
+    if nmol <= 7:
+        print('nmol is not greater than 7. Nothing to do.')
+    else:
+        num_molecules = nmol - 7
+        try:
+            assert len(wkl) == num_molecules
+        except:
+            print('Expecting density of {} molecule(s) \
+            on top of the first 7'.format(num_molecules))
+            print('Please make sure that wkl \
+            is an iterable of length {}'.format(num_molecules))
+
+        if iform == 0:
+            span, fmt = 10, '{:>10.3f}'
+        elif iform == 1:
+            span, fmt = 15, '{:>15.7f}'
+        else:
+            raise ValueError('iform must be either 0 or 1')
+
+        return tuple((span, fmt, density) for density in wkl)
+
+
+
+@write_record_string
 def record_3_1(MODEL = None,
                IBMAX = None,
                NOPRNT = None,
