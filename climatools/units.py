@@ -81,3 +81,53 @@ def wavenumber_to_nanometres(v):
     Convert cm-1 to nm
     '''
     return 10**7 / v
+
+
+def molecular_mass_mapping():
+    substances = (('air', 28.97),
+                  ('H2O', 18.016),
+                  ('CO2', 44.),
+                  ('O3', 48.),
+                  ('N2O', 44.),
+                  ('CO', 28.),
+                  ('CH4', 16.),
+                  ('O2', 32.))
+    d = dict(substances)
+    return lambda substance_name: d[substance_name]
+
+
+def mixingratio_volume2mass(substance_name = 'H2O', volume_mix = .1):
+    '''
+    Convert volume mixing ratio to mass mixing ratio
+    INPUT:
+    substance_name --- name of substance
+    volume_mix --- value of volume mixing ratio
+    Note that the volume mixing ratio can be in different units,
+    such as [ml/l], [ppmv], etc.
+    '''
+    d = molecular_mass_mapping()
+    return d(substance_name) * volume_mix / d('air')
+
+
+def mixingratio_mass2volume(substance_name = 'H2O', mass_mix = .1):
+    '''
+    Convert mass mixing ratio to volume mixing ratio
+    INPUT:
+    substance_name --- name of substance
+    mass_mix --- value of mass mixing ratio
+    Note that the mass mixing ratio can be in different units,
+    such as [g/g], [mg/g], [ppmm], etc.
+    '''
+    d = molecular_mass_mapping()
+    return d('air') * mass_mix / d(substance_name)
+
+
+def vmr2columndens(vmr=None, coldry=None):
+    '''
+    Convert volumne mixing ratio to column density
+    Parameters
+    ----------
+    vmr: volume mixing ratio 
+    coldry: dry air column density [molecules/cm**2]
+    '''
+    return coldry * vmr
