@@ -231,23 +231,14 @@ def record_3_3_A(AVTRAT = None,
                  for value in [AVTRAT, TDIFF1, TDIFF2, ALTD1, ALTD2])
 
 
-def record_3_3_B(ds=None, IBMAX=None,
-                 time=None, lat=None, lon=None):
+def record_3_3_B(heights=None):
     Nrow, fmtspec = 8, '{:>10.3f}'
-
-    if IBMAX < 0:
-        name = 'ipressure'
-    elif IBMAX > 0:
-        name = 'altitude'
-    else:
-        raise ValueError('record_3_3_B is not applicable for IMBAX = 0')
     
-    totdata = (ds[name]
-               .sel(time=time, lat=lat, lon=lon)[::-1][: abs(IBMAX)].values)
+
 
     notes_rows = (
         ((Nrow, fmtspec, value) for value in row) 
-        for row in itertools.zip_longest(*(Nrow * [iter(totdata)]))
+        for row in itertools.zip_longest(*(Nrow * [iter(heights)]))
         )
     records_rows = (''.join(length * ' ' if value == None\
                             else fmtspec.format(value)\
@@ -344,58 +335,11 @@ def record_3_6(nmol=None,
                        for length, fmtspec, value in notes)
                        
 
-def record_3_5_to_3_6s(ds=None, NMOL=None, IMMAX=None,
-                       time=None, lat=None, lon=None):
-    
-    surface = dict(time=time, lat=lat, lon=lon)
-
-    # surface altitude in km (used repeatedly for all levels)
-    zm0 = ds['PHIS'].sel(**surface) / 9.8 * 1e-3 
-
-    lines = collections.deque([])
-
-    for ilev in ds.coords['ilev'].values[::-1]:
-        surface_ilev = dict(ilev=ilev, **surface)
-        
-        record_ilev = record_3_5(nmol=NMOL,
-                                 zm=zm0,
-                                 pm=ds['ipressure'].sel(**surface_ilev),
-                                 tm=ds['iT'].sel(**surface_ilev),
-                                 jcharp='A',
-                                 jchart='A',
-                                 jchar_h2o='C',
-                                 jchar_co2='A',
-                                 jchar_o3='A',
-                                 jchar_n2o='A',
-                                 jchar_co='A',
-                                 jchar_ch4='A',
-                                 jchar_o2='C')
-
-        lines.append(record_ilev)
-
-        record_ilev = record_3_6(nmol=NMOL,
-                                 h2o=ds['iQ'].sel(**surface_ilev),
-                                 co2=ds['co2vmr'],
-                                 o3=ds['iO3'].sel(**surface_ilev),
-                                 n2o=ds['n2ovmr'],
-                                 co=0,
-                                 ch4=ds['ch4vmr'],
-                                 o2=ds['o2mmr'])
-        
-        lines.append(record_ilev)
-
-    return '\n'.join(lines)
-
-
-
 
 
 '''
 Records for IN_AER_RRTM
 '''
-
-
-
 
 @write_record_string
 def record_a1_1(naer=None):
@@ -443,16 +387,15 @@ def record_a2_3(ipha=None, phase=None):
     return notes
     
 
-def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
+def write_input_rrtm(ds=None, aerosol=False, iatm=0):
     '''
-    Writes INPUT_RRTM file for a column in ds.
-    INPUT:
-    ds --- xarray.Dataset, dataset containing all required variables
-           for RRTMG-SW column model, for all time, latitude and longitude
-    time --- time label of the column. [number of years after the initial time]
-    lat --- latitude of the column. [degrees]
-    lon --- longigutde of the column. [degrees]
-    aerosol --- True or False.  True to include aerosol effects
+    Writes INPUT_RRTM for RRTMG column model
+    Parameters
+    ----------
+    ds: xarray.Dataset containing data variables required by RRTMG-SW column model,
+        such as pressure, temperature and molecule densities.
+    aerosol: True or False.  True to include aerosol effects
+    iatm: flag for RRTATM. 1 for yes. 
     '''
     content = collections.deque([])
 
@@ -481,8 +424,8 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                               ICOS=icos))
 
     # record 1.2.1
-    juldat = int(ds.coords['time'].values[0] % 365)
-    sza = 60.
+    juldat = ds['juldat'].values #int(ds.coords['time'].values[0] % 365)
+    sza = ds['sza'].values
     isolvar = 0.
     solvar = None
     content.append(record_1_2_1(JULDAT=juldat,
@@ -499,7 +442,6 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                               SEMISS=semiss))
     
     if iatm == 0:
-        raise ValueError('Sorry, IATM=0 option is currently not implemented.')
         # record 2.1
         iform = 1
         nlayrs = ds.dims['lev']
@@ -510,25 +452,25 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
         
         for l in range(ds.dims['lev'])[::-1]:
             # record 2.1.1
-            pave = ds['pressure'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
-            pz_bot = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=l+1)
-            pz_top = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=l)
-            tave = ds['T'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
-            tz_bot = ds['iT'].sel(time=time, lat=lat, lon=lon).isel(lev=l+1)
-            tz_top = ds['iT'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
+            pave = ds['layer_pressure'].isel(lev=l)
+            pz_bot = ds['level_pressure'].isel(ilev=l+1)
+            pz_top = ds['level_pressure'].isel(ilev=l)
+
+            tave = ds['layer_temperature'].isel(lev=l)
+            tz_bot = ds['level_temperature'].isel(lev=l+1)
+            tz_top = ds['level_temperature'].isel(lev=l)
 
             content.append(record_2_1_1(pave=pave, pz_bot=pz_bot, pz_top=pz_top,
                                         tave=tave, tz_bot=tz_bot, tz_top=tz_top))
 
             # record 2.1.2
             names_mols = ['h2o', 'co2', 'o3', 'n2o', 'co', 'ch4', 'o2']   
-            wkl = [ds['coldens_' + name]
-                   .sel(time=time, lat=lat, lon=lon).isel(lev=l)
-                   for name in names_mols]
+            wkl = [ds['layer_coldens_' + name].isel(lev=l) for name in names_mols]
             content.append(record_2_1_2(iform=iform, wkl=wkl, wbroadl=0))
             
             # record 2.1.3
-            # Densities of molecules in addition to the 7 in record 2.1.2 
+            # Densities of molecules in addition to the 7 in record 2.1.2
+            
 
     if iatm == 1:
         # record 3.1
@@ -552,8 +494,8 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                                   REF_LAT=ref_lat))
 
         # record 3.2
-        hbound = 1e-2 * ds['PS'].sel(time=time, lat=lat, lon=lon)
-        htoa = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=0)
+        hbound = ds['surface_pressure']
+        htoa = ds['level_pressure'].isel(ilev=0)
         content.append(record_3_2(HBOUND=hbound, HTOA=htoa))
             
         if ibmax == 0:
@@ -570,19 +512,45 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
                                        ALTD2=altd2))
         else:
             # record 3.3.B
-            content.append(record_3_3_B(ds=ds, IBMAX=ibmax,
-                                        time=time, lat=lat, lon=lon))
+            if ibmax < 0:
+                name = 'level_pressure'
+            else:
+                name = 'altitude'
+
+            heights = (ds[name][::-1][: abs(ibmax)].values)            
+
+            content.append(record_3_3_B(heights=heights))
             
         if model == 0:
             # record 3.4
             immax = - ds.dims['ilev']
-            hmod = '({}, {})'.format(lat, lon)
+            hmod = 'user-specified'
             content.append(record_3_4(IMMAX=immax, HMOD=hmod))
 
             # record 3.5 to 3.6
-            content.append(
-                record_3_5_to_3_6s(ds=ds, NMOL=nmol, IMMAX=immax,
-                                   time=time, lat=lat, lon=lon))
+            for i in range(ds.dims['ilev'])[::-1]:
+                content.append(record_3_5(nmol=nmol,
+                                          zm=ds['surface_pressure'],
+                                          pm=ds['level_pressure'].isel(ilev=i),
+                                          tm=ds['level_temperature'].isel(ilev=i),
+                                          jcharp='A',
+                                          jchart='A',
+                                          jchar_h2o='C',
+                                          jchar_co2='A',
+                                          jchar_o3='A',
+                                          jchar_n2o='A',
+                                          jchar_co='A',
+                                          jchar_ch4='A',
+                                          jchar_o2='C'))
+
+                content.append(record_3_6(nmol=nmol,
+                                          h2o=ds['level_mmr_h2o'].isel(ilev=i),
+                                          co2=ds['level_vmr_co2'],
+                                          o3=ds['level_vmr_o3'].isel(ilev=i),
+                                          n2o=ds['level_vmr_n2o'],
+                                          co=ds['level_vmr_co'],
+                                          ch4=ds['level_vmr_ch4'],
+                                          o2=ds['level_mmr_o2']))
             
     with open('INPUT_RRTM', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
