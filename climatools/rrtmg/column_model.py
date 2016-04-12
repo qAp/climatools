@@ -501,14 +501,34 @@ def write_input_rrtm(ds=None, time=181, lat=-90, lon=0, aerosol=False):
     if iatm == 0:
         raise ValueError('Sorry, IATM=0 option is currently not implemented.')
         # record 2.1
-        iform = None
-        nlayrs = None
-        nmol = None
-        content.append(record_2_1(IFORM=iform,
-                                  NLAYRS=nlayrs,
-                                  NMOL=nmol))
-        # record 2.1.1 to 2.1.3
-        content.append(record_2_1_1to3(ds=ds))
+        iform = 1
+        nlayrs = ds.dims['lev']
+        nmol = 7
+        content.append(record_2_1(iform=iform,
+                                  nlayrs=nlayrs,
+                                  nmol=nmol))
+        
+        for l in range(ds.dims['lev'])[::-1]:
+            # record 2.1.1
+            pave = ds['pressure'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
+            pz_bot = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=l+1)
+            pz_top = ds['ipressure'].sel(time=time, lat=lat, lon=lon).isel(ilev=l)
+            tave = ds['T'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
+            tz_bot = ds['iT'].sel(time=time, lat=lat, lon=lon).isel(lev=l+1)
+            tz_top = ds['iT'].sel(time=time, lat=lat, lon=lon).isel(lev=l)
+
+            content.append(record_2_1_1(pave=pave, pz_bot=pz_bot, pz_top=pz_top,
+                                        tave=tave, tz_bot=tz_bot, tz_top=tz_top))
+
+            # record 2.1.2
+            names_mols = ['h2o', 'co2', 'o3', 'n2o', 'co', 'ch4', 'o2']   
+            wkl = [ds['coldens_' + name]
+                   .sel(time=time, lat=lat, lon=lon).isel(lev=l)
+                   for name in names_mols]
+            content.append(record_2_1_2(iform=iform, wkl=wkl, wbroadl=0))
+            
+            # record 2.1.3
+            # Densities of molecules in addition to the 7 in record 2.1.2 
 
     if iatm == 1:
         # record 3.1
