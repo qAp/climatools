@@ -304,25 +304,25 @@ def get_pressure_difference(ds=None):
     '''
     Get layer pressure difference
     Args:
-        ds: xarray.Dataset containing level pressure (`ipressure`)
+        ds: xarray.Dataset containing level pressure (`level_pressure`)
     Returns:
         ds: xarray.Dataset with
             layer pressure difference (`dpressure`) added as a field
     Raises:
-        KeyError: when there is no `ipressure` field
+        KeyError: when there is no `level_pressure` field
     '''
-    if 'ipressure' not in ds:
+    if 'level_pressure' not in ds:
         raise KeyError('No level pressures in input dataset.')
 
     upper_levels = range(0, ds.dims['ilev'] - 1)
     lower_levels = range(1, ds.dims['ilev'])
 
-    upper_pres = ds.coords['ipressure'].isel(ilev=upper_levels).values
-    lower_pres = ds.coords['ipressure'].isel(ilev=lower_levels).values
+    upper_pres = ds.coords['level_pressure'].isel(ilev=upper_levels).values
+    lower_pres = ds.coords['level_pressure'].isel(ilev=lower_levels).values
     
-    ds['dpressure'] = (ds.coords['pressure'].dims,
+    ds['dpressure'] = (ds.coords['layer_pressure'].dims,
                        lower_pres - upper_pres,
-                       ds.coords['pressure'].attrs)
+                       ds.coords['layer_pressure'].attrs)
     ds['dpressure'].attrs['long_name'] = 'layer pressure difference'
     return ds
                 
