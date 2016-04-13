@@ -9,21 +9,21 @@ def hybrid2mbar(ds):
     ds --- xray.Dataset containing hybrid layer and level coordinates
     OUTPUT:
     ds --- same as input but with additional coordinate variables,
-           pressure and ipressure, for layer pressure
+           pressure and level_pressure, for layer pressure
            and level pressure, respectively. Both are in milibars.
     '''
     if 'lev' in ds:
         layer_pressure = 1e-2 * (ds['hyam'] * ds['P0'] + ds['hybm'] * ds['PS'])
-        ds.coords['pressure'] = (layer_pressure.dims, layer_pressure)
-        ds.coords['pressure']\
+        ds.coords['layer_pressure'] = (layer_pressure.dims, layer_pressure)
+        ds.coords['layer_pressure']\
             .attrs.update({'units': 'mbar',
                            'long_name': 'pressure at mid-points',
                            'formula': 'hyam * P0 + hybm * PS'})        
 
     if 'ilev' in ds:
         level_pressure = 1e-2 * (ds['hyai'] * ds['P0'] + ds['hybi'] * ds['PS'])
-        ds.coords['ipressure'] = (level_pressure.dims, level_pressure)
-        ds.coords['ipressure']\
+        ds.coords['level_pressure'] = (level_pressure.dims, level_pressure)
+        ds.coords['level_pressure']\
             .attrs.update({'units': 'mbar',
                            'long_name': 'pressure at interfaces',
                            'formula': 'hyai * P0 + hybi * PS'})
@@ -131,3 +131,5 @@ def vmr2columndens(vmr=None, coldry=None):
     coldry: dry air column density [molecules/cm**2]
     '''
     return coldry * vmr
+
+
