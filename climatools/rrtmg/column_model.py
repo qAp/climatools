@@ -62,17 +62,25 @@ def record_1_2(IAER = None,
 
 
 @write_record_string
-def record_1_2_1(JULDAT = None,
-                 SZA = None,
-                 ISOLVAR = None,
-                 SOLVAR = None):
+def record_1_2_1(juldat=None,
+                 sza=None,
+                 isolvar=None,
+                 solvar=None):
+    if juldat != None:
+        juldat = int(juldat)
+    if sza != None:
+        sza = float(sza)
+    if isolvar != None:
+        isolvar = float(isolvar)
+    if solvar != None:
+        solvar = float(solvar)
     return tuple([(12, None, None),
-                  (3, '{:>3d}', JULDAT),
+                  (3, '{:>3d}', juldat),
                   (3, None, None),
-                  (7, '{:>7.4f}', SZA),
+                  (7, '{:>7.4f}', sza),
                   (4, None, None),
                   (1, None, None)] + 
-                 [(5, '{:>5.3f}', sv) for sv in SOLVAR or 14 * [None]])
+                 [(5, '{:>5.3f}', sv) for sv in solvar or 14 * [None]])
 
 
 @write_record_string
@@ -428,10 +436,10 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
     sza = ds['sza'].values
     isolvar = 0.
     solvar = None
-    content.append(record_1_2_1(JULDAT=juldat,
-                                SZA=sza,
-                                ISOLVAR=isolvar,
-                                SOLVAR=solvar))
+    content.append(record_1_2_1(juldat=juldat,
+                                sza=sza,
+                                isolvar=isolvar,
+                                solvar=solvar))
 
     # record 1.4
     iemis = 0
