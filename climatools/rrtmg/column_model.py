@@ -126,14 +126,14 @@ def record_2_1_1(pave=None, pz_bot=None, pz_top=None,
     tz_bot: temperature at bottom of layer L
     tz_top: temperature at top of layer L
     '''
-    return ((10, '{:>10.4f}', pave),
-            (10, '{:>10.4f}', tave),
+    return ((10, '{:>10.4f}', float(pave)),
+            (10, '{:>10.4f}', float(tave)),
             (23, None, None),
-            (8, '{:>8.3f}', pz_bot),
-            (7, '{:>7.2f}', tz_bot),
+            (8, '{:>8.3f}', float(pz_bot)),
+            (7, '{:>7.2f}', float(tz_bot)),
             (7, None, None),
-            (8, '{:>8.3f}', pz_top),
-            (7, '{:>7.2f}', tz_top))
+            (8, '{:>8.3f}', float(pz_top)),
+            (7, '{:>7.2f}', float(tz_top)))
 
 
 def record_2_1_2(iform=0, wkl=None, wbroadl=None):
@@ -413,7 +413,7 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
 
     # record 1.2
     iaer = 10 if aerosol else 0
-    iatm = 1
+    iatm = iatm
     iscat = 1
     istrm = None
     iout = 98
@@ -465,8 +465,8 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
             pz_top = ds['level_pressure'].isel(ilev=l)
 
             tave = ds['layer_temperature'].isel(lev=l)
-            tz_bot = ds['level_temperature'].isel(lev=l+1)
-            tz_top = ds['level_temperature'].isel(lev=l)
+            tz_bot = ds['level_temperature'].isel(ilev=l+1)
+            tz_top = ds['level_temperature'].isel(ilev=l)
 
             content.append(record_2_1_1(pave=pave, pz_bot=pz_bot, pz_top=pz_top,
                                         tave=tave, tz_bot=tz_bot, tz_top=tz_top))
