@@ -66,13 +66,13 @@ def record_1_2_1(juldat=None,
                  sza=None,
                  isolvar=None,
                  solvar=None):
-    if juldat != None:
+    if juldat is not None:
         juldat = int(juldat)
-    if sza != None:
+    if sza is not None:
         sza = float(sza)
-    if isolvar != None:
+    if isolvar is not None:
         isolvar = float(isolvar)
-    if solvar != None:
+    if solvar is not None:
         solvar = float(solvar)
     return tuple([(12, None, None),
                   (3, '{:>3d}', juldat),
@@ -136,6 +136,7 @@ def record_2_1_1(pave=None, pz_bot=None, pz_top=None,
             (7, '{:>7.2f}', float(tz_top)))
 
 
+@write_record_string
 def record_2_1_2(iform=0, wkl=None, wbroadl=None):
     '''
     Parameters
@@ -160,11 +161,14 @@ def record_2_1_2(iform=0, wkl=None, wbroadl=None):
     else:
         raise ValueError('iform must be either 0 or 1')
 
+    wkl = [float(density) if density is not None else density for density in wkl]
+    wbroadl = float(wbroadl) if wbroadl is not None else wbroadl
     notes = [(span, fmt, density) for density in wkl]
     notes.append((span, fmt, wbroadl))
     return tuple(notes)
     
 
+@write_record_string
 def record_2_1_3(nmol=7, wkl=None, iform=0):
     '''
     Parameters
@@ -559,7 +563,7 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
                                           co=ds['level_vmr_co'],
                                           ch4=ds['level_vmr_ch4'],
                                           o2=ds['level_mmr_o2']))
-            
+
     with open('INPUT_RRTM', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
     
