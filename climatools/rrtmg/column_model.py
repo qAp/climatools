@@ -113,11 +113,18 @@ def record_2_1(iform=None, nlayrs=None, nmol=None):
 
 
 @write_record_string
-def record_2_1_1(pave=None, pz_bot=None, pz_top=None,
+def record_2_1_1(iform=1, is_surface_layer=False,
+                 pave=None, pz_bot=None, pz_top=None,
                  tave=None, tz_bot=None, tz_top=None):
     '''
     Parameters
     ----------
+    iform: column amount format flag. 0 or 1
+           0: read read PAVE, WKL(M,L), WBROADL(L)
+              in F10.4, E10.3, E10.3 formats (default)
+           1: read PAVE, WKL(M,L), WBROADL(L) in E15.7 format
+    is_surface_layer: boolean. True if current layer is
+                      the surface layer
     pave: average pressure of layer [millibars]
           (**If IFORM=1, then PAVE in E15.7 format**)
     pz_bot: pressure at bottom of layer L
@@ -126,14 +133,65 @@ def record_2_1_1(pave=None, pz_bot=None, pz_top=None,
     tz_bot: temperature at bottom of layer L
     tz_top: temperature at top of layer L
     '''
-    return ((10, '{:>10.4f}', float(pave)),
-            (10, '{:>10.4f}', float(tave)),
-            (23, None, None),
-            (8, '{:>8.3f}', float(pz_bot)),
-            (7, '{:>7.2f}', float(tz_bot)),
-            (7, None, None),
-            (8, '{:>8.3f}', float(pz_top)),
-            (7, '{:>7.2f}', float(tz_top)))
+    if iform == 0:
+        if is_surface_layer:
+            '(3f10.4,a3,i2,1x,2(f7.2,f8.3,f7.2))'
+            notes = ((10, '{:>10.4f}', float(pave)),
+                     (10, '{:>10.4f}', float(tave)),
+                     (10, '{:>10.4f}', 0),
+                     (3, '{:>3s}', '0'),
+                     (2, '{:>2d}', 0),
+                     (1, None, None,),
+                     (7, '{:>7.2f}', 0.),
+                     (8, '{:>8.3f}', float(pz_bot)),
+                     (7, '{:>7.2f}', float(tz_bot)),
+                     (7, '{:>7.2f}', 0.),
+                     (8, '{:>8.3f}', float(pz_top)),
+                     (7, '{:>7.2f}', float(tz_top)))
+        else:
+            '(3f10.4,a3,i2,23x,(f7.2,f8.3,f7.2))'
+            notes = ((10, '{:>10.4f}', float(pave)),
+                     (10, '{:>10.4f}', float(tave)),
+                     (10, '{:>10.4f}', 0),
+                     (3, '{:>3s}', '0'),
+                     (2, '{:>2d}', 0),
+                     (23, None, None,),
+                     (7, '{:>7.2f}', 0.),
+                     (8, '{:>8.3f}', float(pz_top)),
+                     (7, '{:>7.2f}', float(tz_top)))
+            
+    elif iform == 1:
+        if is_surface_layer:
+            '(g15.7,g10.4,g10.4,a3,i2,1x,2(g7.2,g8.3,g7.2))'
+            notes = (
+                (15, '{:>15.7f}', float(pave)),
+                (10, '{:>10.4f}', float(tave)),
+                (10, '{:>10.4f}', 0),
+                (3, '{:>3s}', '0'),
+                (2, '{:>2d}', 0),
+                (1, None, None),
+                (7, '{:>7.2f}', 0),
+                (8, '{:>8.3f}', float(pz_bot)),
+                (7, '{:>7.2f}', float(tz_bot)),
+                (7, '{:>7.2f}', 0),
+                (8, '{:>8.3f}', float(pz_top)),
+                (7, '{:>7.2f}', float(tz_top))
+                )
+        else:
+            '(g15.7,g10.4,g10.4,a3,i2,23x,(g7.2,g8.3,g7.2))'
+            notes = (
+                (15, '{:>15.7f}', float(pave)),
+                (10, '{:>10.4f}', float(tave)),
+                (10, '{:>10.4f}', 0),
+                (3, '{:>3s}', '0'),
+                (2, '{:>2d}', 0),
+                (23, None, None),
+                (7, '{:>7.2f}', 0),
+                (8, '{:>8.3f}', float(pz_top)),
+                (7, '{:>7.2f}', float(tz_top))
+                )
+        
+    return notes
 
 
 @write_record_string
@@ -155,13 +213,14 @@ def record_2_1_2(iform=0, wkl=None, wbroadl=None):
         print('wkl needs to be an iterable of length 7')
 
     if iform == 0:
-        span, fmt = 10, '{:>10.3f}'
+        span, fmt = 10, '{:>10.3e}'
     elif iform == 1:
-        span, fmt = 15, '{:>15.7f}'
+        span, fmt = 15, '{:>15.7e}'
     else:
         raise ValueError('iform must be either 0 or 1')
 
-    wkl = [float(density) if density is not None else density for density in wkl]
+    wkl = [float(density) if density is not None else density
+           for density in wkl]
     wbroadl = float(wbroadl) if wbroadl is not None else wbroadl
     notes = [(span, fmt, density) for density in wkl]
     notes.append((span, fmt, wbroadl))
@@ -462,22 +521,30 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
                                   nlayrs=nlayrs,
                                   nmol=nmol))
         
-        for l in range(ds.dims['lev'])[::-1]:
+        for l, lev in enumerate(range(ds.dims['lev'])[::-1]):
             # record 2.1.1
-            pave = ds['layer_pressure'].isel(lev=l)
-            pz_bot = ds['level_pressure'].isel(ilev=l+1)
-            pz_top = ds['level_pressure'].isel(ilev=l)
+            pave = ds['layer_pressure'].isel(lev=lev)
+            pz_bot = ds['level_pressure'].isel(ilev=lev+1)
+            pz_top = ds['level_pressure'].isel(ilev=lev)
 
-            tave = ds['layer_temperature'].isel(lev=l)
-            tz_bot = ds['level_temperature'].isel(ilev=l+1)
-            tz_top = ds['level_temperature'].isel(ilev=l)
+            tave = ds['layer_temperature'].isel(lev=lev)
+            tz_bot = ds['level_temperature'].isel(ilev=lev+1)
+            tz_top = ds['level_temperature'].isel(ilev=lev)
 
-            content.append(record_2_1_1(pave=pave, pz_bot=pz_bot, pz_top=pz_top,
-                                        tave=tave, tz_bot=tz_bot, tz_top=tz_top))
+            if l == 0:
+                is_surface_layer = True
+            else:
+                is_surface_layer = False
+                
+            content.append(
+                record_2_1_1(iform=iform, is_surface_layer=is_surface_layer,
+                             pave=pave, pz_bot=pz_bot, pz_top=pz_top,
+                             tave=tave, tz_bot=tz_bot, tz_top=tz_top))
 
             # record 2.1.2
             names_mols = ['h2o', 'co2', 'o3', 'n2o', 'co', 'ch4', 'o2']   
-            wkl = [ds['layer_coldens_' + name].isel(lev=l) for name in names_mols]
+            wkl = [ds['layer_coldens_' + name].isel(lev=lev)
+                   for name in names_mols]
             content.append(record_2_1_2(iform=iform, wkl=wkl, wbroadl=0))
             
             # record 2.1.3
