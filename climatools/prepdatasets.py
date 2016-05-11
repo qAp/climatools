@@ -20,8 +20,8 @@ def convert_pressure_time_units(cases):
     hyam, which will not be needed later.
     '''
     ds = cases[random.choice(list(cases.keys()))]
-    lev = climaunits.hybrid2mbar(ds, level_type = 'lev')
-    ilev = climaunits.hybrid2mbar(ds, level_type = 'ilev')
+    ds = climaunits.hybrid2mbar(ds)
+
     datetimes = climadates.time2datetimes(ds)
     datetimes = [climadates.\
                  UTCtime_to_localtime(datetime,
@@ -29,8 +29,6 @@ def convert_pressure_time_units(cases):
                                       positivise_longitude(ds['lon'].values[0])) \
                  for datetime in datetimes]
     for name, ds in cases.items():
-        ds.coords['ilev'] = ('ilev', ilev, {'units': 'mbar', 'long_name': 'interface pressure'})
-        ds.coords['lev'] = ('lev', lev, {'units': 'mbar', 'long_name': 'level pressure'})
         ds.coords['time'] = ('time', datetimes, {'units': 'datetime', 'long_name': 'time'})
     return cases
     
