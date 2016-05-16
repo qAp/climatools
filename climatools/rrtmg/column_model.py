@@ -573,7 +573,7 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
                                   REF_LAT=ref_lat))
 
         # record 3.2
-        hbound = ds['surface_pressure']
+        hbound = 1e-2 * ds['PS']
         htoa = ds['level_pressure'].isel(ilev=0)
         content.append(record_3_2(HBOUND=hbound, HTOA=htoa))
             
@@ -608,28 +608,30 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
 
             # record 3.5 to 3.6
             for i in range(ds.dims['ilev'])[::-1]:
-                content.append(record_3_5(nmol=nmol,
-                                          zm=ds['surface_pressure'],
-                                          pm=ds['level_pressure'].isel(ilev=i),
-                                          tm=ds['level_temperature'].isel(ilev=i),
-                                          jcharp='A',
-                                          jchart='A',
-                                          jchar_h2o='C',
-                                          jchar_co2='A',
-                                          jchar_o3='A',
-                                          jchar_n2o='A',
-                                          jchar_co='A',
-                                          jchar_ch4='A',
-                                          jchar_o2='C'))
-
-                content.append(record_3_6(nmol=nmol,
-                                          h2o=ds['level_mmr_h2o'].isel(ilev=i),
-                                          co2=ds['level_vmr_co2'],
-                                          o3=ds['level_vmr_o3'].isel(ilev=i),
-                                          n2o=ds['level_vmr_n2o'],
-                                          co=ds['level_vmr_co'],
-                                          ch4=ds['level_vmr_ch4'],
-                                          o2=ds['level_mmr_o2']))
+                content.append(
+                    record_3_5(nmol=nmol,
+                               zm=1e-3 * ds['level_altitude'].isel(ilev=i),
+                               pm=ds['level_pressure'].isel(ilev=i),
+                               tm=ds['level_temperature'].isel(ilev=i),
+                               jcharp='A',
+                               jchart='A',
+                               jchar_h2o='C',
+                               jchar_co2='A',
+                               jchar_o3='A',
+                               jchar_n2o='A',
+                               jchar_co='A',
+                               jchar_ch4='A',
+                               jchar_o2='C'))
+                
+                content.append(
+                    record_3_6(nmol=nmol,
+                               h2o=1e3 * ds['level_mmr_h2o'].isel(ilev=i),
+                               co2=1e6 * ds['level_vmr_co2'].isel(ilev=i),
+                               o3=1e6  * ds['level_vmr_o3'].isel(ilev=i),
+                               n2o=1e6 * ds['level_vmr_n2o'].isel(ilev=i),
+                               co=1e6  * ds['level_vmr_co'].isel(ilev=i),
+                               ch4=1e6 * ds['level_vmr_ch4'].isel(ilev=i),
+                               o2=1e3 * ds['level_mmr_o2'].isel(ilev=i)))
 
     with open('INPUT_RRTM', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
