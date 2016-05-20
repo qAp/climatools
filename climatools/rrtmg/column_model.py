@@ -637,16 +637,14 @@ def write_input_rrtm(ds=None, aerosol=False, iatm=0):
         file.write('\n'.join(content))
     
         
-def write_in_aer_rrtm(ds, time=181, lat=-90, lon=0):
+def write_in_aer_rrtm(ds):
     '''
     Writes IN_AER_RRTM file for a column in ds.
-    INPUT:
-    ds --- xarray.Dataset, dataset containing all required variables
-           for RRTMG-SW column model; to take into account of aerosol effects,
-           , and for all times, latitudes and longitudes
-    time --- time label of the column. [number of years after the initial time]
-    lat --- latitude of the column. [degrees]
-    lon --- longigutde of the column. [degrees]
+
+    Parameters
+    ----------
+    ds: xarray.Dataset containing variables needed for including
+        aerosol effects, at some `time`, `latitude` and `longitude`
     '''
     content = collections.deque([])
     
@@ -667,15 +665,15 @@ def write_in_aer_rrtm(ds, time=181, lat=-90, lon=0):
     # record A2.1.1 for all layers
     for i, lev in enumerate(ds.coords['lev'][::-1]):
         lay = i + 1
-        aod = 1e-22 * ds['tauxar'].sel(time=time, lat=lat, lon=lon, lev=lev).values
+        aod = ds['tauxar'].sel(lev=lev).values
         content.append(record_a2_1_1(iaod=iaod, lay=lay, aod=aod))
         
     # record A2.2
-    ssa = 1e-22 * ds['wa'].sel(time=time, lat=lat, lon=lon).isel(lev=0).values
+    ssa = ds['wa'].isel(lev=0).values
     content.append(record_a2_2(issa=issa, ssa=ssa))
     
     # record A2.3
-    phase = 1e-22 * ds['ga'].sel(time=time, lat=lat, lon=lon).isel(lev=0).values
+    phase = ds['ga'].isel(lev=0).values
     content.append(record_a2_3(ipha=ipha, phase=phase))
 
     with open('IN_AER_RRTM', mode='w', encoding='utf-8') as file:
