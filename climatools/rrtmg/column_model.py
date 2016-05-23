@@ -668,15 +668,17 @@ def write_in_aer_rrtm(ds):
         aod = ds['tauxar'].sel(lev=lev).values
         content.append(record_a2_1_1(iaod=iaod, lay=lay, aod=aod))
         
-    # record A2.2
-    ssa = ds['wa'].isel(lev=0).values
-    content.append(record_a2_2(issa=issa, ssa=ssa))
+    # record A2.2 for all layers
+    for lev in ds.coords['lev'][::-1]:
+        ssa = ds['wa'].sel(lev=lev).values
+        content.append(record_a2_2(issa=issa, ssa=ssa))
     
-    # record A2.3
-    phase = ds['ga'].isel(lev=0).values
-    content.append(record_a2_3(ipha=ipha, phase=phase))
+    # record A2.3 for all layers
+    for lev in ds.coords['lev'][::-1]:
+        phase = ds['ga'].sel(lev=lev).values
+        content.append(record_a2_3(ipha=ipha, phase=phase))
 
-    with open('IN_AER_RRTM', mode='w', encoding='utf-8') as file:
+    with open('IN_AER_RRTM_temp', mode='w', encoding='utf-8') as file:
         file.write('\n'.join(content))
 
         
