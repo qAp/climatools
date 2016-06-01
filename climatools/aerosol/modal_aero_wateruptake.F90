@@ -30,13 +30,18 @@ subroutine modal_aero_wateruptake_sub(                &
        specdens_amode = reshape((/ 1770.0, 1000.0, 1000.0, 1700.0, 2600.0, 1900.0, &
        1770.0, 1000.0, 1900.0, -9999., -9999., -9999., &
        2600.0, 1900.0, 1770.0, -9999., -9999., -9999. /), &
-       (/ ntot_amode, max_nspec_amode /))
+       (/ ntot_amode, max_nspec_amode /), &
+       (/-9999., -9999./), &
+       (/2, 1/))
+  
   ! hygroscopicity of aerosol (from physprop)
   real(kind = 8), dimension(ntot_amode, max_nspec_amode), parameter :: &
        spechygro = reshape((/ 0.507, 0.10000000010000001, 0.14, 1.000000013351432e-10, 0.068, 1.16, &
        0.507, 0.14, 1.16, -9999., -9999., -9999., &
        0.068, 1.16, 0.507, -9999., -9999., -9999. /), &
-       (/ ntot_amode, max_nspec_amode /))
+       (/ ntot_amode, max_nspec_amode /), &
+       (/-9999., -9999./), &
+       (/2, 1/))
   
   real(kind = 8) :: alnsg_amode(ntot_amode)
   
