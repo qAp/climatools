@@ -2,154 +2,29 @@ import os
 import sys
 
 import numpy as np
-import scipy.interpolate as interpolate
+
 import pandas as pd
 import xarray as xr
 
 
 
-import climatools.aerosol.aerosol_constants as aeroconst
+import climatools.rrtmg.camhist.aerosol_constants as aeroconst
 
 #f2py3-compiled modules
-import climatools.aerosol.aerowateruptake as f2py3_aerowateruptake
-import climatools.aerosol.modal_aero_sw as f2py3_modal_aero_sw
+
+#import (climatools.rrtmg.camhist.f2py.aerowateruptake
+#        as f2py3_aerowateruptake)
+#import (climatools.rrtmg.camhist.f2py.modal_aero_sw
+#        as f2py3_modal_aero_sw)
+
+from climatools.rrtmg.camhist.f2py import (aerowateruptake as
+                                           f2py3_aerowateruptake)
+
+from climatools.rrtmg.camhist.f2py import (modal_aero_sw as
+                                           f2py3_modal_aero_sw)
 
 
 
-
-OZONE_DATA_DIRECTORY = '/nuwa_data/data/cesm1/inputdata/atm/cam/ozone'
-OZONE_FILENAME = 'ozone_1.9x2.5_L26_1850clim_c090420.nc'
-
-with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, OZONE_FILENAME),
-                     decode_cf=False) as ds:
-    OZONE_DATASET = ds.copy(deep=True)
-
-
-
-def steal_hybrid_level_coefficients(ds):
-    '''
-    Takes and adds fields necessary in order to convert
-    hybrid levels to milibars.  This function is created
-    because some ozone data files do not have the
-    coefficients necessary to convert surface and reference
-    pressure to level/layer pressures in milibars.  These
-    coefficients will be taken from other .nc files with
-    26 levels.  It is assumed that these are the same 26 levels.
-    INPUT:
-    ds --- xarray.Dataset
-    OUTPUT:
-    ds --- xarray.Dataset with additional fields:
-           hyam --- coefficient A for mid-points
-           hybm --- coefficient B for mid-points
-           PS --- surface pressure
-           P0 --- reference pressure
-    '''
-    filegood = 'ozone_1.9x2.5_L26_1850clim_c091112.nc'
-    with xr.open_dataset(os.path.join(OZONE_DATA_DIRECTORY, filegood),
-                         decode_cf=False) as dsgood:
-        
-        for var in ['hyam', 'hybm', 'P0', 'PS']:
-            newvar = dsgood[var]
-            ds[var] = (newvar.dims, newvar, newvar.attrs)
-            
-    return ds
-
-
-OZONE_DATASET = steal_hybrid_level_coefficients(OZONE_DATASET)
-
-
-def get_interpfunc(da=None, dim='time',
-                   bounds_error=False, fill_value='extrapolate'):
-    '''
-    Linearly interpolates `da` along dimension `dim`.  This function
-    returns a function that evaluates `da` at a set of values along
-    dimension `dim`.
-
-    Parameters
-    ----------
-    da : xarray.DataArray
-    dim : string
-          name of dimension to interpolate along
-    '''
-    
-    x = da.coords[dim]
-    y = da.values
-    axis = da.dims.index(dim)
-    func = interpolate.interp1d(x=x, y=y, axis=axis,
-                                bounds_error=bounds_error,
-                                fill_value=fill_value)
-
-    def callf(coords=None, name_dim=None):
-        data = func(coords)
-
-        dims_interp = list(da.dims)
-        coords_interp = [coords if d == dim else da.coords[d]
-                         for d in dims_interp]
-
-        if name_dim:
-            dims_interp[dims_interp.index(dim)] = name_dim
-        
-        da_interp = xr.DataArray(data, dims=dims_interp, coords=coords_interp,
-                                 attrs=da.attrs)
-        return da_interp
-    
-    return callf
-
-
-def get_o3_concentration(ds=None, interpfunc=None):
-    '''
-    Get o3 concentration by interpolating the time dimension
-    of pre-loaded dataset of ozone concentrations.
-    This pre-loaded dataset is defined in aerosol.aerosol_constants
-    module.
-    INPUT:
-    ds --- xarray.Dataset
-    OUTPUT:
-    ds --- xarray.Dataset, with additional data variable O3
-           obtained from pre-loaded dataset. 
-    '''
-    da = interpfunc(coords=ds.coords['time'])
-    ds['O3'] = (da.dims, da, da.attrs)
-    return ds
-
-
-def get_o2_concentration(ds=None):
-    '''
-    Add data variable for O2 concentration.
-    Value found in physics/cam/chem_surfvals.f90
-    '''
-    name = 'o2mmr'
-    long_name = 'o2 mass mixing ratio'
-    ds[name] = 0.23143
-    ds[name].attrs['long_name'] = long_name
-    return ds
-
-
-def interp_layers2levels(ds, vars=None):
-    '''
-    Interpolate layer values to levels.
-    
-    Args:
-        ds: xarray.Dataset
-        vars: list of variables in `ds` for which layers values are to be
-              interpolated onto levels. Defaults to an empty list.
-    Returns:
-        ds: xarray.Dataset, with new variable for the level values added
-            for each variable in `vars`
-    '''
-    if not vars:
-        vars = []
-        
-    for var in vars:
-        try:
-            da = ds[var]
-        except KeyError:
-            continue
-        else:
-            interpfunc = get_interpfunc(da, dim='lev')
-            da_interp = interpfunc(coords=ds.coords['ilev'], name_dim='ilev')
-            ds['i' + var] = (da_interp.dims, da_interp, da_interp.attrs)
-    return ds
 
 
 def get_mmr_name_CAMhist(name, mode):
@@ -161,25 +36,29 @@ def get_mmr_name_CAMhist(name, mode):
 def get_raer_column(ds, lon=0, lat=0, time=0):
     '''
     Returns mass mixing ratio of aerosol species in MAM3,
-    in a numpy array of the shape required by modal_aero_wateruptake_sub().
+    in a numpy array of the shape required by
+    modal_aero_wateruptake_sub().
     '''
     pcols, pver, ntot_amode, max_nspec_amode = 1, 30, 3, 6
     
     args_isel = dict(lon=lon, lat=lat, time=time)
 
     raer = np.zeros((pcols, pver, ntot_amode, max_nspec_amode))
-    for imode, (mode, dict_species) in enumerate(aeroconst.MAM3_SPECIES.items()):
+    for imode, (mode, dict_species) in enumerate(aeroconst\
+                                                 .MAM3_SPECIES.items()):
         for ispecies, (species, name) in enumerate(dict_species.items()):
             name_mmr = aeroconst.SPECIES_MMR[name]
             name_camhist = name_mmr + '_a{:d}'.format(mode)
-            raer[:, :, imode, ispecies] = ds[name_camhist].isel(**args_isel).values
+            raer[:, :, imode, ispecies] = ds[name_camhist]\
+                                          .isel(**args_isel).values
     return raer
 
 
 def aerosol_species_mmr(ds):
     ntot_amode = len(aeroconst.MAM3_SPECIES.keys())
     max_nspec_amode = max(len(dict_mode.keys())
-                          for mode, dict_mode in aeroconst.MAM3_SPECIES.items())
+                          for mode, dict_mode
+                          in aeroconst.MAM3_SPECIES.items())
 
     modes = range(1, ntot_amode + 1)
     species = range(1, max_nspec_amode + 1)
@@ -228,7 +107,8 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
         cloud_fraction = ds['CLOUD'].isel(**args_isel)
         species_mmr = get_raer_column(ds, **args_isel)
     
-        relative_humidity = relative_humidity.values.reshape((pcols, pver))
+        relative_humidity = relative_humidity.values\
+                            .reshape((pcols, pver))
         cloud_fraction = cloud_fraction.values.reshape((pcols, pver))
         
         qaerwat, dgncur_awet, wetdens = f2py3_aerowateruptake.\
@@ -257,7 +137,8 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
                 # add new dimension and coordinates for aerosol mode
                 ds.coords['mode'] = (('mode',), modes)
                 # initialise data variables QAERWAT, DGNCUR_AWET and WETDENS
-                ds.update({name: (required_dims, np.zeros(required_shape))})
+                ds.update({name: (required_dims,
+                                  np.zeros(required_shape))})
 
 #            ds[name][dict(**args_isel)] = xarray.DataArray(\
 #                data[0,:,:],
@@ -266,6 +147,7 @@ def wateruptake_column(ds, itime=0, ilon=0, ilat=0):
             ds[name][dict(**args_isel)] = data[0,:,:]
         return ds
                 
+
 
 def wateruptake(ds):
     '''
@@ -299,32 +181,6 @@ def wateruptake(ds):
     
     return ds
 
-
-def get_pressure_difference(ds=None):
-    '''
-    Get layer pressure difference
-    Args:
-        ds: xarray.Dataset containing level pressure (`level_pressure`)
-    Returns:
-        ds: xarray.Dataset with
-            layer pressure difference (`dpressure`) added as a field
-    Raises:
-        KeyError: when there is no `level_pressure` field
-    '''
-    if 'level_pressure' not in ds:
-        raise KeyError('No level pressures in input dataset.')
-
-    upper_levels = range(0, ds.dims['ilev'] - 1)
-    lower_levels = range(1, ds.dims['ilev'])
-
-    upper_pres = ds.coords['level_pressure'].isel(ilev=upper_levels).values
-    lower_pres = ds.coords['level_pressure'].isel(ilev=lower_levels).values
-    
-    ds['dpressure'] = (ds.coords['layer_pressure'].dims,
-                       lower_pres - upper_pres,
-                       ds.coords['layer_pressure'].attrs)
-    ds['dpressure'].attrs['long_name'] = 'layer pressure difference'
-    return ds
                 
                 
 def modal_aero_sw(ds):
