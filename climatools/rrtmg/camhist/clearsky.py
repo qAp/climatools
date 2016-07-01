@@ -205,7 +205,44 @@ def gasunits_to_pppv(ds=None):
 
 
 
+def add_extra_layer_above(ds=None):
+    # reset layer and level index to integer values starting from 1
+    ds.coords['lev'] = range(1, ds.dims['lev'] + 1)
+    ds.coords['ilev'] = range(1, ds.dims['ilev'] + 1)
 
+    # reindex layer and leverl with an additional index number
+    ds = ds.reindex(lev=range(ds.dims['lev'] + 1))
+    ds = ds.reindex(ilev=range(ds.dims['ilev'] + 1))
+
+    # assign top layer and level pressures
+    ds['layer_pressure'][dict(lev=0)] = (.5 * ds['level_pressure']
+                                         .isel(ilev=1))
+    ds['level_pressure'][dict(ilev=0)] = 1e-4
+
+    # assign top layer and level temperatures
+    ds['layer_temperature'][dict(lev=0)] = (ds['layer_temperature']
+                                            [dict(lev=1)])
+    ds['level_temperature'][dict(ilev=1)] = (.5 *
+                                             sum(ds['layer_temperature']
+                                                 [dict(lev=[0,1])]))
+    ds['level_temperature'][dict(ilev=0)] = (ds['level_temperature']
+                                             [dict(ilev=1)])
+
+    # assign top layer molecule densities
+    names_molecules = ['h2o', 'co2', 'o3', 'n2o', 'co', 'ch4', 'o2']
+    for molecule in names_molecules:
+        name_var = 'layer_vmr_' + molecule
+        ds[name_var][dict(lev=0)] = ds[name_var][dict(lev=1)]
+
+    return ds
+
+
+
+
+
+
+    
+    
     
 
     
