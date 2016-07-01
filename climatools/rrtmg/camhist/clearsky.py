@@ -1,7 +1,9 @@
 import os
 
+import numpy as np
 import xarray as xr
 
+import climatools.units as climaunits
 
 
 '''
@@ -109,5 +111,104 @@ def get_o2_concentration(ds=None):
     ds[name] = 0.23143
     ds[name].attrs['long_name'] = long_name
     return ds
+
+
+
+def set_co_concentration(ds=None):
+    '''
+    Add data variable for CO concentration.
+    Value set to 0.
+    '''
+    name = 'covmr'
+    long_name = 'co volume mixing ratio'
+    ds[name] = 0.
+    ds[name].attrs['long_name'] = long_name
+    return ds
+    
+
+
+def get_required_variables():
+    '''
+    The CAM history dataset contains many variables.
+    This is the subset of it that is required to run RRTMG
+    column model.
+    '''
+    variables = ['ilev', 'lev',
+                 'level_pressure', 'layer_pressure', 'dpressure',
+                 'iT', 'T',
+                 'Q', 'co2vmr', 'O3',
+                 'n2ovmr', 'covmr', 'ch4vmr', 'o2mmr']
+    return variables
+
+
+
+def gasunits_to_pppv(ds=None):
+    '''
+    Regardless of what units gas concentrations are given in in
+    the original CAM history, convert them to [l/l].
+    Where the concentration is constant with layers, broadcast
+    the value to all layers.
+    '''
+    # H2O: convert [kg/kg] to [l/l]
+    layer_vmr = climaunits.mixingratio_mass2volume(substance_name='H2O',
+                                                   mass_mix=ds['Q'])
+    ds['layer_vmr_h2o'] = (('lev',),
+                           layer_vmr,
+                           {'units': 'l/l',
+                            'long_name': 'h2o vmr'})
+
+    # CO2: broadcast co2vmr, in [l/l], to all layers
+    layer_vmr = ds['co2vmr'].values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_co2'] = (('lev',),
+                           layer_vmr,
+                           {'units': 'l/l',
+                            'long_name': 'co2 vmr'})
+
+    # O3: broadcast O3, in [l/l], to all layers
+    layer_vmr = ds['O3'].values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_o3'] = (('lev',),
+                          layer_vmr,
+                          {'units': 'l/l',
+                           'long_name': 'o3 vmr'})
+
+    # N2O: broadcast n2ovmr, in [l/l], to all layers
+    layer_vmr = ds['n2ovmr'].values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_n2o'] = (('lev',),
+                           layer_vmr,
+                           {'units': 'l/l',
+                            'long_name': 'n2o vmr'})
+
+    # CO: broadcast covmr, in [l/l], to all layers
+    layer_vmr = ds['covmr'].values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_co'] = (('lev',),
+                          layer_vmr,
+                          {'units': 'l/l',
+                           'long_name': 'co vmr'})
+
+    # CH4: broadcast ch4vmr, in [l/l], to all layers
+    layer_vmr = ds['ch4vmr'].values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_ch4'] = (('lev',),
+                           layer_vmr,
+                           {'units': 'l/l',
+                            'long_name': 'ch4 vmr'})
+
+    # O2: convert o2mmr ([kg/kg]) to [l/l], and broadcast to all layers
+    layer_vmr = climaunits.mixingratio_mass2volume(substance_name='O2',
+                                                   mass_mix=ds['o2mmr'])
+    layer_vmr = layer_vmr.values * np.ones((ds.dims['lev'],))
+    ds['layer_vmr_o2'] = (('lev',),
+                          layer_vmr,
+                          {'units': 'l/l',
+                           'long_name': 'o2 vmr'})
+
+    return ds
+
+
+
+
+    
+
+    
+
 
 
