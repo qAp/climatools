@@ -2,6 +2,11 @@ import re
 import os
 import fnmatch
 import filecmp
+import subprocess
+
+
+
+
 
 def any_unique_labels(levels, labels):
     '''
@@ -138,7 +143,7 @@ def Fortran_subroutine_parents_childs_dict(childs = None, parents = None):
 
 
 
-def read_subroutines_from_file(fpath):
+def read_subroutines_from_file(fpath, check_encoding=False):
     '''
     Returns a list of strings each of which is the Fortran for a subroutine
     defined in the Fortran file at FPATH
@@ -148,13 +153,21 @@ def read_subroutines_from_file(fpath):
     subroutines --- list of strings each of which is the Fortran for a subroutine
     defined in the Fortran file at FPATH
     '''
-    with open(fpath, mode = 'r', encoding = 'utf-8') as file:
+    if check_encoding:
+        proc = subprocess.Popen(['chardetect', fpath],
+                                stdout=subprocess.PIPE)
+        out = proc.communicate()[0]
+        encoding = out.decode('utf-8').split()[1]
+    else:
+        encoding = 'utf-8'
+        
+    with open(fpath, mode = 'r', encoding=encoding) as file:
         code = file.read()
     subroutines = get_subroutine_bodies_from_Fortran(code)
     return subroutines
 
 
-def get_subroutines_from_file(fpath):
+def get_subroutines_from_file(fpath, check_encoding=False):
     '''
     Returns a list of dictionaries, one for each subroutine in FPATH.
     Each dictionary contains a list of child subroutines.
@@ -164,12 +177,14 @@ def get_subroutines_from_file(fpath):
     list of dictionaries each of which corresponds to a subroutine, and whose value
     is a list of child subroutines for that subroutine.
     '''
-    subroutines = read_subroutines_from_file(fpath)
+    subroutines = read_subroutines_from_file(fpath,
+                                             check_encoding=check_encoding)
     return [Fortran_subroutine_to_dict(subr) for subr in subroutines]
 
 
 
-def Fortran_subroutine_relations_from_files(paths_fortran = None):
+def Fortran_subroutine_relations_from_files(paths_fortran=None,
+                                            check_encoding=False):
     '''
     INPUT:
     paths_fortran --- list of file paths of fortran files
@@ -179,7 +194,8 @@ def Fortran_subroutine_relations_from_files(paths_fortran = None):
     '''
     list_subrs = []
     for fpath in paths_fortran:
-        list_subrs.extend(get_subroutines_from_file(fpath))
+        list_subrs.extend(get_subroutines_from_file(fpath,
+                                                    check_encoding=check_encoding))
         
         d_subr_childs = Fortran_subroutine_childs_dict(list_subrs)
         d_subr_parents = Fortran_subroutine_parents_dict(d_subr_childs)
