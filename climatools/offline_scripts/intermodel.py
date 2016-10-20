@@ -120,14 +120,21 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
 
     srss = [srs[(1e-2 < srs.index)] for srs in srss]
     
-    viz.plot_pdseries_indexVSvalues_linearlog(srss=srss,
-                                              names=names,
-                                              colours=colours,
-                                              linestyles=linestyles,
-                                              title=('Total cooling rate. {}'\
-                                                     .format(name_molecule)),
-                                              xlabel='cooling rate [deg/day]',
-                                              ylabel='pressure [mb]')
+    fig = viz.plot_pdseries_indexVSvalues_linearlog(srss=srss,
+                                                    names=names,
+                                                    colours=colours,
+                                                    linestyles=linestyles,
+                                                    title=('Total cooling rate. {}'\
+                                                           .format(name_molecule)),
+                                                    xlabel='cooling rate [deg/day]',
+                                                    ylabel='pressure [mb]')
+    
+    # force lower y-axis limit so there is no blank area at the bottom of plot
+    ylim_lower = 1020
+    axs = [ax for ax in fig.get_axes()]
+    ylims = [ax.get_ylim() for ax in axs]
+    [ax.set_ylim((ylim_lower, ylim[-1]))
+     for ylim, ax in zip(ylims, axs)]
     
     display.display(plt.gcf()); plt.close()
 
