@@ -114,16 +114,18 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
         print(name_diff)
         print(df_print)
         print()
-        
-    viz.plot_pres_vs_hrcr(dfs=dfs,
-                          names=names,
-                          linestyles=linestyles,
-                          colours=colours,
-                          title=('Total cooling rate. {}'\
-                                 .format(name_molecule)),
-                          cooling_rate=True,
-                          xlim_linear=None,
-                          xlim_log=None)
+
+    dfs = [df.set_index('pressure') for df in dfs]
+    srss = [df['cooling_rate'] for df in dfs]
+    
+    viz.plot_pdseries_indexVSvalues_linearlog(srss=srss,
+                                              names=names,
+                                              colours=colours,
+                                              linestyles=linestyles,
+                                              title=('Total cooling rate. {}'\
+                                                     .format(name_molecule)),
+                                              xlabel='cooling rate [deg/day]',
+                                              ylabel='pressure [mb]')
     
     display.display(plt.gcf()); plt.close()
 
