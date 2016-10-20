@@ -127,7 +127,8 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
                                                     title=('Total cooling rate. {}'\
                                                            .format(name_molecule)),
                                                     xlabel='cooling rate [deg/day]',
-                                                    ylabel='pressure [mb]')
+                                                    ylabel='pressure [mb]',
+                                                    figsize=(11, 5))
     
     # force lower y-axis limit so there is no blank area at the bottom of plot
     ylim_lower = 1020
