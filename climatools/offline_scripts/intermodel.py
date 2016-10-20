@@ -117,6 +117,8 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
 
     dfs = [df.set_index('pressure') for df in dfs]
     srss = [df['cooling_rate'] for df in dfs]
+
+    srss = [srs[(1e-2 < srs.index)] for srs in srss]
     
     viz.plot_pdseries_indexVSvalues_linearlog(srss=srss,
                                               names=names,
