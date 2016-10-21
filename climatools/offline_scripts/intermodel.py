@@ -129,13 +129,24 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
                                                     xlabel='cooling rate [deg/day]',
                                                     ylabel='pressure [mb]',
                                                     figsize=(11, 5))
+
+    axs = [ax for ax in fig.get_axes()]
     
     # force lower y-axis limit so there is no blank area at the bottom of plot
     ylim_lower = 1020
-    axs = [ax for ax in fig.get_axes()]
     ylims = [ax.get_ylim() for ax in axs]
     [ax.set_ylim((ylim_lower, ylim[-1]))
      for ylim, ax in zip(ylims, axs)]
+
+    # force adjust x-axis limit in the linear-y subplot
+    xlim_manual = {'CO2': (-.2, .5), 'O3': (-.5, 1.),
+                   'H2O_CO2_O3': (-.1, 2.5)}
+    if name_molecule in xlim_manual:
+        ax = axs[0]
+        xlim = ax.get_xlim()
+        ax.set_xlim(xlim_manual[name_molecule])
+
+    
     
     display.display(plt.gcf()); plt.close()
 
