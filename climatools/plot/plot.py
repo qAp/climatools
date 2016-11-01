@@ -44,10 +44,10 @@ class ClimavizArrayAccessor(object):
         if ax is None:
             ax = plt.gca()
             if figsize:
-                print('lol')
                 plt.gcf().set_size_inches(*figsize)
 
-
+        xincrease = kwargs.pop('xincrease', True)
+        yincrease = kwargs.pop('yincrease', True)
 
         xlabel, x = list(darray.indexes.items())[0]
 
@@ -79,6 +79,12 @@ class ClimavizArrayAccessor(object):
         # Rotate dates on ylabels
         if np.issubdtype(y.dtype, np.datetime64):
             plt.gcf().autofmt_xdate()
+
+        if not xincrease:
+            ax.invert_xaxis()
+
+        if not yincrease:
+            ax.invert_yaxis()            
 
         
         return primitive
