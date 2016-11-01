@@ -44,19 +44,34 @@ class ClimavizArrayAccessor(object):
             ax = plt.gca()
             
         xlabel, x = list(darray.indexes.items())[0]
-            
-        #_ensure_plottable([x])
+
+        y = darray
+        if darray.name is not None:
+            ylabel = darray.name
+        else:
+            ylabel = None
+
+        index_on_yaxis = kwargs.pop('index_on_yaxis', False)
+        if index_on_yaxis:
+            xlabel, ylabel = ylabel, xlabel
+            x, y = y, x
         
-        primitive = ax.plot(x, darray, *args, **kwargs)
-        
-        ax.set_xlabel(xlabel)
+        primitive = ax.plot(x, y, *args, **kwargs)
+
         ax.set_title(darray._title_for_slice())
         
-        if darray.name is not None:
-            ax.set_ylabel(darray.name)
+        if xlabel:
+            ax.set_xlabel(xlabel)
+        
+        if ylabel:
+            ax.set_ylabel(ylabel)
 
         # Rotate dates on xlabels
         if np.issubdtype(x.dtype, np.datetime64):
+            plt.gcf().autofmt_xdate()
+
+        # Rotate dates on ylabels
+        if np.issubdtype(y.dtype, np.datetime64):
             plt.gcf().autofmt_xdate()
 
         return primitive
