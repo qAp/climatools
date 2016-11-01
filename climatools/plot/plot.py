@@ -51,7 +51,8 @@ class ClimavizArrayAccessor(object):
 
         xscale = kwargs.pop('xscale', None)
         yscale = kwargs.pop('yscale', None)
-        
+
+        grid = kwargs.pop('grid', None)
 
         xlabel, x = list(darray.indexes.items())[0]
 
@@ -96,6 +97,8 @@ class ClimavizArrayAccessor(object):
         if yscale:
             ax.set_yscale(yscale)
 
+        if grid:
+            ax.grid(b=grid)
         
         return primitive
         
