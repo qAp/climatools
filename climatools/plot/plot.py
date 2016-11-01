@@ -49,6 +49,10 @@ class ClimavizArrayAccessor(object):
         xincrease = kwargs.pop('xincrease', True)
         yincrease = kwargs.pop('yincrease', True)
 
+        xscale = kwargs.pop('xscale', None)
+        yscale = kwargs.pop('yscale', None)
+        
+
         xlabel, x = list(darray.indexes.items())[0]
 
         y = darray
@@ -84,7 +88,13 @@ class ClimavizArrayAccessor(object):
             ax.invert_xaxis()
 
         if not yincrease:
-            ax.invert_yaxis()            
+            ax.invert_yaxis()
+
+        if xscale:
+            ax.set_xscale(xscale)
+
+        if yscale:
+            ax.set_yscale(yscale)
 
         
         return primitive
