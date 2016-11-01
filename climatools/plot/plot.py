@@ -39,10 +39,16 @@ class ClimavizArrayAccessor(object):
         
         # Ensures consistency with .plot method
         ax = kwargs.pop('ax', None)
+        figsize = kwargs.pop('figsize', None)
         
         if ax is None:
             ax = plt.gca()
-            
+            if figsize:
+                print('lol')
+                plt.gcf().set_size_inches(*figsize)
+
+
+
         xlabel, x = list(darray.indexes.items())[0]
 
         y = darray
@@ -74,5 +80,6 @@ class ClimavizArrayAccessor(object):
         if np.issubdtype(y.dtype, np.datetime64):
             plt.gcf().autofmt_xdate()
 
+        
         return primitive
         
