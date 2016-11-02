@@ -99,6 +99,9 @@ class ClimavizArrayAccessor(object):
 
         if grid:
             ax.grid(b=grid)
+
+        if 'label' in kwargs:
+            ax.legend(loc='best')
         
         return primitive
         
