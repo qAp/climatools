@@ -40,7 +40,7 @@ class ClimavizArrayAccessor(object):
         # Ensures consistency with .plot method
         ax = kwargs.pop('ax', None)
         figsize = kwargs.pop('figsize', None)
-        
+
         if ax is None:
             ax = plt.gca()
             if figsize:
@@ -54,6 +54,30 @@ class ClimavizArrayAccessor(object):
 
         grid = kwargs.pop('grid', None)
 
+        index_on_yaxis = kwargs.pop('index_on_yaxis', False)
+
+        varlim_from_indexrange = kwargs.pop('varlim_from_indexrange', None)
+
+        if varlim_from_indexrange:
+            darray_slice = darray.loc[slice(*varlim_from_indexrange)]
+            max_tmp = darray_slice.max()
+            min_tmp = darray_slice.min()
+
+            if index_on_yaxis:
+                if not ax.lines:
+                    ax.set_xlim(min_tmp, max_tmp)
+                else:
+                    min_now, max_now = ax.get_xlim()
+                    ax.set_xlim((min(min_tmp, min_now),
+                                 max(max_tmp, max_now)))
+            else:
+                if not ax.lines:
+                    ax.set_ylim(min_tmp, max_tmp)
+                else:
+                    min_now, max_now = ax.get_ylim()
+                    ax.set_ylim((min(min_tmp, min_now),
+                                 max(max_tmp, max_now)))        
+
         xlabel, x = list(darray.indexes.items())[0]
 
         y = darray
@@ -62,7 +86,6 @@ class ClimavizArrayAccessor(object):
         else:
             ylabel = None
 
-        index_on_yaxis = kwargs.pop('index_on_yaxis', False)
         if index_on_yaxis:
             xlabel, ylabel = ylabel, xlabel
             x, y = y, x
@@ -99,6 +122,8 @@ class ClimavizArrayAccessor(object):
 
         if grid:
             ax.grid(b=grid)
+
+
 
         if 'label' in kwargs:
             ax.legend(loc='best')
