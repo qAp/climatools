@@ -108,11 +108,15 @@ class ClimavizArrayAccessor(object):
         if np.issubdtype(y.dtype, np.datetime64):
             plt.gcf().autofmt_xdate()
 
-        if not xincrease:
-            ax.invert_xaxis()
+        if xincrease:
+            ax.set_xlim(sorted(ax.get_xlim()))
+        else:
+            ax.set_xlim(sorted(ax.get_xlim(), reverse=True))
 
-        if not yincrease:
-            ax.invert_yaxis()
+        if yincrease:
+            ax.set_ylim(sorted(ax.get_ylim()))
+        else:
+            ax.set_ylim(sorted(ax.get_ylim(), reverse=True))
 
         if xscale:
             ax.set_xscale(xscale)
