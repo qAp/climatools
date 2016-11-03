@@ -58,6 +58,12 @@ class ClimavizArrayAccessor(object):
 
         varlim_from_indexrange = kwargs.pop('varlim_from_indexrange', None)
 
+        if xscale:
+            ax.set_xscale(xscale)
+
+        if yscale:
+            ax.set_yscale(yscale)
+
         if varlim_from_indexrange:
             darray_slice = darray.loc[slice(*varlim_from_indexrange)]
             max_tmp = darray_slice.max()
@@ -118,11 +124,7 @@ class ClimavizArrayAccessor(object):
         else:
             ax.set_ylim(sorted(ax.get_ylim(), reverse=True))
 
-        if xscale:
-            ax.set_xscale(xscale)
 
-        if yscale:
-            ax.set_yscale(yscale)
 
         if grid:
             ax.grid(b=grid)
