@@ -46,8 +46,9 @@ class ClimavizArrayAccessor(object):
             if figsize:
                 plt.gcf().set_size_inches(*figsize)
 
-        xincrease = kwargs.pop('xincrease', True)
-        yincrease = kwargs.pop('yincrease', True)
+        # Unpack keyword arguments that will not be accepted by pyplot.plot
+        xincrease = kwargs.pop('xincrease', None)
+        yincrease = kwargs.pop('yincrease', None)
 
         xscale = kwargs.pop('xscale', None)
         yscale = kwargs.pop('yscale', None)
@@ -58,35 +59,10 @@ class ClimavizArrayAccessor(object):
 
         varlim_from_indexrange = kwargs.pop('varlim_from_indexrange', None)
 
-        if xscale:
-            ax.set_xscale(xscale)
-
-        if yscale:
-            ax.set_yscale(yscale)
-
-        if varlim_from_indexrange:
-            darray_slice = darray.loc[slice(*varlim_from_indexrange)]
-            max_tmp = darray_slice.max()
-            min_tmp = darray_slice.min()
-
-            if index_on_yaxis:
-                if not ax.lines:
-                    ax.set_xlim(min_tmp, max_tmp)
-                else:
-                    min_now, max_now = ax.get_xlim()
-                    ax.set_xlim((min(min_tmp, min_now),
-                                 max(max_tmp, max_now)))
-            else:
-                if not ax.lines:
-                    ax.set_ylim(min_tmp, max_tmp)
-                else:
-                    min_now, max_now = ax.get_ylim()
-                    ax.set_ylim((min(min_tmp, min_now),
-                                 max(max_tmp, max_now)))        
-
+        # map DataArray values and index to x and y, or vice versa.
         xlabel, x = list(darray.indexes.items())[0]
-
         y = darray
+        
         if darray.name is not None:
             ylabel = darray.name
         else:
@@ -95,7 +71,112 @@ class ClimavizArrayAccessor(object):
         if index_on_yaxis:
             xlabel, ylabel = ylabel, xlabel
             x, y = y, x
+
+        # set, or update, y-axis scale and limits
+        if not index_on_yaxis:
+            if varlim_from_indexrange == None:
+                yslice = y
+            else:
+                yslice = y.loc[slice(*varlim_from_indexrange)]
+        else:
+            yslice = y
         
+        if ax.lines:
+            ylim_bot, ylim_top = list(ax.get_ylim())
+            lims = [ylim_bot, ylim_top, min(yslice), max(yslice)]
+            ymin, ymax = min(lims), max(lims)
+        else:
+            ymin, ymax = min(yslice), max(yslice)
+
+        if yscale == 'linear':
+            ax.set_yscale('linear')
+        elif yscale == 'log':
+            if ymax <= 0:
+                raise ValueError('Warning: yaxis. Max value to be plotted '
+                                 'needs to be greater than zero '
+                                 'in order to axis set to log scale.')
+            elif ymin <= 0:
+                print('Warning: yaxis. Min value to be plotted '
+                      'is less or equal to zero. This part will be '
+                      'omitted on a log scale.')
+                ax.set_yscale('log')
+            else:
+                ax.set_yscale('log')
+        else:
+            if ax.get_yscale() == 'log':
+                if ymin <= 0:
+                    print('Warning: yaxis. Min value to be plotted '
+                          'is less or equal to zero. This part will be '
+                          'omitted on the exisitng log scale.'
+                          'Consider using linear scale instead.')
+
+        if yincrease == True:
+            ax.set_ylim(bottom=ymin, top=ymax)
+        elif yincrease == False:
+            ax.set_ylim(bottom=ymax, top=ymin)
+        else:
+            if ax.lines:
+                if ylim_bot < ylim_top:
+                    ax.set_ylim(bottom=ymin, top=ymax)
+                else:
+                    ax.set_ylim(bottom=ymax, top=ymin)
+            else:
+                ax.set_ylim(bottom=ymin, top=ymax)
+
+        # set, or update, x-axis scale and limits
+        if index_on_yaxis:
+            if varlim_from_indexrange == None:
+                xslice = x
+            else:
+                xslice = x.loc[slice(*varlim_from_indexrange)]
+        else:
+            xslice = x
+                
+        if ax.lines:
+            xlim_left, xlim_right = list(ax.get_xlim())
+            lims = [xlim_left, xlim_right, min(xslice), max(xslice)]
+            xmin, xmax = min(lims), max(lims)
+        else:
+            xmin, xmax = min(xslice), max(xslice)
+            
+
+        if xscale == 'linear':
+            ax.set_xscale('linear')
+        elif xscale == 'log':
+            if xmax <= 0:
+                raise ValueError('Warning: xaxis. Max value to be plotted '
+                                 'needs to be greater than zero '
+                                 'in order to axis set to log scale.')
+            elif xmin <= 0:
+                print('Warning: xaxis. Min value to be plotted '
+                      'is less or equal to zero. This part will be '
+                      'omitted on a log scale.')
+                ax.set_xscale('log')
+            else:
+                ax.set_xscale('log')
+        else:
+            if ax.get_xscale() == 'log':
+                if xmin <= 0:
+                    print('Warning: xaxis. Min value to be plotted '
+                          'is less or equal to zero. This part will be '
+                          'omitted on the exisitng log scale.'
+                          'Consider using linear scale instead.')
+
+        if xincrease == True:
+            ax.set_xlim(left=xmin, right=xmax)
+        elif xincrease == False:
+            ax.set_xlim(left=xmax, right=xmin)
+        else:
+            if ax.lines:
+                if xlim_left < xlim_right:
+                    ax.set_xlim(left=xmin, right=xmax)
+                else:
+                    ax.set_xlim(left=xmax, right=xmin)
+            else:
+                ax.set_xlim(left=xmin, right=xmax)
+
+
+        # make the line plot: x against y
         primitive = ax.plot(x, y, *args, **kwargs)
 
         ax.set_title(darray._title_for_slice())
@@ -114,22 +195,8 @@ class ClimavizArrayAccessor(object):
         if np.issubdtype(y.dtype, np.datetime64):
             plt.gcf().autofmt_xdate()
 
-        if xincrease:
-            ax.set_xlim(sorted(ax.get_xlim()))
-        else:
-            ax.set_xlim(sorted(ax.get_xlim(), reverse=True))
-
-        if yincrease:
-            ax.set_ylim(sorted(ax.get_ylim()))
-        else:
-            ax.set_ylim(sorted(ax.get_ylim(), reverse=True))
-
-
-
         if grid:
             ax.grid(b=grid)
-
-
 
         if 'label' in kwargs:
             ax.legend(loc='best')
