@@ -73,6 +73,8 @@ class ClimavizArrayAccessor(object):
             x, y = y, x
 
         # set, or update, y-axis scale and limits
+
+        
         if not index_on_yaxis:
             if varlim_from_indexrange == None:
                 yslice = y
@@ -90,6 +92,7 @@ class ClimavizArrayAccessor(object):
 
         if yscale == 'linear':
             ax.set_yscale('linear')
+            ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
         elif yscale == 'log':
             if ymax <= 0:
                 raise ValueError('Warning: yaxis. Max value to be plotted '
@@ -109,7 +112,9 @@ class ClimavizArrayAccessor(object):
                           'is less or equal to zero. This part will be '
                           'omitted on the exisitng log scale.'
                           'Consider using linear scale instead.')
-
+            else:
+                ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
+                
         if yincrease == True:
             ax.set_ylim(bottom=ymin, top=ymax)
         elif yincrease == False:
@@ -123,7 +128,11 @@ class ClimavizArrayAccessor(object):
             else:
                 ax.set_ylim(bottom=ymin, top=ymax)
 
+
+
         # set, or update, x-axis scale and limits
+
+        
         if index_on_yaxis:
             if varlim_from_indexrange == None:
                 xslice = x
@@ -142,6 +151,7 @@ class ClimavizArrayAccessor(object):
 
         if xscale == 'linear':
             ax.set_xscale('linear')
+            ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
         elif xscale == 'log':
             if xmax <= 0:
                 raise ValueError('Warning: xaxis. Max value to be plotted '
@@ -161,6 +171,8 @@ class ClimavizArrayAccessor(object):
                           'is less or equal to zero. This part will be '
                           'omitted on the exisitng log scale.'
                           'Consider using linear scale instead.')
+            else:
+                ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
 
         if xincrease == True:
             ax.set_xlim(left=xmin, right=xmax)
