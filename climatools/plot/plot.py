@@ -88,6 +88,10 @@ class ClimavizArrayAccessor(object):
         else:
             ymin, ymax = yslice.min(), yslice.max()
 
+        if ymin == ymax:
+            ymin -= .06
+            ymax += .06
+
         if yscale == 'linear':
             ax.set_yscale('linear')
             ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
@@ -143,7 +147,10 @@ class ClimavizArrayAccessor(object):
             xmin, xmax = min(lims), max(lims)
         else:
             xmin, xmax = xslice.min(), xslice.max()
-            
+
+        if xmin == xmax:
+            xmin -= .06
+            xmax += .06
 
         if xscale == 'linear':
             ax.set_xscale('linear')
