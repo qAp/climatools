@@ -73,8 +73,6 @@ class ClimavizArrayAccessor(object):
             x, y = y, x
 
         # set, or update, y-axis scale and limits
-
-        
         if not index_on_yaxis:
             if varlim_from_indexrange == None:
                 yslice = y
@@ -82,13 +80,13 @@ class ClimavizArrayAccessor(object):
                 yslice = y.loc[slice(*varlim_from_indexrange)]
         else:
             yslice = y
-        
+
         if ax.lines:
             ylim_bot, ylim_top = list(ax.get_ylim())
-            lims = [ylim_bot, ylim_top, min(yslice), max(yslice)]
+            lims = [ylim_bot, ylim_top, yslice.min(), yslice.max()]
             ymin, ymax = min(lims), max(lims)
         else:
-            ymin, ymax = min(yslice), max(yslice)
+            ymin, ymax = yslice.min(), yslice.max()
 
         if yscale == 'linear':
             ax.set_yscale('linear')
@@ -114,7 +112,7 @@ class ClimavizArrayAccessor(object):
                           'Consider using linear scale instead.')
             else:
                 ax.yaxis.get_major_formatter().set_powerlimits((0, 1))
-                
+
         if yincrease == True:
             ax.set_ylim(bottom=ymin, top=ymax)
         elif yincrease == False:
@@ -129,10 +127,8 @@ class ClimavizArrayAccessor(object):
                 ax.set_ylim(bottom=ymin, top=ymax)
 
 
-
-        # set, or update, x-axis scale and limits
-
         
+        # set, or update, x-axis scale and limits
         if index_on_yaxis:
             if varlim_from_indexrange == None:
                 xslice = x
@@ -143,10 +139,10 @@ class ClimavizArrayAccessor(object):
                 
         if ax.lines:
             xlim_left, xlim_right = list(ax.get_xlim())
-            lims = [xlim_left, xlim_right, min(xslice), max(xslice)]
+            lims = [xlim_left, xlim_right, xslice.min(), xslice.max()]
             xmin, xmax = min(lims), max(lims)
         else:
-            xmin, xmax = min(xslice), max(xslice)
+            xmin, xmax = xslice.min(), xslice.max()
             
 
         if xscale == 'linear':
