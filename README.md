@@ -1,12 +1,5 @@
 # Collection of routines for processing and visualising data related to climate modelling
 
-Often the data output from climate models are stored in netCDF or HDF files.  This library uses
-[xray][xray] to import and manipulate these data, 
-and [matplotlib][matplotlib] module to make various different types of plots of these data.
-The time dimension of these data is handled by using Pandas's datetime objects.
-
-Examples of usage can be found in most of the IPython notebooks [here][scam_notebooks], where the data
-are from runs of the Single-column Community Atmosphere Model ([SCAM][scam]).  
 
 # General features
 
@@ -74,6 +67,15 @@ for ax, timeslice in zip(axs, timeslices):
 ## Optimized color bars for two-dimensional contour plots
 
 # Model-specific features
+Often the data output from climate models are stored in netCDF or HDF files.  This library uses
+[xray][xray] to import and manipulate these data, 
+and [matplotlib][matplotlib] module to make various different types of plots of these data.
+The time dimension of these data is handled by using Pandas's datetime objects.
+
+Examples of usage can be found in most of the IPython notebooks [here][scam_notebooks], where the data
+are from runs of the Single-column Community Atmosphere Model ([SCAM][scam]).  
+
+
 ## Loading output data from offline radiation models
 
 
