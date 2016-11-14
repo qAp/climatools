@@ -28,7 +28,8 @@ da1 = xr.DataArray(data=y1, dims=['x'], coords=[x], name='y')
 
 # plot the index on the y-axis
 da.climaviz.plot(index_on_yaxis=True, figsize=(5, 7))
-da1.climaviz.plot(index_on_yaxis=True, xscale='log', yincrease=False)
+da1.climaviz.plot(index_on_yaxis=True, xscale='log', yincrease=False,
+                  varlim_from_indexrange=(-25, -10))
 ```
 ![1d plot example]
 (https://github.com/qAp/climatools/blob/xarray_accessor/climatools/examples/1d_plotting/1dplot_example.png)
