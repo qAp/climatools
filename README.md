@@ -8,8 +8,8 @@ The time dimension of these data is handled by using Pandas's datetime objects.
 Examples of usage can be found in most of the IPython notebooks [here][scam_notebooks], where the data
 are from runs of the Single-column Community Atmosphere Model ([SCAM][scam]).  
 
-# Some highlights
-## Loading output data from offline radiation models
+# General features
+
 ## Conveniently plot one-dimensional `xarray.DataArray`
 The `.climaviz.plot` method can now be supplied with keyword arguments to adjust the axes' scales and directions, to indicate that the index values are to be plotted on the y-axis instead of on the x-axis, and to constrain the variable's axis' limits based on variable values over a specified range on the index's axis.
 ```
@@ -73,6 +73,8 @@ for ax, timeslice in zip(axs, timeslices):
 
 ## Optimized color bars for two-dimensional contour plots
 
+# Model-specific features
+## Loading output data from offline radiation models
 
 
 [scam_notebooks]: http://nbviewer.ipython.org/github/qAp/SCAM_radiation_notebooks/tree/master/
