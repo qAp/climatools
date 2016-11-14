@@ -33,7 +33,43 @@ da1.climaviz.plot(index_on_yaxis=True, xscale='log', yincrease=False)
 ![1d plot example]
 (https://github.com/qAp/climatools/blob/xarray_accessor/climatools/examples/1d_plotting/1dplot_example.png)
 
-## Optimized axes ticks and labels for time labeals
+## Optimized axes ticks and labels for time labels
+For datetime values of type `np.datetime64`, the tick labels are optimized in such a way that labels for common time-scales are not repeatedly displayed at every tick.
+```
+import numpy as np
+import pandas as pd
+import xarray as xr
+import matplotlib.pyplot as plt
+import climatools.plot.plot
+
+n_datetimes = 33 * 24 * 60
+
+datetimes = pd.date_range('2000-05-23 00:10:00', 
+                          freq='Min', periods=n_datetimes)
+
+data = np.sin(2 * np.pi / 24 * 
+              np.array([datetime.hour for datetime in datetimes]))
+
+da = xr.DataArray(data, dims=['time'], coords=[datetimes])
+
+
+timeslices = [slice('2000-05-30 00:02:00', '2000-05-31 14:03.10'),
+              slice('2000-05-30 00:02:00', '2000-06-01 14:03.10'),
+              slice('2000-05-30 00:02:00', '2000-06-10 14:03.10')]
+
+fig, axs = plt.subplots(nrows=3, ncols=1, figsize=(10, 15))
+
+axs = axs.flatten()
+
+for ax, timeslice in zip(axs, timeslices):
+    da.sel(time=timeslice).climaviz.plot(ax=ax, 
+                                         linewidth=1.5, 
+                                         color='grey')
+```
+
+![optimize datetime axes ticks example]
+(https://github.com/qAp/climatools/blob/xarray_accessor/climatools/examples/autoadjust_datetime_ticks/autoadjust_datetime_ticks.png)
+
 ## Optimized color bars for two-dimensional contour plots
 
 
