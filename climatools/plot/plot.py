@@ -2,8 +2,12 @@
 
 
 import numpy as np
+import pandas as pd
 
 import xarray as xr
+
+
+from ..viz import set_xaxis_datetime_ticklocs_ticklabels
 
 
 @xr.register_dataarray_accessor('climaviz')
@@ -204,11 +208,23 @@ class ClimavizArrayAccessor(object):
 
         # Rotate dates on xlabels
         if np.issubdtype(x.dtype, np.datetime64):
-            plt.gcf().autofmt_xdate()
+            if index_on_yaxis:
+                dtnss = x.values
+            else:
+                dtnss = x
+            timestamps = [pd.Timestamp(dtns).to_datetime() for dtns in dtnss]
+            duration = pd.Timedelta(timestamps[-1] - timestamps[0])
+            set_xaxis_datetime_ticklocs_ticklabels(ax.xaxis, duration=duration)
 
         # Rotate dates on ylabels
         if np.issubdtype(y.dtype, np.datetime64):
-            plt.gcf().autofmt_xdate()
+            if index_on_yaxis:
+                dtnss = y
+            else:
+                dtnss = y.values
+            timestamps = [pd.Timestamp(dtns).to_datetime() for dtns in dtnss]
+            duration = pd.Timedelta(timestamps[-1] - timestamps[0])
+            set_xaxis_datetime_ticklocs_ticklabels(ax.yaxis, duration=duration)
 
         if grid:
             ax.grid(b=grid)
