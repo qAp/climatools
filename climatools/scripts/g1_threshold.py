@@ -12,6 +12,33 @@ from IPython import display
 
 
 
+def print_diff_benchmark(dict_df, benchmark='crd'):
+    othermodels = [model for model in dict_df.keys()]
+    othermodels.remove(benchmark)
+
+    df_bench = dict_df[benchmark]
+
+    print()
+    print(benchmark.upper())
+    display.display(df_bench)
+
+    for model in othermodels:
+        print()
+        print(model.upper())
+        display.display(dict_df[model])
+
+
+    for model in othermodels:
+        df_model = dict_df[model]
+
+        print()
+        print('{} - {}'.format(model.upper(), benchmark.upper()))
+        if not all(df_model.index == df_bench.index):
+            print('Model indices not identical to benchmark indices, '
+                  "forcing model indices to be the same as benchmark's")
+            df_model.index = df_bench.index
+        display.display(df_model - df_bench)
+        
 
 def load_dataset_crd(vartype, rundir):
     if vartype == 'flux':
