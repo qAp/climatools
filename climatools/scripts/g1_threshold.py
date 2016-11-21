@@ -6,6 +6,7 @@ import xarray as xr
 import matplotlib
 import matplotlib.pyplot as plt
 
+from ..plot.plot import *
 from ..html.html import *
 
 from IPython import display
@@ -13,12 +14,19 @@ from IPython import display
 
 
 
-def load_dataset_crd(vartype, rundir):
+def load_dataset_crd(vartype, rundir,
+                     fpath_flux=None, fpath_coolr=None):
     if vartype == 'flux':
-        fname = 'output_fluxg.dat'
+        if fpath_flux == None:
+            fname = 'output_fluxg.dat'
+        else:
+            fname = fpath_flux
         vdim = 'level'
     elif vartype == 'cooling rate':
-        fname = 'output_coolrg.dat'
+        if fpath_coolr == None:
+            fname = 'output_coolrg.dat'
+        else:
+            fname = fpath_coolr
         vdim = 'layer'
 
     fpath = os.path.join(rundir, fname)
@@ -57,6 +65,8 @@ class Model(object):
         self.type_model = kwargs.pop('type_model', None)
         self.linestyle = '-'
         self.data = {}
+        self.fpath_flux = None
+        self.fpath_coolr = None
 
     def load_data(self):
         if not (self.rundir and self.type_model):
@@ -64,11 +74,14 @@ class Model(object):
                              " because no directory and model type info")
         
         if self.type_model == 'crd':
+            
             self.data['flux'] = load_dataset_crd(vartype='flux',
-                                                 rundir=self.rundir)
+                                                 rundir=self.rundir,
+                                                 fpath_flux=self.fpath_flux)
             self.data['cooling rate'] = load_dataset_crd(
                 vartype='cooling rate',
-                rundir=self.rundir)
+                rundir=self.rundir,
+                fpath_coolr=self.fpath_coolr)
         elif self.type_model == 'clirad':
             self.data['flux'] = load_dataset_clirad(
                 vartype='flux', rundir=self.rundir)
