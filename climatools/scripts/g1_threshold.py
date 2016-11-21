@@ -12,33 +12,6 @@ from IPython import display
 
 
 
-def print_diff_benchmark(dict_df, benchmark='crd'):
-    othermodels = [model for model in dict_df.keys()]
-    othermodels.remove(benchmark)
-
-    df_bench = dict_df[benchmark]
-
-    print()
-    print(benchmark.upper())
-    display.display(df_bench)
-
-    for model in othermodels:
-        print()
-        print(model.upper())
-        display.display(dict_df[model])
-
-
-    for model in othermodels:
-        df_model = dict_df[model]
-
-        print()
-        print('{} - {}'.format(model.upper(), benchmark.upper()))
-        if not all(df_model.index == df_bench.index):
-            print('Model indices not identical to benchmark indices, '
-                  "forcing model indices to be the same as benchmark's")
-            df_model.index = df_bench.index
-        display.display(df_model - df_bench)
-        
 
 def load_dataset_crd(vartype, rundir):
     if vartype == 'flux':
@@ -159,21 +132,108 @@ class Fig_FluxCoolr(object):
 
 
 
+def print_diff_benchmark(dict_df, benchmark='crd'):
+    othermodels = [model for model in dict_df.keys()]
+    othermodels.remove(benchmark)
+
+    df_bench = dict_df[benchmark]
+
+    print()
+    print(benchmark.upper())
+    display.display(df_bench)
+
+    for model in othermodels:
+        print()
+        print(model.upper())
+        display.display(dict_df[model])
+
+
+    for model in othermodels:
+        df_model = dict_df[model]
+
+        print()
+        print('{} - {}'.format(model.upper(), benchmark.upper()))
+        if not all(df_model.index == df_bench.index):
+            print('Model indices not identical to benchmark indices, '
+                  "forcing model indices to be the same as benchmark's")
+            df_model.index = df_bench.index
+        display.display(df_model - df_bench)
+
+        
+
+
+class Table(object):
+    def __init__(self):
+        self.vartype = None
+        self.sumg = False
+        self.at_pressures = None
+        self.hreftext = 'Table: {vartype}. g-groups {sumg}'
+
+    def display_hrefanchor(self):
+        s = self.hreftext.format(vartype=self.vartype,
+                                 sumg='' if self.sumg == False else 'total')
+        html = getHTML_hrefanchor(s=s)
+        display.display(display.HTML(html))
+        
+    def display_withdiff(self, analysis, benchmark=None):
+        if self.vartype == 'flux':
+            self.vdim = 'level'
+        elif self.vartype == 'cooling rate':
+            self.vdim = 'layer'
+        else:
+            raise ValueError("`vartype` must be either "
+                             "'flux' or 'cooling rate'")
+        
+        if list(self.at_pressures) == None:
+            dict_ds = {name: model.data[self.vartype]
+                       for name, model in analysis.models.items()}
+        else:
+            dict_ds = {name: model.data[self.vartype]\
+                       .sel(pressure=self.at_pressures, method='nearest')
+                       for name, model in analysis.models.items()}
+
+        if self.sumg:
+            dict_ds = {name: ds.sum('g') for name, ds in dict_ds.items()}
+
+        dict_df = {name: ds.to_dataframe() for name, ds in dict_ds.items()}
+        dict_df = {name: df.set_index([self.vdim], append=True)
+                   for name, df in dict_df.items()}
+
+        s = self.hreftext.format(vartype=self.vartype,
+                                 sumg='' if self.sumg == False else 'total')
+        html = getHTML_idanchor(s=s)
+        markdown = getMarkdown_sectitle(s=s)
+        display.display(display.HTML(html))
+        display.display(display.Markdown(markdown))
+
+        print_diff_benchmark(dict_df, benchmark=benchmark)
+
+
+    
+
+
+
+
 class Analysis(object):
     def __init__(self):
         self.models = {}
         self.figs = {}
+        self.tables = {}
 
     def model(self, name, **kwargs):
         if name not in self.models:
             self.models[name] = Model(**kwargs)
         return self.models[name]
-        
+
     def fig_fluxcoolr(self, name, **kwargs):
         if name not in self.figs:
             self.figs[name] = Fig_FluxCoolr(**kwargs)
         return self.figs[name]
 
+    def table(self, name):
+        if name not in self.tables:
+            self.tables[name] = Table()
+        return self.tables[name]
 
         
 
