@@ -92,6 +92,12 @@ class Fig_FluxCoolr(object):
                        for varname in ['flug', 'fnetg', 'coolrg']}
         self.varlims_from_indexrange = {yscale: None for yscale in yscales}
 
+    def display_hrefanchor(self):
+        for g in self.ggroups:
+            s = self.hreftext.format(g=g)
+            html = getHTML_hrefanchor(s)
+            display.display(display.HTML(html))
+
     def plot(self, analysis):
         for g in self.ggroups:
             
