@@ -106,13 +106,14 @@ class Fig_FluxCoolr(object):
         self.varlims_from_indexrange = {yscale: None for yscale in yscales}
 
     def display_hrefanchor(self):
-        for g in self.ggroups:
+        for g in self.ggroups + ['total']:
             s = self.hreftext.format(g=g)
             html = getHTML_hrefanchor(s)
             display.display(display.HTML(html))
 
     def plot(self, analysis):
-        for g in self.ggroups:
+        
+        for g in self.ggroups + ['total']:
             
             s = self.hreftext.format(g=g)
             html = getHTML_idanchor(s=s)
@@ -126,17 +127,19 @@ class Fig_FluxCoolr(object):
             for ax, (vartype, yscale) in zip(axs, self.names_ax):
                 for varname in self.vars_plot[vartype]:
                     for modelname, model in analysis.models.items():
-                        model.data[vartype][varname]\
-                             .sel(g=g)\
-                             .climaviz\
-                             .plot(ax=ax,
-                                   linewidth=2, grid=True,
-                                   label=modelname.upper() + ' ' + varname,
-                                   color=self.colors[varname],
-                                   linestyle=model.linestyle,
-                                   index_on_yaxis=True,
-                                   yincrease=False, yscale=yscale,
-                                   varlim_from_indexrange=self.varlims_from_indexrange[yscale])
+                        if g == 'total':
+                            da = model.data[vartype][varname].sum('g')
+                        else:
+                            da = model.data[vartype][varname].sel(g=g)
+                        da.climaviz\
+                          .plot(ax=ax,
+                                linewidth=2, grid=True,
+                                label=modelname.upper() + ' ' + varname,
+                                color=self.colors[varname],
+                                linestyle=model.linestyle,
+                                index_on_yaxis=True,
+                                yincrease=False, yscale=yscale,
+                                varlim_from_indexrange=self.varlims_from_indexrange[yscale])
                 ax.set_xlabel(vartype)
                         
             plt.tight_layout()
