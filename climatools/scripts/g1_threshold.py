@@ -88,6 +88,11 @@ class Model(object):
             self.data['cooling rate'] = load_dataset_clirad(
                 vartype='cooling rate', rundir=self.rundir)
 
+        df_dgdgs = pd.read_csv(os.path.join(self.rundir, 'dgdgs.dat'),
+                               sep=r'\s+')
+        df_dgdgs = df_dgdgs.set_index(['g'])
+        self.data['dgdgs'] = xr.Dataset.from_dataframe(df_dgdgs)
+
 
 
 class Fig_FluxCoolr(object):
@@ -190,6 +195,23 @@ class Table(object):
                                  sumg='' if self.sumg == False else 'total')
         html = getHTML_hrefanchor(s=s)
         display.display(display.HTML(html))
+
+
+    def display_dgdgs(self, model):
+        if self.sumg == True:
+            ds = model.data['dgdgs'].sum('g')
+        else:
+            ds = model.data['dgdgs']
+        
+        s = self.hreftext.format(vartype=self.vartype,
+                                 sumg='' if self.sumg == False else 'total')
+        html = getHTML_idanchor(s=s)
+        markdown = getMarkdown_sectitle(s=s)
+        display.display(display.HTML(html))
+        display.display(display.Markdown(markdown))
+        
+        display.display(ds.to_dataframe())
+
         
     def display_withdiff(self, analysis, benchmark=None):
         if self.vartype == 'flux':
