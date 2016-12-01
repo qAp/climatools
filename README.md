@@ -25,7 +25,7 @@ da1.climaviz.plot(index_on_yaxis=True, xscale='log', yincrease=False,
                   varlim_from_indexrange=(-25, -10))
 ```
 ![1d plot example]
-(https://github.com/qAp/climatools/blob/xarray_accessor/climatools/examples/1d_plotting/1dplot_example.png)
+(https://github.com/qAp/climatools/blob/master/climatools/examples/1d_plotting/1dplot_example.png)
 
 ## Optimized axes ticks and labels for time labels
 For datetime values of type `np.datetime64`, the tick labels are optimized in such a way that labels for common time-scales are not repeatedly displayed at every tick.
@@ -62,7 +62,7 @@ for ax, timeslice in zip(axs, timeslices):
 ```
 
 ![optimize datetime axes ticks example]
-(https://github.com/qAp/climatools/blob/xarray_accessor/climatools/examples/autoadjust_datetime_ticks/autoadjust_datetime_ticks.png)
+(https://github.com/qAp/climatools/blob/master/climatools/examples/autoadjust_datetime_ticks/autoadjust_datetime_ticks.png)
 
 ## Optimized color bars for two-dimensional contour plots
 
