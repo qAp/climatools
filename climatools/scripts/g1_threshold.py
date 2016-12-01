@@ -96,8 +96,9 @@ class Model(object):
 
 
 class Fig_FluxCoolr(object):
-    def __init__(self):
-        self.ggroups = [1, 2, 3, 4]
+    def __init__(self, ggroups=None):
+        if ggroups is None:
+            self.ggroups = [1, 2, 3, 4]
         vartypes = ['flux', 'cooling rate']
         yscales = ['linear', 'log']
         self.names_ax = list(itertools.product(vartypes, yscales))
