@@ -32,4 +32,27 @@ def data(s=''):
 
 
 
+def numbers(s=''):
+    '''
+    Extract numebers from a piece of Fortran code.  This covers
+    numbers written in various forms, such as 8, .8, 8., -8E-09,
+    8e-09.
+
+    Parameters
+    ----------
+    s : {string}
+        Fortran code
+    '''
+    pattern = '''
+    (
+    -?
+    \d+
+    (?: \. \d*)?
+    (?: (?: E|e) (?: -|\+) \d+)?
+    )
+    (?: _r8)?
+    '''
+    regex = re.compile(pattern, re.VERBOSE)
+    return regex.findall(s)
+
 
