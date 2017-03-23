@@ -4,6 +4,7 @@ import itertools
 import pandas as pd
 import xarray as xr
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from ..plot.plot import *
