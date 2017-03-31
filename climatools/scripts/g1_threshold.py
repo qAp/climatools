@@ -97,14 +97,21 @@ class Model(object):
 
 
 class Fig_FluxCoolr(object):
-    def __init__(self, ggroups=None):
+    def __init__(self, ggroups=None, vartypes=None):
+        print('constructing...')
+        yscales = ['linear', 'log']
+        
         if ggroups is None:
             self.ggroups = [1, 2, 3, 4]
-        vartypes = ['flux', 'cooling rate']
-        yscales = ['linear', 'log']
-        self.names_ax = list(itertools.product(vartypes, yscales))
-        self.hreftext = 'Figure: flux, cooling rate. g-group {g}'
+        if vartypes is None:
+            self.vartypes = ['flux', 'cooling rate']
+
+        self.ggroups = ggroups
         self.vartypes = vartypes
+        self.names_ax = list(itertools.product(self.vartypes, yscales))
+        self.hreftext = ('Figure: ' +
+                         ', '.join(vartype for vartype in self.vartypes)
+                         + ' g-group {g}')
         self.yscales = yscales
         
         self.vars_plot = {vartype: None for vartype in vartypes}
@@ -128,7 +135,8 @@ class Fig_FluxCoolr(object):
             display.display(display.HTML(html))
             display.display(display.Markdown(markdown))
             
-            fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(15, 11))
+            fig, axs = plt.subplots(nrows=len(self.vartypes), ncols=2,
+                                    figsize=(15, 5 * len(self.vartypes) + 1))
             axs = axs.flatten()
 
             for ax, (vartype, yscale) in zip(axs, self.names_ax):
