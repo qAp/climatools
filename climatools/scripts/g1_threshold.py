@@ -102,18 +102,21 @@ class Fig_FluxCoolr(object):
         
         if ggroups is None:
             self.ggroups = [1, 2, 3, 4]
+        else:
+            self.ggroups = ggroups
+            
         if vartypes is None:
             self.vartypes = ['flux', 'cooling rate']
-
-        self.ggroups = ggroups
-        self.vartypes = vartypes
+        else:
+            self.vartypes = vartypes
+            
         self.names_ax = list(itertools.product(self.vartypes, yscales))
         self.hreftext = ('Figure: ' +
                          ', '.join(vartype for vartype in self.vartypes)
                          + ' g-group {g}')
         self.yscales = yscales
         
-        self.vars_plot = {vartype: None for vartype in vartypes}
+        self.vars_plot = {vartype: None for vartype in self.vartypes}
         self.colors = {varname: None
                        for varname in ['flug', 'fnetg', 'coolrg']}
         self.varlims_from_indexrange = {yscale: None for yscale in yscales}
