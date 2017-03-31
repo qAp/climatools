@@ -155,7 +155,12 @@ class Fig_FluxCoolr(object):
                                 index_on_yaxis=True,
                                 yincrease=False, yscale=yscale,
                                 varlim_from_indexrange=self.varlims_from_indexrange[yscale])
-                ax.set_xlabel(vartype)
+                if vartype == 'flux':
+                    ax.set_xlabel(vartype + ' ($W m^{-2}$)')
+                elif vartype == 'cooling rate':
+                    ax.set_xlabel(vartype + ' ($deg/day$)')
+
+                ax.set_ylabel(ax.get_ylabel() + ' ($hPa$)')
                         
             plt.tight_layout()
             display.display(plt.gcf())
