@@ -98,7 +98,6 @@ class Model(object):
 
 class Fig_FluxCoolr(object):
     def __init__(self, ggroups=None, vartypes=None):
-        print('constructing...')
         yscales = ['linear', 'log']
         
         if ggroups is None:
