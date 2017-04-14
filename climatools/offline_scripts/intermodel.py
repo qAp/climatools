@@ -114,39 +114,17 @@ def lw_results_all_wavenumbers(infos_wavenumber=None,
         print(name_diff)
         print(df_print)
         print()
+        
+    viz.plot_pres_vs_hrcr(dfs=dfs,
+                          names=names,
+                          linestyles=linestyles,
+                          colours=colours,
+                          title=('Total cooling rate. {}'\
+                                 .format(name_molecule)),
+                          cooling_rate=True,
+                          xlim_linear=None,
+                          xlim_log=None)
 
-    dfs = [df.set_index('pressure') for df in dfs]
-    srss = [df['cooling_rate'] for df in dfs]
-
-    srss = [srs[(1e-2 < srs.index)] for srs in srss]
-    
-    fig = viz.plot_pdseries_indexVSvalues_linearlog(srss=srss,
-                                                    names=names,
-                                                    colours=colours,
-                                                    linestyles=linestyles,
-                                                    title=('Total cooling rate. {}'\
-                                                           .format(name_molecule)),
-                                                    xlabel='cooling rate [deg/day]',
-                                                    ylabel='pressure [mb]',
-                                                    figsize=(11, 5))
-
-    axs = [ax for ax in fig.get_axes()]
-    
-    # force lower y-axis limit so there is no blank area at the bottom of plot
-    ylim_lower = 1020
-    ylims = [ax.get_ylim() for ax in axs]
-    [ax.set_ylim((ylim_lower, ylim[-1]))
-     for ylim, ax in zip(ylims, axs)]
-
-    # force adjust x-axis limit in the linear-y subplot
-    xlim_manual = {'CO2': (-.2, .5), 'O3': (-.5, 1.),
-                   'H2O_CO2_O3': (-.1, 2.5)}
-    if name_molecule in xlim_manual:
-        ax = axs[0]
-        xlim = ax.get_xlim()
-        ax.set_xlim(xlim_manual[name_molecule])
-
-    
     
     display.display(plt.gcf()); plt.close()
 
