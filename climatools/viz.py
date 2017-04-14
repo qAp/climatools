@@ -1,6 +1,7 @@
 import sys
 import random
 import numpy as np
+import itertools
 import pandas as pd
 
 import matplotlib
@@ -11,6 +12,67 @@ import climatools.muths as muths
 import climatools.dates as dates
 import climatools.misc as misc
 
+
+
+
+def matplotlib_basic_colours():
+    '''
+    Returns a list of plot colours available in matplotlib.
+    The colours in this list are easily distinguished from each
+    other by eye.
+    '''
+    return ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+
+def matplotlib_nonnothing_linestyles(longname = False):
+    '''
+    Returns the list of plot linestyles available in matplotlib.
+    Linestyles that are invisible are left out of this list.
+    '''
+    if longname:
+        return [v for k, v in Line2D.markers.items() if v != '_draw_nothing']
+    else:
+        return [k for k, v in Line2D.lineStyles.items()
+                if v != '_draw_nothing']
+    
+    
+def matplotlib_nonnothing_markers(longname = False):
+    '''
+    Returns the list of plot markers available in matplotlib.
+    Markers that are invisible are left out of this list.
+    '''
+    if longname:
+        return [v for k, v in Line2D.markers.items() if v != 'nothing']
+    else:
+        return [k for k, v in Line2D.markers.items() if v != 'nothing']
+
+
+def matplotlib_colour_linestyle_tuples(N = 10):
+    '''
+    Returns a shuffled list of unique tuples of plot colours and linestyles
+    of length Npairs.
+    INPUT:
+    Npairs --- length of list returned,
+    the number of unique tuples of plot colours and linestyles returned.
+    '''
+    colours = matplotlib_basic_colours()
+    linestyles = matplotlib_nonnothing_linestyles()
+    
+    uniques = list(itertools.product(colours, linestyles))
+    
+    random.shuffle(uniques)
+    return random.sample(uniques, N)
+
+
+def matplotlib_colour_linestyle_marker_tuples(N = 10):
+    colours = matplotlib_basic_colours()
+    linestyles = matplotlib_nonnothing_linestyles()
+    markers = matplotlib_nonnothing_markers()
+    
+    uniques = list(itertools.product(colours, linestyles, markers))
+    
+    random.shuffle(uniques)
+    return random.sample(uniques, N)
 
 
 def matplotlib_colormap_names(kind = 'divergent'):
@@ -889,3 +951,187 @@ def plotVS_interest_for_all_cases(dsets, diff_dsets, interest = 'FLNT',
                bbox_to_anchor = (.45, .91), prop = {'size': 12})
     plt.subplots_adjust(wspace = 0., top = .84, bottom = .15)
     return fig
+
+
+def plot_pdseries_indexVSvalues_linearlog(srss=None,
+                                          names=None,
+                                          colours=None,
+                                          linestyles=None,
+                                          markers=None,
+                                          ylim=None, ylabel=None, 
+                                          xlim_linear=None, xlim_log=None,
+                                          xlabel=None,
+                                          title=None, 
+                                          figsize=(8, 5)):
+    '''
+    Plots index versus values for one or more Pandas.Series,
+    for both linear and log y-scales.
+    
+    When y-scale is linear, x-axis limits are the minimum and maximum
+    values for the range of y above 1.  When y-scale log, x-axis limits
+    are the minumum and maximum values for the range of y below 1.
+    
+    Parameters
+    ----------
+    srss : list of Pandas series to plot
+    names : corresponding list of strings to label the above;
+            these are used in the legend
+    colours : corresponding list of matplotlib colours
+              (e.g. \'k\', \'r\', etc.)
+    linestyles : corresponding list of matplotlib linestyles
+                 (e.g. \'-\', \'--\', etc.)
+    markers : corresponding list of matplotlib markers
+              (e.g. \'o\', \'+\', etc.)
+    ylim : a tuple of length two containing the lower and upper
+           limits on the y-axis
+    xlim_linear : a tuple of length two containing
+                  the lower and upper limits on the linear x-axis
+    xlim_log : a tuple of length two containing the lower and upper limits
+               on the log x-axis
+    title : string containing the title of the figure
+    xlabel : string containing the x-axis label
+    ylabel : string containing the y-axis label
+    figsize : tuple of length two containing the width and height,
+              in centimetres, of the figure
+    fig : matplotlib figure object for the plot
+    '''
+    xys = list(itertools.chain(*[(srs.values, srs.index.values)
+                                 for srs in srss]))
+    
+    if not markers:
+        markers = [None for _ in range(len(xys))]
+        
+    if not linestyles:
+        linestyles = ['-' for _ in range(len(xys))]
+
+    if not colours:
+        colour_cycle = itertools.cycle(matplotlib_basic_colours())
+        colours = [next(colour_cycle) for _ in range(len(xys))]
+
+    if not names:
+        names = [k + 1 for k in range(len(xys))]
+
+    fig, axs = plt.subplots(nrows=1, ncols=2, figsize=figsize)
+    
+    for yscale, ax in zip(('linear', 'log'), axs):
+
+        lines = ax.plot(*xys)
+
+        [plt.setp(line,
+                  linestyle=style, color=colour, marker=marker,
+                  linewidth=2.)
+         for line, style, colour, marker
+         in zip(lines, linestyles, colours, markers)]
+        
+        ax.set_title(title)
+        ax.grid(b=True)
+        ax.legend(names, loc='best')
+
+        if ylim:
+            ax.set_ylim(ylim)
+        ax.set_yscale(yscale)
+        ax.invert_yaxis()
+        ax.set_ylabel(ylabel)
+        
+        if yscale == 'linear':
+            if xlim_linear:
+                ax.set_xlim(xlim_linear)
+            else:
+                if ylim:
+                    ymin, ymax = ylim
+                    xmin = min([srs[(srs.index > 1e0) & (srs.index < ymax)]
+                                .min() for srs in srss])
+                    xmax = max([srs[(srs.index > 1e0) & (srs.index < ymin)]
+                                .max() for srs in srss])
+                else:
+                    xmin = min([srs[srs.index > 1e0].min() for srs in srss])
+                    xmax = max([srs[srs.index > 1e0].max() for srs in srss])
+                    
+                dx = xmax - xmin
+                xmin -= .1 * dx
+                xmax += .1 * dx
+                ax.set_xlim((xmin, xmax))
+        elif yscale == 'log':
+            if xlim_log:
+                ax.set_xlim(xlim_log)
+            else:
+                if ylim:
+                    ymin, ymax = ylim
+                    xmin = min([srs[(srs.index < 1e0) & (srs.index > ymin)]
+                                .min() for srs in srss])
+                    xmax = max([srs[(srs.index < 1e0) & (srs.index > ymin)]
+                                .max() for srs in srss])
+                else:
+                    xmin = min([srs[srs.index < 1e0].min() for srs in srss])
+                    xmax = max([srs[srs.index < 1e0].max() for srs in srss])
+                    
+                dx = xmax - xmin
+                xmin -= .1 * dx
+                xmax += .1 * dx
+                ax.set_xlim((xmin, xmax))
+                
+        ax.xaxis.get_major_formatter().set_powerlimits((0, 1))
+        ax.set_xlabel(xlabel)
+    return fig
+
+
+def plot_pandas_series(ax=None,
+                       srss=None, names=None,
+                       colours=None, linestyles=None, markers=None,
+                       values_vs_index=False,
+                       logy=False, inverty=False, ylim=None, ylabel='ylabel',
+                       logx=False, invertx=False, xlim=None, xlabel='xlabel',
+                       title='title'):
+
+    if values_vs_index:
+        xys = list(itertools.chain(*[(srs.values, srs.index.values)
+                                     for srs in srss]))
+    else:
+        xys = list(itertools.chain(*[(srs.index.values, srs.values)
+                                     for srs in srss]))
+    
+    if not markers:
+        markers = [None for _ in range(len(xys))]
+        
+    if not linestyles:
+        linestyles = ['-' for _ in range(len(xys))]
+
+    if not colours:
+        colour_cycle = itertools.cycle(matplotlib_basic_colours())
+        colours = [next(colour_cycle) for _ in range(len(xys))]
+
+    if not names:
+        names = [k + 1 for k in range(len(xys))]
+        
+    lines = ax.plot(*xys)
+
+    [plt.setp(line,
+              linestyle=style, color=colour, marker=marker,
+              linewidth=1.7)
+     for line, style, colour, marker
+     in zip(lines, linestyles, colours, markers)]
+        
+    ax.set_title(title)
+    ax.grid(b=True)
+    ax.legend(names, loc='best')
+
+    if ylim:
+        ax.set_ylim(ylim)
+
+    if logy:
+        ax.set_yscale('log')
+
+    if inverty:
+        ax.invert_yaxis()
+
+    ax.set_ylabel(ylabel)
+
+    if xlim:
+        ax.set_xlim(xlim)
+
+    if logx:
+        ax.set_xscale('log')
+
+    ax.set_xlabel(xlabel)
+
+    return ax
