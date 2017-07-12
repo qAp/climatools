@@ -127,6 +127,15 @@ class Fig_FluxCoolr(object):
             html = getHTML_hrefanchor(s)
             display.display(display.HTML(html))
 
+    def set_pressure_displayrange(self, low=None, high=None):
+        '''
+        If set, would set the eventual limits of the axis 
+        on which the index values are plotted. (The y-axis).
+        '''
+        self.pressure_display_low = low
+        self.pressure_display_high = high
+        
+
     def plot(self, analysis):
         
         for g in self.ggroups + ['total']:
@@ -157,6 +166,13 @@ class Fig_FluxCoolr(object):
                                 index_on_yaxis=True,
                                 yincrease=False, yscale=yscale,
                                 varlim_from_indexrange=self.varlims_from_indexrange[yscale])
+
+                if getattr(self, 'pressure_display_low', None):
+                    ax.set_ylim(top=self.pressure_display_low)
+
+                if getattr(self, 'pressure_display_high', None):
+                    ax.set_ylim(bottom=self.pressure_display_high)
+                    
                 if vartype == 'flux':
                     ax.set_xlabel(vartype + ' ($W m^{-2}$)')
                 elif vartype == 'cooling rate':
