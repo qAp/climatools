@@ -30,7 +30,10 @@ def load_dataset_crd(vartype, rundir,
             fname = fpath_coolr
         vdim = 'layer'
 
-    fpath = os.path.join(rundir, fname)
+    try:
+        fpath = os.path.join(rundir, fname)
+    except TypeError:
+        fpath = fname
     
     df = pd.read_csv(fpath, sep=r'\s+')
     df = df.set_index(['pressure', 'g'])
