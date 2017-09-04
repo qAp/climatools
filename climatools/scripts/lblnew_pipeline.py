@@ -1,52 +1,33 @@
 
-# coding: utf-8
-
-# In[1]:
-
-
 import os
 import subprocess
 import collections
 import shutil
 import time
+import itertools
+import re
 
 import climatools.clirad.info as cliradinfo
 
 
-# In[ ]:
-
-
-params_3 = {
-    'molecule': 'h2o',
-    'band': 9,
-    'ref_pts': [(600, 250), ],
-    'ng_refs': [9,],
-    'wgt': [9 * (1, )],
-    'option_wgt_flux': 2,
-    'option_wgt_k': 1,
-    'klin': 0,
-    'commitnumber': '31186b1',
-    'atmpro': 'mls',
-    'tsfc': 294
-}
-
-
-# In[2]:
 
 
 CLIRADLW_BANDS = cliradinfo.wavenumber_bands(region='lw')
-CLIRADLW_BANDS
 
-
-# In[3]:
-
-
+# Specify the directory in which 'lblnew.f' is kept.
 DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src',
                        'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
 
+# Specify the directory in which 'results.ipynb' is kept.
+DIR_IPYNB = os.path.join(
+    '/chia_cluster/home/jackyu/radiation',
+    'offline_radiation_notebooks',
+    'longwave',
+    'lblnew_20160916',
+    'study__g1_threshold')
 
-# In[4]:
+
 
 
 def get_dir_case(params):
@@ -101,11 +82,18 @@ def get_dir_case(params):
                     atmpro=params['atmpro'])
 
 
-# In[5]:
-
 
 def run_cases(cases_params=None):
-    
+    '''
+    Run lblnew.f for one or more sets of its
+    input parameters.
+
+    Parameters
+    ----------
+    cases_params: list-like
+        List of dictionaries.  One dictionary for each set
+        of lblnew input values.
+    '''
     procs = []
     for params in cases_params:
         dir_case = get_dir_case(params)
@@ -157,53 +145,42 @@ def run_cases(cases_params=None):
     return procs
 
 
-# In[6]:
-
-
-# for printing some input parameters
-import itertools
-import re
-
-def innames():
-    return ['vstar', 'nband', 'nv', 'dv',
-            'flgh2o',
-            'tsfc',
-            'pressure_reference_1',
-            'temperature_reference_1', 
-            'pressure_reference_2', 
-            'temperature_reference_2',
-            'ighigh', 
-            'ng', 
-            'nref',
-            'p_refs',
-            't_refs',
-            'ng_refs',
-            'absth',
-            'wgt',
-            'option_wgt_flux',
-            'option_wgt_k',
-            'option_klin',
-            'fac_meank',
-            'klin']
-
-
-
 def pattern_assign(name):
+    '''
+    Returns regular expression for a Fortran 
+    parameter variable assignment.
+    '''
     return ''' 
     parameter .* :: \s* &? \s* ({} \s* = (.*) \n)
     '''.format(name)
 
+
 def pattern_data(name):
+    '''
+    Returns regular expression for a Fortran
+    'data' variable assignment
+    '''
     return '''
     (data [^/{name}]+ {name}[^,] [^/{name}]+ / ([^/]+) /)
     '''.format(name=name)
 
+
 def pattern_atmpro():
+    '''
+    Returns regular expression that matches
+    the assignment of the atmosphere profile
+    used in lblnew.f.
+    '''
     return '''
     (atmosphere_profiles/(.*)75_r8.pro)
     '''
 
+
 def pattern_molecule():
+    '''
+    Returns regular expression that matches 
+    the assignment of molecule flags in lblnew.f.
+    '''
     return '''
     (
     data \s+  
@@ -221,6 +198,18 @@ def pattern_molecule():
 
 
 def enter_input_params(path_lblnew, params=None):
+    '''
+    Insert input values into lblnew.f
+
+    Parameters
+    ----------
+    path_lblnew: string
+        Path to the lblnew.f file to be edited.
+    params: dict
+        Dictionary of input values.  The keys and values
+        are the names and values of the input parameters.
+    '''
+
     molecules = ('h2o', 'co2', 'o3', 'n2o', 'ch4', 'o2')
     
     with open(path_lblnew, mode='r', encoding='utf-8') as f:
@@ -312,18 +301,6 @@ def enter_input_params(path_lblnew, params=None):
 
     
     
-
-
-# In[7]:
-
-
-DIR_IPYNB = os.path.join(
-    '/chia_cluster/home/jackyu/radiation',
-    'offline_radiation_notebooks',
-    'longwave',
-    'lblnew_20160916',
-    'study__g1_threshold')
-
 def get_analysis_dir(params):
     '''
     Returns the absolute path of the directory in which 
@@ -378,9 +355,17 @@ def get_analysis_dir(params):
 
 
 
-
-
 def analyse_case(params):
+    '''
+    Execute the analysis notebook (i.e. plot
+    and tabulate results) for a case.
+
+    Paramaters
+    -----------
+    params: dict
+        Dictionary of input values.  The keys and values                        
+        are the names and values of the input parameters.
+    '''
     dir_case = get_analysis_dir(params)
     
     print(dir_case)
@@ -424,10 +409,17 @@ def analyse_case(params):
                             stderr=subprocess.PIPE)
 
 
-# In[27]:
-
-
 def commit_msg(param):
+    '''
+    Compose git-commit message for a lblnew case.
+
+    Parameters
+    ----------
+    param: dict
+        Dictionary of input values.  The keys and values                        
+        are the names and values of the input parameters.        
+    '''
+
     title = '{molecule} band{band} {atmpro} ng_refs{ng_refs}'
     title = title.format(
         **{n: param[n] for n in ['molecule', 
@@ -442,7 +434,19 @@ def commit_msg(param):
     msg = [['-m', m] for m in msg]
     return [a for m in msg for a in m]
 
+
+
 def git_addcommit(param):
+    '''
+    Git-add and commit a lblnew case.
+    
+    Parameters
+    ----------
+    param: dict
+        Dictionary of input values.  The keys and values                        
+        are the names and values of the input parameters.        
+    '''
+
     print(get_analysis_dir(param))
     fpath_results = os.path.join(
         get_analysis_dir(param), 'results.ipynb')
@@ -460,121 +464,20 @@ def git_addcommit(param):
     proc_gitcommit = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
- 
     return proc_gitcommit
 
 
-# In[81]:
-
-
-h2o_band09_ng1 = {
-    'molecule': 'h2o',
-    'band': 9,
-    'ref_pts': [(600, 250)],
-    'ng_refs': [1],
-    'option_wgt_flux': 2,
-    'option_wgt_k': 1,
-    'klin': 0,
-    'commitnumber': '31186b1',
-    'atmpro': 'mls',
-    'tsfc': 294
-}
-
-wgts = [.95, .9, .85]
-params_h2o_band09_ng1 = []
-
-for wgt in wgts:
-    param = h2o_band09_ng1.copy()
-    param['wgt'] = [(wgt,),]
-    params_h2o_band09_ng1.append(param)
-    
-    
-h2o_band09_ng2 = {
-    'molecule': 'h2o',
-    'band': 9,
-    'ref_pts': [(600, 250)],
-    'ng_refs': [2,],
-    'option_wgt_flux': 2,
-    'option_wgt_k': 1,
-    'klin': 1e-24,
-    'commitnumber': '31186b1',
-    'atmpro': 'mls',
-    'tsfc': 294
-}
-
-wgts = [.95, .9, .85]
-params_h2o_band09_ng2 = []
-
-for wgt in wgts:
-    param = h2o_band09_ng2.copy()
-    param['wgt'] = [(wgt, 1),]
-    params_h2o_band09_ng2.append(param)
-
-
-# In[28]:
-
-
-h2o_band07_ng7 = {
-    'molecule': 'h2o',
-    'band': 7,
-    'ref_pts': [(600, 250)],
-    'ng_refs': [7],
-    'wgt': [(.5, .5, .5, .5, .5, .5, .9,)],
-    'w_diffuse': [(1.9, 1.66, 1.66, 1.66, 1.66, 1.66, 1.9)],
-    'option_wgt_flux': 2,
-    'option_wgt_k': 1,
-    'klin': 0,
-    'commitnumber': 'bd5b4a5',
-}
-
-atmpro_tsfc = [('saw', 257), ('trp', 300), ('mls', 294), ]
-params_h2o_band07_ng7 = []
-
-for atmpro, tsfc in atmpro_tsfc:
-    param = h2o_band07_ng7.copy()
-    param['atmpro'] = atmpro
-    param['tsfc'] = tsfc
-    params_h2o_band07_ng7.append(param)
-    
-    
-
-
-# In[29]:
-
-
-params = []
-#params.extend(params_h2o_band09_ng1)
-#params.extend(params_h2o_band09_ng2)
-params.extend(params_h2o_band07_ng7)
-params
-
-
-# In[33]:
-
-
-for param in params:
-    try:
-        shutil.rmtree(get_dir_case(param))
-    except FileNotFoundError:
-        continue
-
-
-# In[34]:
-
-
-
-for param in params:
-    try:
-        shutil.rmtree(get_analysis_dir(param))
-    except FileNotFoundError:
-        continue
-
-
-# In[35]:
-
-
 def run_pipieline(params):
+    '''
+    Runs lblnew pipeline for one or more sets
+    of input values.
 
+    Parameters
+    ----------
+    params: list-like
+        List of dictionaries.  One dictionary for each set
+        of lblnew input values.
+    '''
     procs = run_cases(params)
 
     print()
@@ -622,8 +525,60 @@ def run_pipieline(params):
     return gprocs
 
 
-# In[ ]:
 
+if __name__ == '__main__':
+    # The following is an example of how to run the pipeline
 
+    # We want to run lblnew.f for 3 cases: h2o band07 at
+    # atmosphere profiles mls, saw and trp.
+    h2o_band07_ng7 = {
+        'molecule': 'h2o',
+        'band': 7,
+        'ref_pts': [(600, 250)],
+        'ng_refs': [7],
+        'wgt': [(.5, .5, .5, .5, .5, .5, .9,)],
+        'w_diffuse': [(1.9, 1.66, 1.66, 1.66, 1.66, 1.66, 1.9)],
+        'option_wgt_flux': 2,
+        'option_wgt_k': 1,
+        'klin': 0,
+        'commitnumber': 'bd5b4a5',
+        }
+    
+    atmpro_tsfc = [('saw', 257), ('trp', 300), ('mls', 294), ]
+    params_h2o_band07_ng7 = []
+    
+    for atmpro, tsfc in atmpro_tsfc:
+        param = h2o_band07_ng7.copy()
+        param['atmpro'] = atmpro
+        param['tsfc'] = tsfc
+        params_h2o_band07_ng7.append(param)
+        
+    params = []
+    params.extend(params_h2o_band07_ng7)
+    
+    # params is a list of 3 dictionaries, corresponding to
+    # mls, saw and trp.
 
+    # Optional: delete any previous run directories for
+    # these 3 cases.
+    for param in params:
+        try:
+            shutil.rmtree(get_dir_case(param))
+        except FileNotFoundError:
+            continue
+
+    # Optional: delete any previous analysis directories for
+    # these 3 cases.
+    for param in params:
+        try:
+            shutil.rmtree(get_analysis_dir(param))
+        except FileNotFoundError:
+            continue
+
+    # Pass the list of dictionaries to the function 
+    # 'run_pipeline()' and computation starts
+    gprocs = lblnew.run_pipieline(params)
+
+    # `gprocs` is a list of (subprocess, param) pairs
+    # for the Git-add-and-submit step.
 
