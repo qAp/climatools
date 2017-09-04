@@ -577,7 +577,7 @@ if __name__ == '__main__':
 
     # Pass the list of dictionaries to the function 
     # 'run_pipeline()' and computation starts
-    gprocs = lblnew.run_pipieline(params)
+    gprocs = run_pipieline(params)
 
     # `gprocs` is a list of (subprocess, param) pairs
     # for the Git-add-and-submit step.
