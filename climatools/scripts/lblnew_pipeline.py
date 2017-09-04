@@ -573,49 +573,53 @@ for param in params:
 # In[35]:
 
 
-procs = run_cases(params)
+def run_pipieline(params):
 
-print()
+    procs = run_cases(params)
 
-aprocs = []
-all_being_analysed = False
-while not all_being_analysed:
-    
-    for proc, param in zip(procs, params):
-        if proc.poll() is None:
-            continue
-        else:
-            proc.kill()
-            aproc = analyse_case(param)
-            aprocs.append((aproc, param))
-            
-    if len(aprocs) == len(procs):
-        all_being_analysed = True   
-        break
+    print()
+
+    aprocs = []
+    all_being_analysed = False
+    while not all_being_analysed:
         
-    time.sleep(5)
-    
-
-print()
-    
-gprocs = []
-all_been_committed = False
-while not all_been_committed:
-    
-    for aproc, param in aprocs:
-        if aproc.poll() is None:
-            continue
-        else:
-            aproc.kill()
-            gproc = git_addcommit(param)
-            out, err = gproc.communicate()
-            gprocs.append((gproc, param))
+        for proc, param in zip(procs, params):
+            if proc.poll() is None:
+                continue
+            else:
+                proc.kill()
+                aproc = analyse_case(param)
+                aprocs.append((aproc, param))
+                
+        if len(aprocs) == len(procs):
+            all_being_analysed = True   
+            break
             
-    if len(gprocs) == len(aprocs):
-        all_been_committed = True
-        break
+        time.sleep(5)
         
-    time.sleep(10)
+    
+    print()
+        
+    gprocs = []
+    all_been_committed = False
+    while not all_been_committed:
+        
+        for aproc, param in aprocs:
+            if aproc.poll() is None:
+                continue
+            else:
+                aproc.kill()
+                gproc = git_addcommit(param)
+                out, err = gproc.communicate()
+                gprocs.append((gproc, param))
+                
+        if len(gprocs) == len(aprocs):
+            all_been_committed = True
+            break
+            
+        time.sleep(10)
+
+    return gprocs
 
 
 # In[ ]:
