@@ -52,6 +52,7 @@ def get_dir_case(params):
         'wgt_flux_{option_wgt_flux}',
         'wgt_k_{option_wgt_k}',
         'klin_{klin}',
+        'w_diffuse_{w_diffuse}',
         'crd_{commitnumber}',
         'atmpro_{atmpro}')
     
@@ -66,6 +67,8 @@ def get_dir_case(params):
     wgt = '__'.join(['_'.join([str(w) for w in wgt_ref]) 
                      for wgt_ref in params['wgt']])
     klin = 'none' if params['klin'] == 0 else params['klin']
+    w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
+                     for w_diffuse_ref in params['w_diffuse']])
     
     return template.format(molecule=params['molecule'],
                     band=params['band'], vmin=vmin, vmax=vmax,
@@ -78,6 +81,7 @@ def get_dir_case(params):
                     option_wgt_flux=params['option_wgt_flux'],
                     option_wgt_k=params['option_wgt_k'],
                     klin=klin,
+                    w_diffuse=w_diffuse,
                     commitnumber=params['commitnumber'],
                     atmpro=params['atmpro'])
 
@@ -283,6 +287,14 @@ def enter_input_params(path_lblnew, params=None):
     d_in['klin']['regex'] = pattern_assign(name='klin')
     d_in['klin']['input_value'] = str(params['klin']) + '_r8'
     
+    w_diffuse = [w for w_diffuse_ref in params['w_diffuse'] for w in w_diffuse_ref]
+    w_diffuse = list(itertools.zip_longest(*(4 * [iter(w_diffuse)])))
+    w_diffuse = [[str(v) + '_r8' for v in row if v != None] for row in w_diffuse]
+    w_diffuse = [' , '.join(row) for row in w_diffuse]
+    input_value = ',\n     &     '.join(w_diffuse)
+    d_in['w_diffuse']['regex'] = pattern_data(name='w_diffuse')
+    d_in['w_diffuse']['input_value'] = input_value
+
     'atmpro'
     d_in['atmpro']['regex'] = pattern_atmpro()
     d_in['atmpro']['input_value'] = params['atmpro']
@@ -324,6 +336,7 @@ def get_analysis_dir(params):
         'wgt_flux_{option_wgt_flux}',
         'wgt_k_{option_wgt_k}',
         'klin_{klin}',
+        'w_diffuse_{w_diffuse}',
         'crd_{commitnumber}',
         'atmpro_{atmpro}')
     
@@ -338,7 +351,8 @@ def get_analysis_dir(params):
     wgt = '__'.join(['_'.join([str(w) for w in wgt_ref]) 
                      for wgt_ref in params['wgt']])
     klin = 'none' if params['klin'] == 0 else params['klin']
-    
+    w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
+                     for w_diffuse_ref in params['w_diffuse']])    
     return template.format(molecule=params['molecule'],
                     band=params['band'], vmin=vmin, vmax=vmax,
                     ng=ng,
@@ -350,6 +364,7 @@ def get_analysis_dir(params):
                     option_wgt_flux=params['option_wgt_flux'],
                     option_wgt_k=params['option_wgt_k'],
                     klin=klin,
+                    w_diffuse=w_diffuse,
                     commitnumber=params['commitnumber'],
                     atmpro=params['atmpro'])    
 
