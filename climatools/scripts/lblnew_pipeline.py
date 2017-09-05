@@ -497,7 +497,7 @@ def run_pipieline(params):
 
     print()
 
-    aprocs = []
+    aprocs = {}
     all_being_analysed = False
     while not all_being_analysed:
         
@@ -505,12 +505,15 @@ def run_pipieline(params):
             if proc.poll() is None:
                 continue
             else:
-                proc.kill()
-                aproc = analyse_case(param)
-                aprocs.append((aproc, param))
+                if proc.pid in aprocs:
+                    continue
+                else:
+                    aproc = analyse_case(param)
+                    aprocs[proc.pid] = (aproc, param)
                 
         if len(aprocs) == len(procs):
             all_being_analysed = True   
+            [proc.kill() for proc in procs]
             break
             
         time.sleep(5)
@@ -518,18 +521,20 @@ def run_pipieline(params):
     
     print()
         
-    gprocs = []
+    gprocs = {}
     all_been_committed = False
     while not all_been_committed:
         
-        for aproc, param in aprocs:
+        for _, (aproc, param) in aprocs.items():
             if aproc.poll() is None:
                 continue
             else:
-                aproc.kill()
-                gproc = git_addcommit(param)
-                out, err = gproc.communicate()
-                gprocs.append((gproc, param))
+                if aproc.pid in gprocs:
+                    continue
+                else:
+                    gproc = git_addcommit(param)
+                    out, err = gproc.communicate()
+                    gprocs[aproc.pid] = (gproc, param)
                 
         if len(gprocs) == len(aprocs):
             all_been_committed = True
