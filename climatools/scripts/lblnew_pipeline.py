@@ -41,7 +41,7 @@ def get_dir_case(params):
         'separate_g_groups',
         'study__lblnew_g1_threshold',
         '{molecule}',
-        'band{band:02d}_wn_{vmin:d}_{vmax:d}',
+        'band0{band}_wn_{vmin:d}_{vmax:d}',
         'ng_{ng:d}',
         'g_ascending_k_descending',
         'refPTs_{refPTs}',
@@ -325,7 +325,7 @@ def get_analysis_dir(params):
         'lblnew_20160916',
         'study__g1_threshold',
         '{molecule}',
-        'band{band:02d}_wn_{vmin:d}_{vmax:d}',
+        'band0{band}_wn_{vmin:d}_{vmax:d}',
         'ng_{ng:d}',
         'g_ascending_k_descending',
         'refPTs_{refPTs}',
@@ -553,7 +553,7 @@ if __name__ == '__main__':
     # atmosphere profiles mls, saw and trp.
     h2o_band07_ng7 = {
         'molecule': 'h2o',
-        'band': 7,
+        'band': '7',
         'ref_pts': [(600, 250)],
         'ng_refs': [7],
         'wgt': [(.5, .5, .5, .5, .5, .5, .9,)],
