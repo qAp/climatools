@@ -42,6 +42,8 @@ def get_dir_case(params):
         'study__lblnew_g1_threshold',
         '{molecule}',
         'band0{band}_wn_{vmin:d}_{vmax:d}',
+        'nv_{nv:d}',
+        'dv_{dv}',
         'ng_{ng:d}',
         'g_ascending_k_descending',
         'refPTs_{refPTs}',
@@ -71,19 +73,21 @@ def get_dir_case(params):
                      for w_diffuse_ref in params['w_diffuse']])
     
     return template.format(molecule=params['molecule'],
-                    band=params['band'], vmin=vmin, vmax=vmax,
-                    ng=ng,
-                    refPTs=refPTs,
-                    ng_refs=ng_refs,
-                    getabsth=getabsth,
-                    absth=absth,
-                    wgt=wgt,
-                    option_wgt_flux=params['option_wgt_flux'],
-                    option_wgt_k=params['option_wgt_k'],
-                    klin=klin,
-                    w_diffuse=w_diffuse,
-                    commitnumber=params['commitnumber'],
-                    atmpro=params['atmpro'])
+                           band=params['band'], vmin=vmin, vmax=vmax,
+                           nv=params['nv'],
+                           dv=params['dv'],
+                           ng=ng,
+                           refPTs=refPTs,
+                           ng_refs=ng_refs,
+                           getabsth=getabsth,
+                           absth=absth,
+                           wgt=wgt,
+                           option_wgt_flux=params['option_wgt_flux'],
+                           option_wgt_k=params['option_wgt_k'],
+                           klin=klin,
+                           w_diffuse=w_diffuse,
+                           commitnumber=params['commitnumber'],
+                           atmpro=params['atmpro'])
 
 
 
@@ -331,6 +335,8 @@ def get_analysis_dir(params):
         'study__g1_threshold',
         '{molecule}',
         'band0{band}_wn_{vmin:d}_{vmax:d}',
+        'nv_{nv:d}',
+        'dv_{dv}',
         'ng_{ng:d}',
         'g_ascending_k_descending',
         'refPTs_{refPTs}',
@@ -359,19 +365,21 @@ def get_analysis_dir(params):
     w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
                      for w_diffuse_ref in params['w_diffuse']])    
     return template.format(molecule=params['molecule'],
-                    band=params['band'], vmin=vmin, vmax=vmax,
-                    ng=ng,
-                    refPTs=refPTs,
-                    ng_refs=ng_refs,
-                    getabsth=getabsth,
-                    absth=absth,
-                    wgt=wgt,
-                    option_wgt_flux=params['option_wgt_flux'],
-                    option_wgt_k=params['option_wgt_k'],
-                    klin=klin,
-                    w_diffuse=w_diffuse,
-                    commitnumber=params['commitnumber'],
-                    atmpro=params['atmpro'])    
+                           band=params['band'], vmin=vmin, vmax=vmax,
+                           nv=params['nv'],
+                           dv=params['dv'],
+                           ng=ng,
+                           refPTs=refPTs,
+                           ng_refs=ng_refs,
+                           getabsth=getabsth,
+                           absth=absth,
+                           wgt=wgt,
+                           option_wgt_flux=params['option_wgt_flux'],
+                           option_wgt_k=params['option_wgt_k'],
+                           klin=klin,
+                           w_diffuse=w_diffuse,
+                           commitnumber=params['commitnumber'],
+                           atmpro=params['atmpro'])    
 
 
 
