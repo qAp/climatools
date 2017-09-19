@@ -234,6 +234,11 @@ def enter_input_params(path_lblnew, params=None):
     d_in['vstar']['input_value'] = ' ' + str(vstar) + '_r8'
     d_in['nband']['regex'] = pattern_assign(name='nband')
     d_in['nband']['input_value'] = ' ' + str(nband)
+    d_in['nv']['regex'] = pattern_assign(name='nv')
+    d_in['nv']['input_value'] = ' ' + str(params['nv'])
+    d_in['dv']['regex'] = pattern_assign(name='dv')
+    d_in['dv']['input_value'] = ' ' + str(params['dv']) + '_r8'
+    
     
     p_refs, t_refs = zip(*params['ref_pts'])
     d_in['p_refs']['regex'] = pattern_assign(name='p_refs')
