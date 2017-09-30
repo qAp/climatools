@@ -232,7 +232,11 @@ def enter_input_params(path_lblnew, params=None):
     d_in['molecule']['input_value'] = input_value
     
     vmin, vmax = CLIRADLW_BANDS[params['band']][0]
-    vstar = vmin
+    if params['molecule'] == 'h2o' and params['band'] == '1':
+        vstar = vmin + 20
+        print('vstar =', vstar)
+    else:
+        vstar = vmin
     nband = vmax - vmin # keeping nv * dv = 1
     d_in['vstar']['regex'] = pattern_assign(name='vstar')
     d_in['vstar']['input_value'] = ' ' + str(vstar) + '_r8'
