@@ -237,7 +237,7 @@ def enter_input_params(path_lblnew, params=None):
         print('vstar =', vstar)
     else:
         vstar = vmin
-    nband = vmax - vstar # keeping nv * dv = 1
+    nband = vmax - vmin # keeping nv * dv = 1
     d_in['vstar']['regex'] = pattern_assign(name='vstar')
     d_in['vstar']['input_value'] = ' ' + str(vstar) + '_r8'
     d_in['nband']['regex'] = pattern_assign(name='nband')
