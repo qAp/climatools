@@ -233,7 +233,7 @@ def enter_input_params(path_lblnew, params=None):
     
     vmin, vmax = CLIRADLW_BANDS[params['band']][0]
     if params['molecule'] == 'h2o' and params['band'] == '1':
-        vstar = vmin + 20
+        vstar = vmin + 10
         print('vstar =', vstar)
     else:
         vstar = vmin
