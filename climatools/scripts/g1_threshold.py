@@ -68,6 +68,8 @@ class Model(object):
         self.rundir = kwargs.pop('rundir', None)
         self.type_model = kwargs.pop('type_model', None)
         self.linestyle = '-'
+        self.color = 'b'
+        self.marker = None
         self.data = {}
         self.fpath_flux = None
         self.fpath_coolr = None
@@ -164,8 +166,9 @@ class Fig_FluxCoolr(object):
                           .plot(ax=ax,
                                 linewidth=2, grid=True,
                                 label=modelname.upper() + ' ' + varname,
-                                color=self.colors[varname],
+                                color=model.color,
                                 linestyle=model.linestyle,
+                                marker=model.marker,
                                 index_on_yaxis=True,
                                 yincrease=False, yscale=yscale,
                                 varlim_from_indexrange=self.varlims_from_indexrange[yscale])
