@@ -49,7 +49,14 @@ def get_dir_from_param(param):
         'atmpro_{atmpro}')
 
     nref = len(param['ng_refs'])
-    vmin, vmax = CLIRADLW_BANDS[param['band']][0]
+
+    if params['molecule'] == 'h2o' and params['band'] == '1':
+        vmin, vmax = 20, 360
+    elif params['molecule'] == 'h2o' and params['band'] == '2':
+        vmin, vmax = 360, 540
+    else:
+        vmin, vmax = CLIRADLW_BANDS[params['band']][0]
+
     ng = sum(param['ng_refs'])
     refPTs = '__'.join(['P_{}_T_{}'.format(*pt) 
                         for pt in param['ref_pts']])
@@ -232,9 +239,9 @@ def enter_input_params(path_lblnew, params=None):
     d_in['molecule']['regex'] = pattern_molecule()
     d_in['molecule']['input_value'] = input_value
 
-    if params['molecule'] == 'h2o' and params['band'] == 1:
+    if params['molecule'] == 'h2o' and params['band'] == '1':
         vmin, vmax = 20, 360
-    elif params['molecule'] == 'h2o' and params['band'] == 2:
+    elif params['molecule'] == 'h2o' and params['band'] == '2':
         vmin, vmax = 360, 540
     else:
         vmin, vmax = CLIRADLW_BANDS[params['band']][0]
