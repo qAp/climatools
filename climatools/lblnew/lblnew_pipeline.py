@@ -340,7 +340,7 @@ def get_analysis_dir(params):
         'longwave',
         'lblnew_20160916',
         'study__g1_threshold',
-        get_dir_from_params(param))
+        get_dir_from_param(params))
 
 
 
