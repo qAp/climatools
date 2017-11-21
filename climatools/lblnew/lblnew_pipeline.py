@@ -369,7 +369,7 @@ def analyse_case(params):
         os.chdir(dir_case)
         assert os.system('cp {}/results.ipynb .'.format(DIR_IPYNB)) == 0
     except AssertionError:
-        pprint.pprint.(params)
+        pprint.pprint(params)
         print('Problem copying Notebook template to analysis '
               'directory for this case.')
         raise
