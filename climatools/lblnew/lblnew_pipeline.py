@@ -22,11 +22,9 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
 
 # Specify the directory in which 'results.ipynb' is kept.
 DIR_IPYNB = os.path.join(
-    '/chia_cluster/home/jackyu/radiation',
-    'offline_radiation_notebooks',
-    'longwave',
-    'lblnew_20160916',
-    'study__g1_threshold')
+    '/chia_cluster/home/jackyu',
+    'climatools/climatools/lblnew')
+
 
 
 
