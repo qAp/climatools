@@ -29,17 +29,8 @@ DIR_IPYNB = os.path.join(
 
 
 
-
-def get_dir_case(params):
-    '''
-    Returns the absolute path of the directory in which 
-    to run the case with input parameters `params`
-    '''   
-    template = os.path.join(
-        '/chia_cluster/home/jackyu/radiation/crd',
-        'LW/examples',
-        'separate_g_groups',
-        'study__lblnew_g1_threshold',
+def get_dir_from_param(param):
+    template = os.path.join( 
         '{molecule}',
         'band0{band}_wn_{vmin:d}_{vmax:d}',
         'nv_{nv:d}',
@@ -57,37 +48,51 @@ def get_dir_case(params):
         'w_diffuse_{w_diffuse}',
         'crd_{commitnumber}',
         'atmpro_{atmpro}')
-    
-    nref = len(params['ng_refs'])
-    vmin, vmax = CLIRADLW_BANDS[params['band']][0]
-    ng = sum(params['ng_refs'])
+
+    nref = len(param['ng_refs'])
+    vmin, vmax = CLIRADLW_BANDS[param['band']][0]
+    ng = sum(param['ng_refs'])
     refPTs = '__'.join(['P_{}_T_{}'.format(*pt) 
-                        for pt in params['ref_pts']])
-    ng_refs = '__'.join([str(n) for n in params['ng_refs']])
+                        for pt in param['ref_pts']])
+    ng_refs = '__'.join([str(n) for n in param['ng_refs']])
     getabsth = '__'.join(['auto' for _ in range(nref)])
     absth = '__'.join(['dlogN_uniform' for _ in range(nref)])
     wgt = '__'.join(['_'.join([str(w) for w in wgt_ref]) 
-                     for wgt_ref in params['wgt']])
-    klin = 'none' if params['klin'] == 0 else params['klin']
+                     for wgt_ref in param['wgt']])
+    klin = 'none' if param['klin'] == 0 else param['klin']
     w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
-                     for w_diffuse_ref in params['w_diffuse']])
+                           for w_diffuse_ref in param['w_diffuse']])
     
-    return template.format(molecule=params['molecule'],
-                           band=params['band'], vmin=vmin, vmax=vmax,
-                           nv=params['nv'],
-                           dv=params['dv'],
+    return template.format(molecule=param['molecule'],
+                           band=param['band'], vmin=vmin, vmax=vmax,
+                           nv=param['nv'],
+                           dv=param['dv'],
                            ng=ng,
                            refPTs=refPTs,
                            ng_refs=ng_refs,
                            getabsth=getabsth,
                            absth=absth,
                            wgt=wgt,
-                           option_wgt_flux=params['option_wgt_flux'],
-                           option_wgt_k=params['option_wgt_k'],
+                           option_wgt_flux=param['option_wgt_flux'],
+                           option_wgt_k=param['option_wgt_k'],
                            klin=klin,
                            w_diffuse=w_diffuse,
-                           commitnumber=params['commitnumber'],
-                           atmpro=params['atmpro'])
+                           commitnumber=param['commitnumber'],
+                           atmpro=param['atmpro'])
+
+
+
+def get_dir_case(param):
+    '''
+    Returns the absolute path of the directory in which 
+    to run the case with input parameters `param`
+    '''   
+    return os.path.join(
+        '/chia_cluster/home/jackyu/radiation/crd',
+        'LW/examples',
+        'separate_g_groups',
+        'study__lblnew_g1_threshold',
+        get_dir_from_param(param))
 
 
 
@@ -327,59 +332,14 @@ def get_analysis_dir(params):
     Returns the absolute path of the directory in which 
     to run the case with input parameters `params`
     '''   
-    template = os.path.join(
+    return os.path.join(
         '/chia_cluster/home/jackyu/radiation',
         'offline_radiation_notebooks',
         'longwave',
         'lblnew_20160916',
         'study__g1_threshold',
-        '{molecule}',
-        'band0{band}_wn_{vmin:d}_{vmax:d}',
-        'nv_{nv:d}',
-        'dv_{dv}',
-        'ng_{ng:d}',
-        'g_ascending_k_descending',
-        'refPTs_{refPTs}',
-        'ng_refs_{ng_refs}',
-        'getabsth_{getabsth}',
-        'absth_{absth}',
-        'wgt_{wgt}',
-        'wgt_flux_{option_wgt_flux}',
-        'wgt_k_{option_wgt_k}',
-        'klin_{klin}',
-        'w_diffuse_{w_diffuse}',
-        'crd_{commitnumber}',
-        'atmpro_{atmpro}')
-    
-    nref = len(params['ng_refs'])
-    vmin, vmax = CLIRADLW_BANDS[params['band']][0]
-    ng = sum(params['ng_refs'])
-    refPTs = '__'.join(['P_{}_T_{}'.format(*pt) 
-                        for pt in params['ref_pts']])
-    ng_refs = '__'.join([str(n) for n in params['ng_refs']])
-    getabsth = '__'.join(['auto' for _ in range(nref)])
-    absth = '__'.join(['dlogN_uniform' for _ in range(nref)])
-    wgt = '__'.join(['_'.join([str(w) for w in wgt_ref]) 
-                     for wgt_ref in params['wgt']])
-    klin = 'none' if params['klin'] == 0 else params['klin']
-    w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
-                     for w_diffuse_ref in params['w_diffuse']])    
-    return template.format(molecule=params['molecule'],
-                           band=params['band'], vmin=vmin, vmax=vmax,
-                           nv=params['nv'],
-                           dv=params['dv'],
-                           ng=ng,
-                           refPTs=refPTs,
-                           ng_refs=ng_refs,
-                           getabsth=getabsth,
-                           absth=absth,
-                           wgt=wgt,
-                           option_wgt_flux=params['option_wgt_flux'],
-                           option_wgt_k=params['option_wgt_k'],
-                           klin=klin,
-                           w_diffuse=w_diffuse,
-                           commitnumber=params['commitnumber'],
-                           atmpro=params['atmpro'])    
+        get_dir_from_params(param))
+
 
 
 
@@ -556,6 +516,20 @@ def run_pipieline(params):
         time.sleep(10)
 
     return gprocs
+
+
+
+def nbviewer_url(param):
+    '''
+    Returns the url for the notebook on nbviewer.jupyter.org
+    '''
+    return os.path.join(
+        'http://nbviewer.jupyter.org/github',
+        'qap/offline_radiation_notebooks/tree/master',
+        'longwave/lblnew_20160916/study__g1_threshold',
+        get_dir_from_param(param),
+        'results.ipynb')
+
 
 
 
