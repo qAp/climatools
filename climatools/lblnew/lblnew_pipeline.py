@@ -1,5 +1,6 @@
 
 import os
+import pprint
 import subprocess
 import collections
 import shutil
@@ -111,12 +112,11 @@ def run_cases(cases_params=None):
     for params in cases_params:
         dir_case = get_dir_case(params)
         
-        print(dir_case)
-        
         try:
             os.makedirs(dir_case)
         except FileExistsError:
-            print(params, 'This case already exists.')
+            pprint.pprint(params)
+            print('This case already exists.')
             print()
             procs.append(None)
             continue
@@ -143,17 +143,15 @@ def run_cases(cases_params=None):
             os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
             assert os.path.exists('lblnew.exe') == True
         except AssertionError:
-            print('Problem compiling source code for case',
-                  params)
+            pprint.pprint(params)
+            print('Problem compiling source code for this case.')
             print()
             procs.append(None)
             continue
         
         proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
-        
         procs.append(proc)
-    
-    print()
+        pprint.pprint(params)
         
     return procs
 
@@ -356,21 +354,20 @@ def analyse_case(params):
     '''
     dir_case = get_analysis_dir(params)
     
-    print(dir_case)
-    
     try:
         os.makedirs(dir_case)
     except FileExistsError:
-        print(params, 'This case already exists.')
+        pprint.pprint(params)
+        print('This case already exists.')
         raise
         
     try:
         os.chdir(dir_case)
         assert os.system('cp {}/results.ipynb .'.format(DIR_IPYNB)) == 0
     except AssertionError:
+        pprint.pprint.(params)
         print('Problem copying Notebook template to analysis '
-              'directory for the case:',
-              dir_case)
+              'directory for this case.')
         raise
     
     dir_crd = get_dir_case(params)
@@ -387,6 +384,7 @@ def analyse_case(params):
     with open('params.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
         
+    pprint.pprint(params)
         
     return subprocess.Popen(['jupyter', 'nbconvert', 
                              '--execute',
@@ -435,7 +433,7 @@ def git_addcommit(param):
         are the names and values of the input parameters.        
     '''
 
-    print(get_analysis_dir(param))
+
     fpath_results = os.path.join(
         get_analysis_dir(param), 'results.ipynb')
     fpath_parampy = os.path.join(
@@ -452,6 +450,9 @@ def git_addcommit(param):
     proc_gitcommit = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
+
+    pprint.pprint(param)
+
     return proc_gitcommit
 
 
@@ -466,10 +467,11 @@ def run_pipieline(params):
         List of dictionaries.  One dictionary for each set
         of lblnew input values.
     '''
+    print('Submitting radiation calculation for cases')
     procs = run_cases(params)
-
     print()
 
+    print('Submitting analysis for cases')
     aprocs = {}
     all_being_analysed = False
     while not all_being_analysed:
@@ -490,10 +492,9 @@ def run_pipieline(params):
             break
             
         time.sleep(5)
-        
-    
     print()
-        
+
+    print('Committing analysis to Git repository for cases')
     gprocs = {}
     all_been_committed = False
     while not all_been_committed:
@@ -514,6 +515,7 @@ def run_pipieline(params):
             break
             
         time.sleep(10)
+    print()
 
     return gprocs
 
