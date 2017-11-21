@@ -231,8 +231,14 @@ def enter_input_params(path_lblnew, params=None):
     input_value = '   ,   '.join([str(flg) for flg in molecule_flags])
     d_in['molecule']['regex'] = pattern_molecule()
     d_in['molecule']['input_value'] = input_value
-    
-    vmin, vmax = CLIRADLW_BANDS[params['band']][0]
+
+    if params['molecule'] == 'h2o' and params['band'] == 1:
+        vmin, vmax = 20, 360
+    elif params['molecule'] == 'h2o' and params['band'] == 2:
+        vmin, vmax = 360, 540
+    else:
+        vmin, vmax = CLIRADLW_BANDS[params['band']][0]
+
     vstar = vmin
     nband = int((vmax - vstar) / (params['nv'] * params['dv']))
     d_in['vstar']['regex'] = pattern_assign(name='vstar')
