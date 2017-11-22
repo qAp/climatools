@@ -124,7 +124,7 @@ def kdist_params(molecule=None, band=None):
             ref_pts = [(1, 250), (10, 250), (500, 250)]
             option_wgt_flux = 2
             option_wgt_k = 1
-            klin = 1e-24
+            klin = 6.375563e-24
             wgt = [(.7, .3, .7), (.7, .6), (.4, .5, .8, .95)]
             w_diffuse = [(1.6, 1.6, 1.7), (1.75, 1.75),
                          (1.55, 1.55, 1.6, 1.85)]
