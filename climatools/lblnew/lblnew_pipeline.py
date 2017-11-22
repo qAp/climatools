@@ -538,7 +538,7 @@ def nbviewer_url(param):
     '''
     return os.path.join(
         'http://nbviewer.jupyter.org/github',
-        'qap/offline_radiation_notebooks/tree/master',
+        'qap/offline_radiation_notebooks/blob/master',
         'longwave/lblnew_20160916/study__g1_threshold',
         get_dir_from_param(param),
         'results.ipynb')
