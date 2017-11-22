@@ -523,6 +523,12 @@ def run_pipieline(params):
                 
         if len(gprocs) == len(aprocs):
             all_been_committed = True
+            for _, (aproc, param) in aprocs.items():
+                out, err = aproc.communicate()
+                print('Jupyter notebook process stdout and stderr')
+                print(out)
+                print(err)
+                print()
             break
             
         time.sleep(10)
