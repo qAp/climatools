@@ -164,7 +164,7 @@ class Fig_FluxCoolr(object):
                             da = model.data[vartype][varname].sel(g=g)
                         da.climaviz\
                           .plot(ax=ax,
-                                linewidth=2, grid=True,
+                                linewidth=2, grid=True, alpha=.6,
                                 label=modelname.upper() + ' ' + varname,
                                 color=model.color,
                                 linestyle=model.linestyle,
