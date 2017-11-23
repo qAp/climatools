@@ -399,6 +399,7 @@ def analyse_case(params):
         
     return subprocess.Popen(['jupyter', 'nbconvert', 
                              '--execute',
+                             '--ExecutePreprocessor.timeout=None',
                              '--to', 'notebook',
                              '--inplace',
                              'results.ipynb'], 
