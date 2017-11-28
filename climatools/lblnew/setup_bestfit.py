@@ -103,7 +103,7 @@ def get_dir_case(param):
 
 
 
-def run_cases(cases_params=None):
+def run_fortran(param):
     '''
     Run lblnew.f for one or more sets of its
     input parameters.
@@ -114,52 +114,45 @@ def run_cases(cases_params=None):
         List of dictionaries.  One dictionary for each set
         of lblnew input values.
     '''
-    procs = []
-    for params in cases_params:
-        dir_case = get_dir_case(params)
+    dir_case = get_dir_case(param)
         
-        try:
-            os.makedirs(dir_case)
-        except FileExistsError:
-            pprint.pprint(params)
-            print('This case already exists.')
-            print()
-            procs.append(None)
-            continue
+    try:
+        os.makedirs(dir_case)
+    except FileExistsError:
+        pprint.pprint(param)
+        print('This case already exists.')
+        print()
+        return None
             
-        try:
-            os.chdir(dir_case)
-            assert os.system('cp {}/*.f .'.format(DIR_SRC)) == 0
-        except AssertionError:
-            print('Problem copying source code to case directory for '
-                  'case',
-                  dir_case)
-            print()
-            procs.append(None)
-            continue
-            
-        
-        fname_code = 'lblnew.f'
-        
+    try:
         os.chdir(dir_case)
-        enter_input_params(fname_code, params=params)
+        assert os.system('cp {}/*.f .'.format(DIR_SRC)) == 0
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem copying source code to case directory for this case.')
+        print()
+        return None
         
-        try:
-            os.chdir(dir_case)
-            os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
-            assert os.path.exists('lblnew.exe') == True
-        except AssertionError:
-            pprint.pprint(params)
-            print('Problem compiling source code for this case.')
-            print()
-            procs.append(None)
-            continue
+    fname_code = 'lblnew.f'
         
-        proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
-        procs.append(proc)
-        pprint.pprint(params)
+    os.chdir(dir_case)
+    enter_input_params(fname_code, params=param)
+    
+    try:
+        os.chdir(dir_case)
+        os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
+        assert os.path.exists('lblnew.exe') == True
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem compiling source code for this case.')
+        print()
+        return None
         
-    return procs
+    proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
+    pprint.pprint(param)
+    return proc
+    
+    
 
 
 def pattern_assign(name):
