@@ -22,9 +22,10 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
 
 # Specify the directory in which 'results.ipynb' is kept.
-DIR_IPYNB = os.path.join(
+PATH_IPYNB = os.path.join(
     '/chia_cluster/home/jackyu',
-    'climatools/climatools/lblnew')
+    'climatools/climatools/lblnew',
+    'results.ipynb')
 
 
 
@@ -89,72 +90,6 @@ def get_dir_from_param(param):
 
 
 
-def get_dir_case(param):
-    '''
-    Returns the absolute path of the directory in which 
-    to run the case with input parameters `param`
-    '''   
-    return os.path.join(
-        '/chia_cluster/home/jackyu/radiation/crd',
-        'LW/examples',
-        'separate_g_groups',
-        'study__lblnew_g1_threshold',
-        get_dir_from_param(param))
-
-
-
-def run_fortran(param):
-    '''
-    Run lblnew.f for one or more sets of its
-    input parameters.
-
-    Parameters
-    ----------
-    cases_params: list-like
-        List of dictionaries.  One dictionary for each set
-        of lblnew input values.
-    '''
-    dir_case = get_dir_case(param)
-        
-    try:
-        os.makedirs(dir_case)
-    except FileExistsError:
-        pprint.pprint(param)
-        print('This case already exists.')
-        print()
-        return None
-            
-    try:
-        os.chdir(dir_case)
-        assert os.system('cp {}/*.f .'.format(DIR_SRC)) == 0
-    except AssertionError:
-        pprint.pprint(param)
-        print('Problem copying source code to case directory for this case.')
-        print()
-        return None
-        
-    fname_code = 'lblnew.f'
-        
-    os.chdir(dir_case)
-    enter_input_params(fname_code, params=param)
-    
-    try:
-        os.chdir(dir_case)
-        os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
-        assert os.path.exists('lblnew.exe') == True
-    except AssertionError:
-        pprint.pprint(param)
-        print('Problem compiling source code for this case.')
-        print()
-        return None
-        
-    proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
-    pprint.pprint(param)
-    return proc
-    
-    
-
-
 def pattern_assign(name):
     '''
     Returns regular expression for a Fortran 
@@ -165,6 +100,7 @@ def pattern_assign(name):
     '''.format(name)
 
 
+
 def pattern_data(name):
     '''
     Returns regular expression for a Fortran
@@ -173,6 +109,7 @@ def pattern_data(name):
     return '''
     (data [^/{name}]+ {name}[^,] [^/{name}]+ / ([^/]+) /)
     '''.format(name=name)
+
 
 
 def pattern_atmpro():
@@ -205,6 +142,7 @@ def pattern_molecule():
     \s* / 
      )
     '''
+
 
 
 def enter_input_params(path_lblnew, params=None):
@@ -330,77 +268,6 @@ def enter_input_params(path_lblnew, params=None):
 
     
     
-def get_analysis_dir(params):
-    '''
-    Returns the absolute path of the directory in which 
-    to run the case with input parameters `params`
-    '''   
-    return os.path.join(
-        '/chia_cluster/home/jackyu/radiation',
-        'offline_radiation_notebooks',
-        'longwave',
-        'lblnew_20160916',
-        'study__g1_threshold',
-        get_dir_from_param(params))
-
-
-
-
-def analyse_case(params):
-    '''
-    Execute the analysis notebook (i.e. plot
-    and tabulate results) for a case.
-
-    Paramaters
-    -----------
-    params: dict
-        Dictionary of input values.  The keys and values                        
-        are the names and values of the input parameters.
-    '''
-    dir_case = get_analysis_dir(params)
-    
-    try:
-        os.makedirs(dir_case)
-    except FileExistsError:
-        pprint.pprint(params)
-        print('This case already exists.')
-        raise
-        
-    try:
-        os.chdir(dir_case)
-        assert os.system('cp {}/results.ipynb .'.format(DIR_IPYNB)) == 0
-    except AssertionError:
-        pprint.pprint(params)
-        print('Problem copying Notebook template to analysis '
-              'directory for this case.')
-        raise
-    
-    dir_crd = get_dir_case(params)
-    dir_xcrd = get_dir_case(params)
-    ng_refs = params['ng_refs']
-    p_refs = [p for p, t in params['ref_pts']]    
-    
-    lines = ["DIR_CRD = '{}'".format(dir_crd),
-             "DIR_XCRD = '{}'".format(dir_xcrd),
-             "NG_REFS = {}".format(ng_refs),
-             "P_REFS = {}".format(p_refs)]
-    
-    os.chdir(dir_case)
-    with open('params.py', encoding='utf-8', mode='w') as f:
-        f.write('\n'.join(lines))
-        
-    pprint.pprint(params)
-        
-    return subprocess.Popen(['jupyter', 'nbconvert', 
-                             '--execute',
-                             '--ExecutePreprocessor.timeout=None',
-                             '--to', 'notebook',
-                             '--inplace',
-                             'results.ipynb'], 
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE)
-
-
 def commit_msg(param):
     '''
     Compose git-commit message for a lblnew case.
@@ -428,35 +295,11 @@ def commit_msg(param):
 
 
 
-def git_addcommit(param):
-    '''
-    Git-add and commit a lblnew case.
-    
-    Parameters
-    ----------
-    param: dict
-        Dictionary of input values.  The keys and values                        
-        are the names and values of the input parameters.        
-    '''
 
 
-    fpath_results = os.path.join(
-        get_analysis_dir(param), 'results.ipynb')
-    fpath_parampy = os.path.join(
-        get_analysis_dir(param), 'params.py')
-    
-    proc_gitadd = subprocess.Popen(['git', 'add', 
-                                    fpath_results, fpath_parampy],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-    
-    our, err = proc_gitadd.communicate()
-    
-    cmd = ['git', 'commit'] + commit_msg(param)
-    proc_gitcommit = subprocess.Popen(cmd,
-                                      stdout=subprocess.PIPE,
-                                      stderr=subprocess.PIPE)
 
-    pprint.pprint(param)
 
-    return proc_gitcommit
+
+
+
+

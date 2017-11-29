@@ -1,31 +1,178 @@
 
+import os
+import pprint
+import subprocess
+import time
 
 
 
-def inspect_attrs(param, overlap):
+
+
+def get_dir_case(param, setup=None):
     '''
-    Check that given parameters are compatible with
-    the overlap option.
+    Returns the absolute path of the directory in which 
+    to run the case with input parameters `param`
+    '''   
+    from setup import get_dir_from_param
+    dir_case = os.path.join(
+        '/chia_cluster/home/jackyu/radiation/crd',
+        'LW/examples',
+        'separate_g_groups',
+        'study__lblnew_g1_threshold',
+        get_dir_from_param(param))
+    return dir_case
+
+
+
+def get_analysis_dir(param, setup=None):
+    '''
+    Returns the absolute path of the directory in which 
+    to run the case with input parameters `params`
+    '''   
+    from setup import get_dir_from_param
+    dir_case =  os.path.join(
+        '/chia_cluster/home/jackyu/radiation',
+        'offline_radiation_notebooks',
+        'longwave',
+        'lblnew_20160916',
+        'study__g1_threshold',
+        get_dir_from_param(param))
+    return dir_case
+
+
+
+def run_fortran(param=None, setup=None):
+    '''
+    Run lblnew.f for a single case.
 
     Parameters
     ----------
-    param:
-    overlap:
+    param: dict
+    setup: module
+           lblnew.setuprun
     '''
-    names = param.keys()
+    dir_case = get_dir_case(param, setup=setup)
+        
+    try:
+        os.makedirs(dir_case)
+    except FileExistsError:
+        pprint.pprint(param)
+        print('This case already exists.')
+        print()
+        return None
+            
+    try:
+        os.chdir(dir_case)
+        assert os.system('cp {}/*.f .'.format(setup.DIR_SRC)) == 0
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem copying source code to case directory for this case.')
+        print()
+        return None
+        
+    fname_code = 'lblnew.f'
+        
+    os.chdir(dir_case)
+    setup.enter_input_params(fname_code, params=param)
+    
+    try:
+        os.chdir(dir_case)
+        os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
+        assert os.path.exists('lblnew.exe') == True
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem compiling source code for this case.')
+        print()
+        return None
+        
+    proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
+    pprint.pprint(param)
+    return proc
 
-    if overlap == False:
-        assert isinstance(param['molecule'], list) == False
-        assert 'ng_refs' in names
-        assert 'ref_pts' in names
-        assert 'wgt' in names
-        assert 'w_diffuse' in names
-        assert 'klin' in names
-
-    if overlap == True:
-        assert isinstance(param['molecule'], list) == True
 
 
+def analyse_case(param, setup=None):
+    '''
+    Execute the analysis notebook (i.e. plot
+    and tabulate results) for a case.
+
+    Paramaters
+    -----------
+    param: dict
+        Dictionary of input values.  The keys and values                        
+        are the names and values of the input parameters.
+    '''
+    dir_case = get_analysis_dir(param, setup=setup)
+    
+    try:
+        os.makedirs(dir_case)
+    except FileExistsError:
+        pprint.pprint(param)
+        print('This case already exists.')
+        raise
+        
+    try:
+        os.chdir(dir_case)
+        assert os.system('cp {} .'.format(setup.PATH_IPYNB)) == 0
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem copying Notebook template to analysis '
+              'directory for this case.')
+        raise
+
+    # Write .py file, used as input for analysis notebook
+    lines = ['{} = {}'.format(parameter.upper(), value) 
+             for parameter, value in param.items()]
+    dir_crd = get_dir_case(param, setup=setup)
+    lines.append("DIR_CRD = '{}'".format(dir_crd))
+    os.chdir(dir_case)
+    with open('param.py', encoding='utf-8', mode='w') as f:
+        f.write('\n'.join(lines))
+        
+    pprint.pprint(param)
+        
+    return subprocess.Popen(['jupyter', 'nbconvert', 
+                             '--execute',
+                             '--ExecutePreprocessor.timeout=None',
+                             '--to', 'notebook',
+                             '--inplace',
+                             'results.ipynb'], 
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE)
+
+
+
+def git_addcommit(param, setup=None):
+    '''
+    Git-add and commit a lblnew case.
+    
+    Parameters
+    ----------
+    param: dict
+        Dictionary of input values.  The keys and values                        
+        are the names and values of the input parameters.        
+    '''
+    from setup import commit_msg
+
+    fpath_results = os.path.join(
+        get_analysis_dir(param, setup=setup), 'results.ipynb')
+    fpath_parampy = os.path.join(
+        get_analysis_dir(param, setup=setup), 'params.py')
+    
+    proc_gitadd = subprocess.Popen(['git', 'add', 
+                                    fpath_results, fpath_parampy],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+    
+    our, err = proc_gitadd.communicate()
+    
+    cmd = ['git', 'commit'] + commit_msg(param)
+    proc_gitcommit = subprocess.Popen(cmd,
+                                      stdout=subprocess.PIPE,
+                                      stderr=subprocess.PIPE)
+
+    pprint.pprint(param)
+    return proc_gitcommit
 
 
 
@@ -46,10 +193,9 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
     gprocs: list
             List of subprocesses for the Git commit of each given case.
     '''
-    from setup import run_fortran, analyse_case, git_addcommit
 
     print('Submitting radiation calculation for cases')
-    procs = [run_fortran(param) for param in params]
+    procs = [run_fortran(param, setup=setup) for param in params]
     print()
 
     print('Submitting analysis for cases')
@@ -64,7 +210,7 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
                 if proc.pid in aprocs:
                     continue
                 else:
-                    aproc = analyse_case(param)
+                    aproc = analyse_case(param, setup=setup)
                     aprocs[proc.pid] = (aproc, param)
                 
         if len(aprocs) == len(procs):
@@ -87,7 +233,7 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
                 if aproc.pid in gprocs:
                     continue
                 else:
-                    gproc = git_addcommit(param)
+                    gproc = git_addcommit(param, setup=setup)
                     out, err = gproc.communicate()
                     gprocs[aproc.pid] = (gproc, param)
                 

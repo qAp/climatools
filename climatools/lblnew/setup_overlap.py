@@ -28,7 +28,7 @@ PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
 
 
 
-def get_fortran_dir(param):
+def get_dir_from_param(param):
     '''
     Returns the directory path that describes the case 
     specified by the input parameters.  
@@ -61,20 +61,117 @@ def get_fortran_dir(param):
 
 
 
+def pattern_assign(name):
+    '''
+    Returns regular expression for a Fortran 
+    parameter variable assignment.
+    '''
+    return ''' 
+    parameter .* :: \s* &? \s* ({} \s* = (.*) \n)
+    '''.format(name)
 
 
-def run_fortran():
-    pass
+
+def pattern_data(name):
+    '''
+    Returns regular expression for a Fortran
+    'data' variable assignment
+    '''
+    return '''
+    (data [^/{name}]+ {name}[^,] [^/{name}]+ / ([^/]+) /)
+    '''.format(name=name)
 
 
 
-def analyse_case():
-    pass
+def pattern_atmpro():
+    '''
+    Returns regular expression that matches
+    the assignment of the atmosphere profile
+    used in lblnew.f.
+    '''
+    return '''
+    (atmosphere_profiles/(.*)75_r8.pro)
+    '''
 
 
 
-def git_addcommit():
-    pass
+def pattern_molecule():
+    '''
+    Returns regular expression that matches 
+    the assignment of molecule flags in lblnew.f.
+    '''
+    return '''
+    (
+    data \s+  
+    flgh2o \s*,\s* flgco2 \s*,\s* flgo3 \s*,\s* flgn2o \s*,\s*
+    flgch4 \s*,\s* flgo2
+    \n 
+    \s* \* \s* / \s* 
+    (
+    [01] \s* , \s* [01] \s* , \s*  [01] \s* , \s* [01] \s* , \s* [01] 
+    \s* , \s* [01]
+    )
+    \s* / 
+     )
+    '''
+
+
+
+def enter_input_params(path_lblnew, params=None):
+    '''
+    Insert input values into lblnew.f
+
+    Parameters
+    ----------
+    path_lblnew: string
+        Path to the lblnew.f file to be edited.
+    params: dict
+        Dictionary of input values.  The keys and values
+        are the names and values of the input parameters.
+    '''
+    molecules = ('h2o', 'co2', 'o3', 'n2o', 'ch4', 'o2')
+    
+    with open(path_lblnew, mode='r', encoding='utf-8') as f:
+        code = f.read()
+    
+    d_in = collections.defaultdict(dict)
+    
+    molecule_flags = [1 if m in params['molecule'] else 0 
+                      for m in molecules]
+    input_value = '   ,   '.join([str(flg) for flg in molecule_flags])
+    d_in['molecule']['regex'] = pattern_molecule()
+    d_in['molecule']['input_value'] = input_value
+
+    vmin, vmax = CLIRADLW_BANDS[params['band']][0]
+
+    vstar = vmin
+    nband = int((vmax - vstar) / (params['nv'] * params['dv']))
+    d_in['vstar']['regex'] = pattern_assign(name='vstar')
+    d_in['vstar']['input_value'] = ' ' + str(vstar) + '_r8'
+    d_in['nband']['regex'] = pattern_assign(name='nband')
+    d_in['nband']['input_value'] = ' ' + str(nband)
+    d_in['nv']['regex'] = pattern_assign(name='nv')
+    d_in['nv']['input_value'] = ' ' + str(params['nv'])
+    d_in['dv']['regex'] = pattern_assign(name='dv')
+    d_in['dv']['input_value'] = ' ' + str(params['dv']) + '_r8'
+    
+    'atmpro'
+    d_in['atmpro']['regex'] = pattern_atmpro()
+    d_in['atmpro']['input_value'] = params['atmpro']
+    
+    d_in['tsfc']['regex'] = pattern_assign(name='tsfc')
+    d_in['tsfc']['input_value'] = str(params['tsfc']) + '_r8'
+    
+    for name, d in d_in.items():
+        regex = re.compile(d['regex'], re.VERBOSE)
+        statement, value = regex.findall(code)[0]
+        input_statement = statement.replace(value, d['input_value'])
+        code = code.replace(statement, input_statement)
+
+    with open(path_lblnew, mode='w', encoding='utf-8') as f:
+        f.write(code)    
+
+
 
 
 
@@ -88,6 +185,7 @@ def test_get_fortran_dir():
              'atmpro': 'mls',
              'commitnumber': '11111'}
     print(get_fortran_dir(param))
+
 
 
 
