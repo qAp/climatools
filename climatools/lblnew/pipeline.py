@@ -124,7 +124,7 @@ def analyse_case(param, setup=None):
     lines = ['{} = {}'.format(parameter.upper(), value) 
              for parameter, value in param.items()]
     dir_crd = get_dir_case(param, setup=setup)
-    lines.append("DIR_CRD = '{}'".format(dir_crd))
+    lines.append("DIR_FORTRAN = '{}'".format(dir_crd))
     os.chdir(dir_case)
     with open('param.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
