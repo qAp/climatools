@@ -173,6 +173,30 @@ def enter_input_params(path_lblnew, params=None):
 
 
 
+def commit_msg(param):
+    '''
+    Compose git-commit message for a lblnew case.
+
+    Parameters
+    ----------
+    param: dict
+        Dictionary of input values.  The keys and values                      
+        are the names and values of the input parameters.        
+    '''
+
+    title = '{molecule} band{band} {atmpro}'
+    title = title.format(
+        **{n: param[n] for n in ['molecule', 'band', 'atmpro']})
+    
+    content = ['{}: {}'.format(parameter, value)
+               for parameter, value in param.items()]
+    
+    msg = [title] + content
+    msg = [['-m', m] for m in msg]
+    return [a for m in msg for a in m]
+
+
+
 
 
 
