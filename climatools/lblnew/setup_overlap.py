@@ -21,10 +21,12 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src',
                        'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
 
+FNAME_IPYNB = 'results_overlap.ipynb'
+
 # Path for the template analysis notebook.
 PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
                          'climatools/climatools/lblnew',
-                          'results_overlap.ipynb')
+                          FNAME_IPYNB)
 
 
 
