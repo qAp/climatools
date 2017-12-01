@@ -246,6 +246,18 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
 
 
 
+def nbviewer_url(param=None, setup=None):
+    '''
+    Returns the url for the notebook on nbviewer.jupyter.org
+    '''
+    return os.path.join(
+        'http://nbviewer.jupyter.org/github',
+        'qap/offline_radiation_notebooks/blob/master',
+        'longwave/lblnew_20160916/study__g1_threshold',
+        setup.get_dir_from_param(param),
+        setup.FNAME_IPYNB)
+
+
 
 
 def test_lblnew_bestfit():
