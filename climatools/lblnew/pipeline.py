@@ -13,13 +13,12 @@ def get_dir_case(param, setup=None):
     Returns the absolute path of the directory in which 
     to run the case with input parameters `param`
     '''   
-    from setup import get_dir_from_param
     dir_case = os.path.join(
         '/chia_cluster/home/jackyu/radiation/crd',
         'LW/examples',
         'separate_g_groups',
         'study__lblnew_g1_threshold',
-        get_dir_from_param(param))
+        setup.get_dir_from_param(param))
     return dir_case
 
 
@@ -29,14 +28,13 @@ def get_analysis_dir(param, setup=None):
     Returns the absolute path of the directory in which 
     to run the case with input parameters `params`
     '''   
-    from setup import get_dir_from_param
     dir_case =  os.path.join(
         '/chia_cluster/home/jackyu/radiation',
         'offline_radiation_notebooks',
         'longwave',
         'lblnew_20160916',
         'study__g1_threshold',
-        get_dir_from_param(param))
+        setup.get_dir_from_param(param))
     return dir_case
 
 
@@ -99,8 +97,8 @@ def analyse_case(param, setup=None):
     Paramaters
     -----------
     param: dict
-        Dictionary of input values.  The keys and values                        
-        are the names and values of the input parameters.
+        Dictionary of input values.  The keys and values                 
+          are the names and values of the input parameters.
     '''
     dir_case = get_analysis_dir(param, setup=setup)
     
@@ -122,6 +120,7 @@ def analyse_case(param, setup=None):
 
     # Write .py file, used as input for analysis notebook
     dir_crd = get_dir_case(param, setup=setup)
+    lines=[]
     lines.append("DIR_FORTRAN = '{}'".format(dir_crd))
     lines.append("PARAM = {}".format(param))
     os.chdir(dir_case)
@@ -135,7 +134,7 @@ def analyse_case(param, setup=None):
                              '--ExecutePreprocessor.timeout=None',
                              '--to', 'notebook',
                              '--inplace',
-                             'results.ipynb'], 
+                             setup.FNAME_IPYNB], 
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
 
@@ -148,24 +147,22 @@ def git_addcommit(param, setup=None):
     Parameters
     ----------
     param: dict
-        Dictionary of input values.  The keys and values                        
+        Dictionary of input values.  The keys and values                       
         are the names and values of the input parameters.        
     '''
-    from setup import commit_msg
-
     fpath_results = os.path.join(
-        get_analysis_dir(param, setup=setup), 'results.ipynb')
+        get_analysis_dir(param, setup=setup), setup.FNAME_IPYNB)
     fpath_parampy = os.path.join(
-        get_analysis_dir(param, setup=setup), 'params.py')
+        get_analysis_dir(param, setup=setup), 'param.py')
     
     proc_gitadd = subprocess.Popen(['git', 'add', 
                                     fpath_results, fpath_parampy],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
     
-    our, err = proc_gitadd.communicate()
+    out, err = proc_gitadd.communicate()
     
-    cmd = ['git', 'commit'] + commit_msg(param)
+    cmd = ['git', 'commit'] + setup.commit_msg(param)
     proc_gitcommit = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
@@ -240,10 +237,6 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
             all_been_committed = True
             for _, (aproc, param) in aprocs.items():
                 out, err = aproc.communicate()
-                print('Jupyter notebook process stdout and stderr')
-                print(out)
-                print(err)
-                print()
             break
             
         time.sleep(10)
