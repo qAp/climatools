@@ -1,5 +1,6 @@
 
 
+
 import os
 import pprint
 import subprocess
@@ -21,12 +22,12 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src',
                        'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
 
-# Specify the directory in which 'results.ipynb' is kept.
-PATH_IPYNB = os.path.join(
-    '/chia_cluster/home/jackyu',
-    'climatools/climatools/lblnew',
-    'results.ipynb')
+FNAME_IPYNB = 'results.ipynb'
 
+# Path for the template analysis notebook.
+PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
+                          'climatools/climatools/lblnew',
+                          FNAME_IPYNB)
 
 
 
