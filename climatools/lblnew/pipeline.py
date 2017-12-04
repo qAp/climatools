@@ -231,12 +231,18 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
                 else:
                     gproc = git_addcommit(param, setup=setup)
                     out, err = gproc.communicate()
+                    print('Git commit stdout and stderr')
+                    print(out.decode('utf-8'))
+                    print(err.decode('utf-8'))
                     gprocs[aproc.pid] = (gproc, param)
                 
         if len(gprocs) == len(aprocs):
             all_been_committed = True
             for _, (aproc, param) in aprocs.items():
                 out, err = aproc.communicate()
+                print('Analysis stdout and stderr')
+                print(out.decode('utf-8'))
+                print(err.decode('utf-8'))
             break
             
         time.sleep(10)
