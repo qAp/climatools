@@ -54,9 +54,9 @@ def get_dir_from_param(param):
     nref = len(param['ng_refs'])
 
     if param['molecule'] == 'h2o' and param['band'] == '1':
-        vmin, vmax = 20, 360
+        vmin, vmax = 20, 340
     elif param['molecule'] == 'h2o' and param['band'] == '2':
-        vmin, vmax = 360, 540
+        vmin, vmax = 340, 540
     else:
         vmin, vmax = CLIRADLW_BANDS[param['band']][0]
 
@@ -173,9 +173,9 @@ def enter_input_params(path_lblnew, params=None):
     d_in['molecule']['input_value'] = input_value
 
     if params['molecule'] == 'h2o' and params['band'] == '1':
-        vmin, vmax = 20, 360
+        vmin, vmax = 20, 340
     elif params['molecule'] == 'h2o' and params['band'] == '2':
-        vmin, vmax = 360, 540
+        vmin, vmax = 340, 540
     else:
         vmin, vmax = CLIRADLW_BANDS[params['band']][0]
 
