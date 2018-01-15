@@ -49,7 +49,7 @@ def get_dir_from_param(param):
         'wgt_{wgt}',
         'wgt_flux_{option_wgt_flux}',
         'w_diffuse_{w_diffuse}',
-        'option_compute_ktable_{option_compute_ktable}'
+        'option_compute_ktable_{option_compute_ktable}',
         'crd_{commitnumber}')
     
     nref = len(param['ng_refs'])
