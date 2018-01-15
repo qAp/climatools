@@ -43,14 +43,15 @@ def get_dir_from_param(param):
         'ng_refs_{ng_refs}',
         'getabsth_{getabsth}',
         'absth_{absth}',
+        'klin_{klin}',
+        'atmpro_{atmpro}',
+        'wgt_k_{option_wgt_k}',
         'wgt_{wgt}',
         'wgt_flux_{option_wgt_flux}',
-        'wgt_k_{option_wgt_k}',
-        'klin_{klin}',
         'w_diffuse_{w_diffuse}',
-        'crd_{commitnumber}',
-        'atmpro_{atmpro}')
-
+        'option_compute_ktable_{option_compute_ktable}'
+        'crd_{commitnumber}')
+    
     nref = len(param['ng_refs'])
 
     if param['molecule'] == 'h2o' and param['band'] == '1':
@@ -71,7 +72,7 @@ def get_dir_from_param(param):
     klin = 'none' if param['klin'] == 0 else param['klin']
     w_diffuse = '__'.join(['_'.join([str(w) for w in w_diffuse_ref]) 
                            for w_diffuse_ref in param['w_diffuse']])
-    
+
     return template.format(molecule=param['molecule'],
                            band=param['band'], vmin=vmin, vmax=vmax,
                            nv=param['nv'],
@@ -87,7 +88,8 @@ def get_dir_from_param(param):
                            klin=klin,
                            w_diffuse=w_diffuse,
                            commitnumber=param['commitnumber'],
-                           atmpro=param['atmpro'])
+                           atmpro=param['atmpro'],
+                           option_compute_ktable=param['option_compute_ktable'])
 
 
 
@@ -257,6 +259,11 @@ def enter_input_params(path_lblnew, params=None):
     
     d_in['tsfc']['regex'] = pattern_assign(name='tsfc')
     d_in['tsfc']['input_value'] = str(params['tsfc']) + '_r8'
+
+    'option_compute_ktable'
+    d_in['option_compute_ktable']['regex'] = pattern_assign(
+        name='option_compute_ktable')
+    d_in['option_compute_ktable']['input_value'] = str(params['option_compute_ktable'])
     
     for name, d in d_in.items():
         regex = re.compile(d['regex'], re.VERBOSE)
