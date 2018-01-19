@@ -41,6 +41,7 @@ def get_dir_from_param(param):
         'g_ascending_k_descending',
         'refPTs_{refPTs}',
         'ng_refs_{ng_refs}',
+        'ng_adju_{ng_adju}',
         'getabsth_{getabsth}',
         'absth_{absth}',
         'klin_{klin}',
@@ -65,6 +66,7 @@ def get_dir_from_param(param):
     refPTs = '__'.join(['P_{}_T_{}'.format(*pt) 
                         for pt in param['ref_pts']])
     ng_refs = '__'.join([str(n) for n in param['ng_refs']])
+    ng_adju = '__'.join([str(n) for n in param['ng_adju']])
     getabsth = '__'.join(['auto' for _ in range(nref)])
     absth = '__'.join(['dlogN_uniform' for _ in range(nref)])
     wgt = '__'.join(['_'.join([str(w) for w in wgt_ref]) 
@@ -80,6 +82,7 @@ def get_dir_from_param(param):
                            ng=ng,
                            refPTs=refPTs,
                            ng_refs=ng_refs,
+                           ng_adju=ng_adju,
                            getabsth=getabsth,
                            absth=absth,
                            wgt=wgt,
@@ -229,6 +232,13 @@ def enter_input_params(path_lblnew, params=None):
         ' (/ ' + 
         ' , '.join([str(n) for n in params['ng_refs']]) +
         ' /) ')    
+
+    'ng_adju'
+    d_in['ng_adju']['regex'] = pattern_assign(name='ng_adju')
+    d_in['ng_adju']['input_value'] = (
+        ' (/ ' + 
+        ' , '.join([str(n) for n in params['ng_adju']]) +
+        ' /) ')
     
     'option_wgt_flux'
     d_in['option_wgt_flux']['regex'] = pattern_assign(name='option_wgt_flux')
