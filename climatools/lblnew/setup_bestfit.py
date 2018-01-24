@@ -51,6 +51,7 @@ def get_dir_from_param(param):
         'wgt_flux_{option_wgt_flux}',
         'w_diffuse_{w_diffuse}',
         'option_compute_ktable_{option_compute_ktable}',
+        'option_compute_btable_{option_compute_btable}',
         'crd_{commitnumber}')
     
     nref = len(param['ng_refs'])
@@ -92,7 +93,8 @@ def get_dir_from_param(param):
                            w_diffuse=w_diffuse,
                            commitnumber=param['commitnumber'],
                            atmpro=param['atmpro'],
-                           option_compute_ktable=param['option_compute_ktable'])
+                           option_compute_ktable=param['option_compute_ktable'],
+                           option_compute_btable=param['option_compute_btable'])
 
 
 
@@ -274,6 +276,11 @@ def enter_input_params(path_lblnew, params=None):
     d_in['option_compute_ktable']['regex'] = pattern_assign(
         name='option_compute_ktable')
     d_in['option_compute_ktable']['input_value'] = str(params['option_compute_ktable'])
+
+    'option_compute_btable'
+    d_in['option_compute_btable']['regex'] = pattern_assign(
+        name='option_compute_btable')
+    d_in['option_compute_btable']['input_value'] = str(params['option_compute_btable'])
     
     for name, d in d_in.items():
         regex = re.compile(d['regex'], re.VERBOSE)
