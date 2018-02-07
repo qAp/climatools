@@ -34,6 +34,7 @@ PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
 def get_dir_from_param(param):
     template = os.path.join( 
         '{molecule}',
+        'conc_{conc}',
         'band0{band}_wn_{vmin:d}_{vmax:d}',
         'nv_{nv:d}',
         'dv_{dv}',
@@ -77,6 +78,7 @@ def get_dir_from_param(param):
                            for w_diffuse_ref in param['w_diffuse']])
 
     return template.format(molecule=param['molecule'],
+                           conc=param['conc'],
                            band=param['band'], vmin=vmin, vmax=vmax,
                            nv=param['nv'],
                            dv=param['dv'],
@@ -151,6 +153,25 @@ def pattern_molecule():
      )
     '''
 
+def pattern_conc(name):
+    '''
+    Returns regular expression that matches where
+    the assignment of the concentration of a molecule
+    can be inserted such that it will override anything
+    else provided.
+    '''
+    d = {'co2': {'gasid': 2, 'concname': 'clayer'}, 
+         'n2o': {'gasid': 4, 'concname': 'qlayer'},
+         'ch4': {'gasid': 5, 'concname': 'rlayer'}}
+
+    assert name in d
+
+    return '''
+      if \s+ \(flag\( {gasid} \)\) \s+ then \s+        
+      ({concname} \s+ = \s+ (.*) \s+ ! .* \n)
+    '''.format(gasid=d[name]['gasid'], 
+               concname=d[name]['concname'])
+
 
 
 def enter_input_params(path_lblnew, params=None):
@@ -179,6 +200,11 @@ def enter_input_params(path_lblnew, params=None):
     d_in['molecule']['regex'] = pattern_molecule()
     d_in['molecule']['input_value'] = input_value
 
+    'Gas concentration'
+    if params['molecule'] in ['co2', 'n2o', 'ch4']:
+        d_in['conc']['regex'] = pattern_conc(name=params['molecule'])
+        d_in['conc']['input_value'] = ' ' + str(params['conc']) + '_r8'
+    
     if params['molecule'] == 'h2o' and params['band'] == '1':
         vmin, vmax = 20, 340
     elif params['molecule'] == 'h2o' and params['band'] == '2':
