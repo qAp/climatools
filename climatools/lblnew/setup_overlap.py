@@ -19,7 +19,7 @@ CLIRADLW_BANDS = cliradinfo.wavenumber_bands(region='lw')
 # Specify the directory in which 'lblnew.f' is kept.
 DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src',
-                       'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
+                       'lblnew_-_overlap')
 
 FNAME_IPYNB = 'results_overlap.ipynb'
 
