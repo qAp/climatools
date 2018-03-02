@@ -205,17 +205,10 @@ def enter_input_params(path_lblnew, params=None):
         d_in['conc']['regex'] = pattern_conc(name=params['molecule'])
         d_in['conc']['input_value'] = ' ' + str(params['conc']) + '_r8'
     
-    if params['molecule'] == 'h2o' and params['band'] == '1':
-        vmin, vmax = 20, 340
-    elif params['molecule'] == 'h2o' and params['band'] == '2':
-        vmin, vmax = 340, 540
-    else:
-        vmin, vmax = CLIRADLW_BANDS[params['band']][0]
-
-    vstar = vmin
-    nband = int((vmax - vstar) / (params['nv'] * params['dv']))
+    vmin, vmax = params['vmin'], params['vmax']
+    nband = int((vmax - vmin) / (params['nv'] * params['dv']))
     d_in['vstar']['regex'] = pattern_assign(name='vstar')
-    d_in['vstar']['input_value'] = ' ' + str(vstar) + '_r8'
+    d_in['vstar']['input_value'] = ' ' + str(vmin) + '_r8'
     d_in['nband']['regex'] = pattern_assign(name='nband')
     d_in['nband']['input_value'] = ' ' + str(nband)
     d_in['nv']['regex'] = pattern_assign(name='nv')
