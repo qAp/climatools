@@ -176,30 +176,45 @@ def kdist_params(molecule=None, band=None):
         elif band == '2':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
         elif band == '3a':
-            ng_refs = [3, 2, 4]
+            # co2 band3a
+            vmin, vmax = 540, 620
+
             ref_pts = [(1, 250), (10, 250), (500, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [3, 2, 4]
+            ng_adju = [0, 0, 0]
             klin = 6.375563e-24
+            option_wgt_k = 1
             wgt = [(.7, .3, .7), (.7, .6), (.4, .5, .8, .95)]
-            w_diffuse = [(1.6, 1.6, 1.7), (1.75, 1.75),
+
+            w_diffuse = [(1.6, 1.6, 1.7), (1.75, 1.75), 
                          (1.55, 1.55, 1.6, 1.85)]
+
         elif band == '3b':
-            ng_refs = [5, 2]
+            # co2 band3b
+            vmin, vmax = 620, 720
+
             ref_pts = [(1, 250), (10, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [5, 2]
+            ng_adju = [0, 0]
             klin = 0
-            wgt = [(0, .6, .5, .7, .8), (.8, .7)]
-            w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66), (1.66, 1.66)]
-        elif band == '3c':
-            ng_refs = [3, 2, 4]
-            ref_pts = [(1, 250), (10, 250), (500, 250)]
-            option_wgt_flux = 2
             option_wgt_k = 1
+            wgt = [(.7, .8, .8, .7, .5), (.6, 0)]
+
+            w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66), (1.66, 1.66)]
+
+        elif band == '3c':
+            # co2 band3c
+            vmin, vmax = 720, 800
+
+            ref_pts = [(1, 250), (10, 250), (500, 250)]
+            ng_refs = [3, 2, 4]
+            ng_adju = [0, 0, 0]
             klin = 6.375563e-24
-            wgt = [(.6, .4, .7), (.7, .5), (.3, .4, .85, .95)]
+            option_wgt_k = 1
+            wgt = [(0.6, 0.4, 0.7), (0.7, 0.5), (0.3, 0.4, 0.85, 0.95)]
+            
             w_diffuse = [(1.7, 1.6, 1.8), (1.8, 1.7), (1.5, 1.6, 1.7, 1.8)]
+
         elif band == '4':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
         elif band == '5':
@@ -211,13 +226,18 @@ def kdist_params(molecule=None, band=None):
         elif band == '8':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
         elif band == '9':
-            ng_refs = [3, 3]
+            # co2 band9
+            vmin, vmax = 1900, 3000
+
             ref_pts = [(1, 250), (50, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [3, 3]
+            ng_adju = [0, 0]
             klin = 6.5e-24
+            option_wgt_k = 1
             wgt = [(.7, .7, .7), (.7, .7, .8)]
+
             w_diffuse = [(1.66, 1.66, 1.66), (1.66, 1.66, 1.8)]
+
     elif molecule == 'o3':
         if band == '5':
             ng_refs = [2, 5]
