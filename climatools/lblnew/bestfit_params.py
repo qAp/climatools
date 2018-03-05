@@ -265,12 +265,16 @@ def kdist_params(molecule=None, band=None):
 
     elif molecule == 'n2o':
         if band == '7':
-            ng_refs = [2, 2]
+            # n2o band7
+            vmin, vmax = 1215, 1380
+
             ref_pts = [(1, 250), (500, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [2, 2]
+            ng_adju = [0, 0]
             klin = 2.22e-20
+            option_wgt_k = 1
             wgt = [(.6, .6), (.7, .9)]
+
             w_diffuse = [(1.8, 1.66), (1.5, 1.8)]
         else:
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
