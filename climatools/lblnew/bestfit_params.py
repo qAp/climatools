@@ -240,13 +240,18 @@ def kdist_params(molecule=None, band=None):
 
     elif molecule == 'o3':
         if band == '5':
-            ng_refs = [2, 5]
+            # o3 band5
+            vmin, vmax = 980, 1100
+
             ref_pts = [(1, 250), (50, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [2, 5]
+            ng_adju = [0, 0]
             klin = 2e-20
+            option_wgt_k = 1
             wgt = [(.35, .6), (.5, .55, .7, .9, 1.)]
+
             w_diffuse = [(1.6, 1.75), (1.55, 1.66, 1.7, 1.75, 1.8)]
+
         elif band == '9':
             ng_refs = [2, 5]
             ref_pts = [(1, 250), (50, 250)]
