@@ -203,7 +203,7 @@ def enter_input_params(path_lblnew, params=None):
     'Gas concentration'
     if params['molecule'] in ['co2', 'n2o', 'ch4']:
         d_in['conc']['regex'] = pattern_conc(name=params['molecule'])
-        d_in['conc']['input_value'] = ' ' + str(params['conc']) + '_r8'
+        d_in['conc']['input_value'] = '{:e}_r8'.format(params['conc'])
     
     vmin, vmax = params['vmin'], params['vmax']
     nband = int((vmax - vmin) / (params['nv'] * params['dv']))
