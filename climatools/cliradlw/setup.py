@@ -1,15 +1,18 @@
-
-
+import os
+import re
+import collections
 
 
 # Specify the directory in which CLIRAD-LW source code is kept.
 DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation',
                        'clirad-lw/LW/lee_hitran2012_update')
 
+FNAME_CLIRADLW = 'CLIRAD_new_25cm_re.f'
+
 FNAME_IPYNB = 'results_cliradlw.ipynb'
 
 # Path for the template analysis notebook.
-PATH_IPYNB = os.path.join()
+PATH_IPYNB = os.path.join('')
 
 
 
@@ -23,23 +26,119 @@ def get_dir_from_param(param):
     param: dict
            Dictionary containing the keys and values of input parameters.
     '''
-    molecule_names = ['h2o', 'co2', 'o3', 'n2o', 'ch4', 'o2']
-    molecule = 'h2o_{h2o}_co2_{co2}_o3_{o3}_n2o_{n2o}_ch4_{ch4}_o2_{o2}'
+    molecule_names = ('h2o', 'co2', 'o3', 'n2o', 'ch4',)
 
-    for name, conc in param['molecule']:
-        molecule = molecule.format(name=str(conc))
-        molecule_names.remove(name)
+    molecule = {}
+    for name, conc in param['molecule'].items():
+        
+        if conc == 'atmpro':
+            molecule[name] = param['atmpro']
+        else:
+            try:
+                float(conc)
+            except (ValueError, TypeError) as e:
+                print('`conc` has to be either atmpro or a number.')
+                raise
+            molecule[name] = conc
 
-    for name in molecule_names:
-        molecule = molecule.format(name=str(0))
+    band = sorted(list(set(param['band'])))
 
-    band = [1 if b + 1 in param['band'] else 0 for b in range(11)]
-    band = ['{:d}'.format(b) for b in band]
-    band = 'band_' + '_'.join(band)
+    s_molecule = []
+    for n in molecule_names:
+        if n in molecule:
+            s_molecule.append('{}_{}'.format(n, molecule[n]))
+    s_molecule = '_'.join(s_molecule)
 
-    commit = 'cliradlw_{}'.format(param['commitnumber'])
+    s_band = ['{:d}'.format(b) for b in band]
+    s_band = 'band_' + '_'.join(s_band)
 
-    atmpro = 'atmpro_{}'.format(param['atmpro'])
+    s_commit = 'cliradlw_{}'.format(param['commitnumber'])
 
-    return os.path.join(molecule, band, commit, atmpro)
+    s_atmpro = 'atmpro_{}'.format(param['atmpro'])
+
+    return os.path.join(s_molecule, s_band, s_atmpro, s_commit)
     
+
+
+def pattern_atmpro():
+    '''
+    Returns regular expression that matches
+    the assignment of the atmosphere profile
+    used in lblnew.f.
+    '''
+    return '''
+    (atmosphere_profiles/(.*)75_r8.pro)
+    '''
+
+
+def pattern_conc(name=None):
+    '''
+    Returns regular expression that matches where
+    the assignment of the concentration of a molecule
+    can be inserted such that it will override anything
+    else provided.
+    '''
+    if name == 'h2o':
+        pattern = r'(\n \s+ wa\(i,k\) \s* = \s* (.*))'
+    elif name == 'o3':
+        pattern = r'(\n \s+ oa\(i,k\) \s* = \s* (.*))'
+    elif name in ('co2', 'n2o', 'ch4',):
+        pattern = r'(\n \s+ {name} \s* = \s* (.*))'.format(name=name)
+    return pattern
+
+
+
+def enter_input_params(path_cliradlw, param=None):
+    '''
+    Insert input values into CLIRAD-LW.
+
+    Parameters
+    ----------
+    path_cliradlw: string
+        Path to the cliradlw.f file to be edited.
+    param: dict
+        Dictionary of input values.  The keys and values
+        are the names and values of the input parameters.
+    '''
+    d_in = collections.defaultdict(dict)
+
+    # Molecule concentration
+    molecule_names = ('h2o', 'co2', 'o3', 'n2o', 'ch4', )
+    molecule = {}
+    for name in molecule_names:
+        if name in param['molecule']:
+            if param['molecule'][name] == 'atmpro' and name in ('h2o', 'o3'):
+                if name == 'h2o':
+                    molecule[name] = 'wa(i,k)'
+                else:
+                    molecule[name] = 'oa(i,k)'
+            elif param['molecule'][name] == 'atmpro':
+                molecule[name] = 0
+            else:
+                molecule[name] = float(param['molecule'][name])
+        else:
+            molecule[name] = 0
+
+    for name, conc in molecule.items():
+        d_in[name]['regex'] = pattern_conc(name=name)
+        if conc in ('wa(i,k)', 'oa(i,k)'):
+            d_in[name]['input_value'] = conc
+        else:
+            d_in[name]['input_value'] = str(float(conc))
+
+
+
+
+    with open(path_cliradlw, mode='r', encoding='utf-8') as f:
+        code = f.read()
+
+    for name, d in d_in.items():
+        regex = re.compile(d['regex'], re.VERBOSE)
+        statement, value = regex.findall(code)[0]
+        print(statement)
+        print(value)
+        input_statement = statement.replace(value, d['input_value'])
+        code = code.replace(statement, input_statement)
+
+    return code
+        
