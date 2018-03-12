@@ -182,7 +182,7 @@ def pipeline_ipynb2git(params=None, setup=None):
     for param in params:
         try:
             shutil.rmtree(
-                get_analysis_dir(param, setup=setup_bestfit))
+                get_analysis_dir(param, setup=setup))
         except FileNotFoundError:
             continue
 
@@ -239,14 +239,14 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
     for param in params:
         try:
             shutil.rmtree(
-                pipeline.get_dir_case(param, setup=setup_bestfit))
+                get_dir_case(param, setup=setup))
         except FileNotFoundError:
             continue
         
     for param in params:
         try:
             shutil.rmtree(
-                pipeline.get_analysis_dir(param, setup=setup_bestfit))
+                get_analysis_dir(param, setup=setup))
         except FileNotFoundError:
             continue
 
