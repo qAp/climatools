@@ -137,9 +137,9 @@ def kdist_params(molecule=None, band=None):
             ref_pts = [(600, 250)]
             ng_refs = [7]
             ng_adju = [0]
-            klin = 0
+            klin = 1e-24
             option_wgt_k = 1
-            wgt = [(.5, .5, .5, .5, .5, .5, .9)]
+            wgt = [(.5, .5, .5, .5, .5, .55, .95)]
 
             w_diffuse = [(2, 1.6, 1.6, 1.6, 1.6, 1.6, 1.8)]
 
