@@ -165,7 +165,7 @@ def kdist_params(molecule=None, band=None):
             ng_adju = [0]
             klin = 1e-24
             option_wgt_k = 1
-            wgt = [(.4, .4, .5, .6, .9)]
+            wgt = [(.4, .4, .5, .55, .85)]
 
             w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66)]
         
