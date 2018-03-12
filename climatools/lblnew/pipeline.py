@@ -155,6 +155,8 @@ def git_addcommit(param, setup=None):
     fpath_parampy = os.path.join(
         get_analysis_dir(param, setup=setup), 'param.py')
     
+    os.chdir(get_analysis_dir(param)) 
+
     proc_gitadd = subprocess.Popen(['git', 'add', 
                                     fpath_results, fpath_parampy],
                                    stdout=subprocess.PIPE,
