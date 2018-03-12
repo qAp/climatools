@@ -67,7 +67,7 @@ def pattern_atmpro():
     used in lblnew.f.
     '''
     return '''
-    (atmosphere_profiles/(.*)75_r8.pro)
+    (atmosphere_profiles/(.*)75.pro)
     '''
 
 
@@ -126,8 +126,9 @@ def enter_input_params(path_cliradlw, param=None):
         else:
             d_in[name]['input_value'] = str(float(conc))
 
-
-
+    # Atmosphere profile
+    d_in['atmpro']['regex'] = pattern_atmpro()
+    d_in['atmpro']['input_value'] = param['atmpro']
 
     with open(path_cliradlw, mode='r', encoding='utf-8') as f:
         code = f.read()
