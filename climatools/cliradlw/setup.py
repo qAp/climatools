@@ -88,6 +88,15 @@ def pattern_conc(name=None):
 
 
 
+def pattern_assign(name=None):
+    '''
+    Returns regular expression for a Fortran 
+    variable assignment.
+    '''
+    pattern=r'(\n \s* {} \s* = \s* (.*) \s* \n)'.format(name)
+    return pattern
+
+
 def enter_input_params(path_cliradlw, param=None):
     '''
     Insert input values into CLIRAD-LW.
@@ -129,6 +138,11 @@ def enter_input_params(path_cliradlw, param=None):
     # Atmosphere profile
     d_in['atmpro']['regex'] = pattern_atmpro()
     d_in['atmpro']['input_value'] = param['atmpro']
+
+    # Surface temperature
+    d_in['tsfc']['regex'] = pattern_assign(name='tb\(1\)')
+    d_in['tsfc']['input_value'] = str(param['tsfc'])
+
 
     with open(path_cliradlw, mode='r', encoding='utf-8') as f:
         code = f.read()
