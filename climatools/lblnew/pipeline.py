@@ -3,6 +3,7 @@ import os
 import pprint
 import subprocess
 import time
+import shutil
 
 
 
@@ -120,6 +121,7 @@ def analyse_case(param, setup=None):
 
     # Write .py file, used as input for analysis notebook
     dir_crd = get_dir_case(param, setup=setup)
+    print(dir_crd)
     lines=[]
     lines.append("DIR_FORTRAN = '{}'".format(dir_crd))
     lines.append("PARAM = {}".format(param))
@@ -164,6 +166,8 @@ def git_addcommit(param, setup=None):
     
     out, err = proc_gitadd.communicate()
     
+    
+    
     cmd = ['git', 'commit'] + setup.commit_msg(param)
     proc_gitcommit = subprocess.Popen(cmd,
                                       stdout=subprocess.PIPE,
@@ -171,6 +175,46 @@ def git_addcommit(param, setup=None):
 
     pprint.pprint(param)
     return proc_gitcommit
+
+
+def pipeline_ipynb2git(params=None, setup=None):
+
+    for param in params:
+        try:
+            shutil.rmtree(
+                get_analysis_dir(param, setup=setup_bestfit))
+        except FileNotFoundError:
+            continue
+
+    aprocs = []
+    for param in params:
+        aproc = analyse_case(param, setup=setup)
+        aprocs.append((aproc, param))
+
+    # Wait for analysis to finish, then git-commit
+    gprocs = {}
+    all_been_committed = False
+    while not all_been_committed:
+        for aproc, param in aprocs:
+            if aproc.poll() is None:
+                continue
+            else:
+                gproc = git_addcommit(param, setup=setup)
+                out, err = gproc.communicate()
+                gprocs[aproc.pid] = (gproc, param)
+
+        if len(gprocs) == len(aprocs):
+            all_been_committed = True
+            for aproc, param in aprocs:
+                out, err = aproc.communicate()
+            break
+
+        time.sleep(10)
+
+    print()
+    return gprocs
+
+
 
 
 
