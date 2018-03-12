@@ -236,6 +236,20 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
             List of subprocesses for the Git commit of each given case.
     '''
 
+    for param in params:
+        try:
+            shutil.rmtree(
+                pipeline.get_dir_case(param, setup=setup_bestfit))
+        except FileNotFoundError:
+            continue
+        
+    for param in params:
+        try:
+            shutil.rmtree(
+                pipeline.get_analysis_dir(param, setup=setup_bestfit))
+        except FileNotFoundError:
+            continue
+
     print('Submitting radiation calculation for cases')
     procs = [run_fortran(param, setup=setup) for param in params]
     print()
