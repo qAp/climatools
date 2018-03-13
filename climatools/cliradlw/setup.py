@@ -11,7 +11,7 @@ FNAME_CLIRADLW = 'CLIRAD_new_25cm_re.f'
 
 # Path for the template analysis notebook.
 PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
-                          'climatools/climatools/lblnew',
+                          'climatools/climatools/cliradlw',
                           'results_cliradlw.ipynb')
 
 
