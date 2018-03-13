@@ -9,11 +9,10 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation',
 
 FNAME_CLIRADLW = 'CLIRAD_new_25cm_re.f'
 
-FNAME_IPYNB = 'results_cliradlw.ipynb'
-
 # Path for the template analysis notebook.
-PATH_IPYNB = os.path.join('')
-
+PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
+                          'climatools/climatools/lblnew',
+                          'results_cliradlw.ipynb')
 
 
 def get_dir_from_param(param):
