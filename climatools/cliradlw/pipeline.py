@@ -14,7 +14,7 @@ def get_fortran_dir(param, setup=None):
     '''   
     dir_case = os.path.join(
         '/chia_cluster/home/jackyu/radiation/clirad-lw',
-        'LW/examples/lblnew/'
+        'LW/examples/lblnew/',
         setup.get_dir_from_param(param))
     return dir_case
 
