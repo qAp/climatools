@@ -135,6 +135,13 @@ def enter_input_params(path_cliradlw, param=None):
         else:
             d_in[name]['input_value'] = str(float(conc))
 
+    # Spectral bands to compute
+    bands = [1 if b in set(param['band']) else 0 for b in range(1, 11 + 1)]
+    bands = [str(b) for b in bands]
+    bands = '(/' + ', '.join(bands) +'/)'
+    d_in['band']['regex'] = pattern_assign(name=r'bands\(1:nband\)')
+    d_in['band']['input_value'] = bands
+
     # Atmosphere profile
     d_in['atmpro']['regex'] = pattern_atmpro()
     d_in['atmpro']['input_value'] = param['atmpro']
