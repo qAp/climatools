@@ -280,7 +280,32 @@ def kdist_params(molecule=None, band=None):
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
         
     elif molecule == 'ch4':
-        raise ValueError('{} {} best-fit not available'.format(molecule, band))
+        if band == '6':
+            # ch4 band6
+            vmin, vmax = 1100, 1215
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [8, 7]
+            ng_adju = [0, 0]
+            klin = 2.22e-20
+            option_wgt_k = 1
+            wgt = [8 * (1,), 7 * (1,)]
+
+            w_diffuse = [8 * (1,), 7 * (1,)]
+        elif band == '7':
+            # ch4 band7
+            vmin, vmax = 1215, 1380
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [8, 7]
+            ng_adju = [0, 0]
+            klin = 2.22e-20
+            option_wgt_k = 1
+            wgt = [8 * (1,), 7 * (1,)]
+
+            w_diffuse = [8 * (1,), 7 * (1,)]
+        else:
+            raise ValueError('{} {} best-fit not available'.format(molecule, band))
     elif molecule == 'o2':
         raise ValueError('{} {} best-fit not available'.format(molecule, band))
 
