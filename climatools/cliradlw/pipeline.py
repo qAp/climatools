@@ -34,3 +34,51 @@ def get_analysis_dir(param, setup=None):
 
 
 
+def run_fortran(param=None, setup=None):
+    '''
+    Run clirad-lw for a single case.
+
+    Parameters
+    ----------
+    param: dict
+    setup: module
+           lblnew.setuprun
+    '''
+    dir_case = get_fortran_dir(param, setup=setup)
+        
+    try:
+        os.makedirs(dir_case)
+    except FileExistsError:
+        pprint.pprint(param)
+        print('This case already exists.')
+        print()
+        return None
+            
+    try:
+        os.chdir(dir_case)
+        path_cliradlw = os.path.join(setup.DIR_SRC, setup.FNAME_CLIRADLW)
+        assert os.system('cp {} .'.format(path_cliradlw)) == 0
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem copying source code to case directory for this case.')
+        print()
+        return None
+        
+    fname_code = setup.FNAME_CLIRADLW
+        
+    os.chdir(dir_case)
+    setup.enter_input_params(fname_code, param=param)
+    
+    try:
+        os.chdir(dir_case)
+        os.system('ifort -g -traceback -fpe0 {} -o cliradlw.exe'.format(fname_code))
+        assert os.path.exists('cliradlw.exe') == True
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem compiling source code for this case.')
+        print()
+        return None
+        
+    proc = subprocess.Popen(['./cliradlw.exe'], stdout=subprocess.PIPE)
+    pprint.pprint(param)
+    return proc
