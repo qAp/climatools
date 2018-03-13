@@ -177,6 +177,17 @@ def git_addcommit(param, setup=None):
     return proc_gitcommit
 
 
+
+def pipeline_git(params=None, setup=None):
+    gprocs = []
+    for param in params:
+        gproc = git_addcommit(param=param, setup=setup)
+        out, err = gproc.communicate()
+        gprocs.append((gproc, param))
+    return gprocs
+
+
+
 def pipeline_ipynb2git(params=None, setup=None):
 
     for param in params:
