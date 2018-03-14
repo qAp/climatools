@@ -287,7 +287,7 @@ def kdist_params(molecule=None, band=None):
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [8, 7]
             ng_adju = [0, 0]
-            klin = 2.22e-20
+            klin = 0
             option_wgt_k = 1
             wgt = [8 * (1,), 7 * (1,)]
 
@@ -299,7 +299,7 @@ def kdist_params(molecule=None, band=None):
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [8, 7]
             ng_adju = [0, 0]
-            klin = 2.22e-20
+            klin = 0
             option_wgt_k = 1
             wgt = [8 * (1,), 7 * (1,)]
 
