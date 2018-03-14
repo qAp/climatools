@@ -85,7 +85,7 @@ def run_fortran(param=None, setup=None):
 
 
 
-def run_analysis(param, setup=None):
+def run_analysis(param, dir_fortran_lblnew=None, setup=None):
     '''
     Execute the analysis notebook (i.e. plot
     and tabulate results) for a case.
@@ -122,6 +122,7 @@ def run_analysis(param, setup=None):
     lines=[]
     lines.append("DIR_FORTRAN = '{}'".format(dir_fortran))
     lines.append("PARAM = {}".format(param))
+    lines.append("DIR_FORTRAN_LBLNEW = '{}'".format(dir_fortran_lblnew))
     os.chdir(dir_case)
     with open('param.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
