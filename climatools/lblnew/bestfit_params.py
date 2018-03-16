@@ -253,12 +253,16 @@ def kdist_params(molecule=None, band=None):
             w_diffuse = [(1.6, 1.75), (1.55, 1.66, 1.7, 1.75, 1.8)]
 
         elif band == '9':
-            ng_refs = [2, 5]
+            # o3 band9
+            vmin, vmax = 1900, 3000
+
             ref_pts = [(1, 250), (50, 250)]
-            option_wgt_flux = 2
-            option_wgt_k = 1
+            ng_refs = [2, 5]
+            ng_adju = [0, 0]
             klin = 2e-20
+            option_wgt_k = 1
             wgt = [(.3, .4), (.5, .6, .7, .85, .9)]
+
             w_diffuse = [(1.55, 1.55), (1.55, 1.55, 1.55, 1.55, 1.8)]
         else:
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
