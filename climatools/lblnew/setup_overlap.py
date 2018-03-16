@@ -47,7 +47,6 @@ def get_dir_from_param(param):
         'band0{band}_wn_{vmin:d}_{vmax:d}',
         'nv_{nv:d}',
         'dv_{dv}',
-        'wgt_flux_{option_wgt_flux}',
         'crd_{commitnumber}',
         'atmpro_{atmpro}')
 
@@ -58,7 +57,6 @@ def get_dir_from_param(param):
     return template.format(band=param['band'], vmin=vmin, vmax=vmax,
                            nv=param['nv'],
                            dv=param['dv'],
-                           option_wgt_flux=param['option_wgt_flux'],
                            commitnumber=param['commitnumber'],
                            atmpro=param['atmpro'],
                            **molecules)
@@ -159,10 +157,6 @@ def enter_input_params(path_lblnew, params=None):
     d_in['dv']['regex'] = pattern_assign(name='dv')
     d_in['dv']['input_value'] = ' ' + str(params['dv']) + '_r8'
 
-    'option_wgt_flux'
-    d_in['option_wgt_flux']['regex'] = pattern_assign(name='option_wgt_flux')
-    d_in['option_wgt_flux']['input_value'] = str(params['option_wgt_flux'])
-    
     'atmpro'
     d_in['atmpro']['regex'] = pattern_atmpro()
     d_in['atmpro']['input_value'] = params['atmpro']
