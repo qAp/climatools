@@ -234,9 +234,9 @@ def kdist_params(molecule=None, band=None):
             ng_adju = [0, 0]
             klin = 6.5e-24
             option_wgt_k = 1
-            wgt = [(.7, .7, .7), (.7, .7, .8)]
+            wgt = [(.7, .8, .7), (.8, .7, .8)]
 
-            w_diffuse = [(1.66, 1.66, 1.66), (1.66, 1.66, 1.8)]
+            w_diffuse = [(1.66, 1.66, 1.75), (1.75, 1.60, 1.85)]
 
     elif molecule == 'o3':
         if band == '5':
