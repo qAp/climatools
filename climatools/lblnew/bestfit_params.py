@@ -369,7 +369,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3b
 
-            commitnumber = 'd5931a1'
+            commitnumber = '00cecd2'
 
             vmin, vmax = 620, 720
             dv = .001
