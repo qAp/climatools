@@ -131,8 +131,6 @@ def enter_input_params(path_cliradlw, param=None):
         else:
             molecule[name] = 0
     
-    print(molecule)
-
     for name, conc in molecule.items():
         d_in[name]['regex'] = pattern_conc(name=name)
         if conc in ('wa(i,k)', 'oa(i,k)'):
@@ -162,10 +160,6 @@ def enter_input_params(path_cliradlw, param=None):
     for name, d in d_in.items():
         regex = re.compile(d['regex'], re.VERBOSE)
         statement, value = regex.findall(code)[0]
-        print(name)
-        print(statement)
-        print(value)
-        print(d['input_value'])
         input_statement = statement.replace(value, d['input_value'])
         code = code.replace(statement, input_statement)
 
