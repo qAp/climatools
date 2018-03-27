@@ -610,11 +610,21 @@ def kdist_params(molecule=None, band=None):
 
     return {'molecule': molecule,
             'band': band,
-            'vmin': vmin, 'vmax': vmax,
+            'commitnumber': commitnumber,
+            'vmin': vmin, 
+            'vmax': vmax,
+            'dv': dv, 
+            'nv': nv,
             'ref_pts': ref_pts,
             'ng_refs': ng_refs,
             'ng_adju': ng_adju,
             'klin': klin,
             'option_wgt_k': option_wgt_k,
             'wgt': wgt,
-            'w_diffuse': w_diffuse}
+            'w_diffuse': w_diffuse,
+            'option_wgt_flux': option_wgt_flux,
+            'atmpro': atmpro,
+            'tsfc': tsfc,
+            'conc': conc,
+            'option_compute_btable': option_compute_btable,
+            'option_compute_ktable': option_compute_ktable}
