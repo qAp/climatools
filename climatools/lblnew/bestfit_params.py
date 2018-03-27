@@ -580,28 +580,28 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band7
 
-            commitnumber = 'd5931a1'
+            commitnumber = '76d5f03'
 
             vmin, vmax = 1215, 1380
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [8, 7]
+            ng_refs = [2, 2]
             ng_adju = [0, 0]
-            klin = 0
+            klin = 3.9e-22
             option_wgt_k = 1
-            wgt = [8 * (1,), 7 * (1,)]
+            wgt = [(1, 1), (1, 1)]
 
-            w_diffuse = [8 * (1,), 7 * (1,)]
-            option_wgt_flux = 1
+            w_diffuse = [(1.66, 1.66), (1.66, 1.90)]
+            option_wgt_flux = 2
 
             atmpro = 'mls'
             tsfc = 294
-            conc = None
+            conc = 1.8e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
         else:
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
