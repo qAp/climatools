@@ -255,7 +255,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band7
 
-            commitnumber = 'd5931a1'
+            commitnumber = '043bdfe'
 
             vmin, vmax = 1215, 1380
             dv = .001
