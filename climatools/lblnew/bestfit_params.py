@@ -276,7 +276,7 @@ def kdist_params(molecule=None, band=None):
             conc = None
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
         elif band == '8':
 
@@ -455,7 +455,7 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
 
     elif molecule == 'o3':
