@@ -580,7 +580,7 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band7
 
-            commitnumber = '76d5f03'
+            commitnumber = '043bdfe'
 
             vmin, vmax = 1215, 1380
             dv = .01
@@ -589,7 +589,7 @@ def kdist_params(molecule=None, band=None):
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [2, 2]
             ng_adju = [0, 0]
-            klin = 3.9e-22
+            klin = 1e-21
             option_wgt_k = 1
             wgt = [(1, 1), (1, 1)]
 
