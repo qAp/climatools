@@ -9,7 +9,7 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation',
 
 FNAME_CLIRADLW = 'CLIRAD_new_25cm_re.f'
 
-FNAME_IPYNB = 'results_cliradlw-Copy1.ipynb'
+FNAME_IPYNB = 'results_cliradlw.ipynb'
 
 # Path for the template analysis notebook.
 PATH_IPYNB = os.path.join('/chia_cluster/home/jackyu',
