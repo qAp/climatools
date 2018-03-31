@@ -167,3 +167,25 @@ def enter_input_params(path_cliradlw, param=None):
         f.write(code)    
 
         
+
+def commit_msg(param):
+    '''
+    Compose git-commit message for a run
+
+    Parameters
+    ----------
+    param: dict
+        Dictionary of input values.  The keys and values                      
+        are the names and values of the input parameters.        
+    '''
+
+    title = '{molecule} band{band} {atmpro}'
+    title = title.format(
+        **{n: param[n] for n in ['molecule', 'band', 'atmpro']})
+    
+    content = ['{}: {}'.format(parameter, value)
+               for parameter, value in param.items()]
+    
+    msg = [title] + content
+    msg = [['-m', m] for m in msg]
+    return [a for m in msg for a in m]
