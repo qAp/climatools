@@ -615,13 +615,13 @@ def kdist_params(molecule=None, band=None):
             nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [2, 2]
+            ng_refs = [2, 3]
             ng_adju = [0, 0]
-            klin = 1e-21
+            klin = 0
             option_wgt_k = 1
-            wgt = [(.5, .5), (.5, .7)]
+            wgt = [(.5, .5), (.5, .5, .5)]
 
-            w_diffuse = [(1.66, 1.66), (1.66, 1.90)]
+            w_diffuse = [(1.66, 1.66), (1.66, 1.66, 1.66)]
             option_wgt_flux = 2
 
             atmpro = 'mls'
