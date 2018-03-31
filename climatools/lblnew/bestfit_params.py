@@ -518,7 +518,35 @@ def kdist_params(molecule=None, band=None):
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
 
     elif molecule == 'n2o':
-        if band == '7':
+        if band == '3a':
+
+            # n2o band3a
+
+            commitnumber = '043bdfe'
+
+            vmin, vmax = 540, 620
+            dv = .01
+            nv = 100
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [5, 5]
+            ng_adju = [0, 0]
+            klin = 2.22e-20
+            option_wgt_k = 1
+            wgt = [(.6, .6, .6, .6, .6), (.6, .6, .6, .6, .8)]
+
+            w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66),
+                         (1.66, 1.66, 1.66, 1.66, 1.8)]
+            option_wgt_flux = 2
+
+            atmpro = 'mls'
+            tsfc = 294
+            conc = 3.2e-07
+
+            option_compute_btable = 0
+            option_compute_ktable = 0
+
+        elif band == '7':
 
             # n2o band7
 
