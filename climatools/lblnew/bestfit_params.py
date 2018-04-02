@@ -122,7 +122,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3b
 
-            commitnumber = 'd5931a1'
+            commitnumber = '043bdfe'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -138,12 +138,12 @@ def kdist_params(molecule=None, band=None):
             w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66, 1.66)]
             option_wgt_flux = 1
 
-            atmpro = 'mls'
+            atmpro = 'trp'
             tsfc = 294
             conc = None
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
         elif band == '3c':
 
