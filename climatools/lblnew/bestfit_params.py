@@ -397,7 +397,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3c
 
-            commitnumber = 'd5931a1'
+            commitnumber = '043bdfe'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -408,7 +408,7 @@ def kdist_params(molecule=None, band=None):
             ng_adju = [0, 0, 0]
             klin = 6.375563e-24
             option_wgt_k = 1
-            wgt = [(0.6, 0.4, 0.7), (0.7, 0.5), (0.3, 0.4, 0.85, 0.95)]
+            wgt = [(0.6, 0.4, 0.7), (0.7, 0.4), (0.3, 0.4, 0.85, 0.90)]
 
             w_diffuse = [(1.7, 1.6, 1.8), (1.8, 1.7), (1.5, 1.6, 1.7, 1.8)]
             option_wgt_flux = 1
@@ -418,7 +418,7 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
         elif band == '4':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
