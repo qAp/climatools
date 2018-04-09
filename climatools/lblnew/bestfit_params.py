@@ -380,7 +380,7 @@ def kdist_params(molecule=None, band=None):
             ng_adju = [0, 0]
             klin = 0
             option_wgt_k = 1
-            wgt = [(0, .6, .5, .7, .8), (.8, .7)]
+            wgt = [(0, .6, .5, .7, .8), (.9, .6)]
 
             w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66), (1.66, 1.66)]
             option_wgt_flux = 1
