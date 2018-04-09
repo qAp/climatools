@@ -135,7 +135,7 @@ def kdist_params(molecule=None, band=None):
             option_wgt_k = 1
             wgt = [(.8, .8, .8, .6, .6, .9)]
 
-            w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66, 1.66)]
+            w_diffuse = [(1.66, 1.66, 1.66, 1.55, 1.5, 1.66)]
             option_wgt_flux = 1
 
             atmpro = 'trp'
