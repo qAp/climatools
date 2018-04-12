@@ -522,22 +522,21 @@ def kdist_params(molecule=None, band=None):
 
             # n2o band3a
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 540, 620
-            dv = .01
-            nv = 100
+            dv = .005
+            nv = 200
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [5, 5]
+            ng_refs = [1, 2]
             ng_adju = [0, 0]
             klin = 2.22e-20
             option_wgt_k = 1
-            wgt = [(.6, .6, .6, .6, .6), (.6, .6, .6, .6, .8)]
+            wgt = [(.5), (.5, .7)]
 
-            w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66),
-                         (1.66, 1.66, 1.66, 1.66, 1.8)]
-            option_wgt_flux = 2
+            w_diffuse = [(1.8,), (1.66, 1.8)]
+            option_wgt_flux = 1
 
             atmpro = 'mls'
             tsfc = 294
