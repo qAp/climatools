@@ -648,7 +648,7 @@ def kdist_params(molecule=None, band=None):
 
             atmpro = 'mls'
             tsfc = 294
-            conc = None
+            conc = 1.8e-6
 
             option_compute_btable = 0
             option_compute_ktable = 0
