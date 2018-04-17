@@ -421,9 +421,59 @@ def kdist_params(molecule=None, band=None):
             option_compute_ktable = 1
 
         elif band == '4':
-            raise ValueError('{} {} best-fit not available'.format(molecule, band))
+
+            # co2 band4
+
+            commitnumber = 'd62b618'
+
+            vmin, vmax = 800, 980
+            dv = .005
+            nv = 200
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [8, 8]
+            ng_adju = [0, 0]
+            klin = 0
+            option_wgt_k = 1
+            wgt = [8 * (1,), 8 * (1,)]
+
+            w_diffuse = [8 * (1.66,), 8 * (1.66,)]
+            option_wgt_flux = 1
+
+            atmpro = 'mls'
+            tsfc = 294
+            conc = 400e-6
+
+            option_compute_btable = 0
+            option_compute_ktable = 0
+
         elif band == '5':
-            raise ValueError('{} {} best-fit not available'.format(molecule, band))
+
+            # co2 band5
+
+            commitnumber = 'd62b618'
+
+            vmin, vmax = 980, 1100
+            dv = .005
+            nv = 200
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [8, 8]
+            ng_adju = [0, 0]
+            klin = 0
+            option_wgt_k = 1
+            wgt = [8 * (1,), 8 * (1,)]
+
+            w_diffuse = [8 * (1.66,), 8 * (1.66,)]
+            option_wgt_flux = 1
+
+            atmpro = 'mls'
+            tsfc = 294
+            conc = 400e-6
+
+            option_compute_btable = 0
+            option_compute_ktable = 0
+
         elif band == '6':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
         elif band == '7':
