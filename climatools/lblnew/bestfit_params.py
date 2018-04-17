@@ -34,7 +34,7 @@ def kdist_params(molecule=None, band=None):
             # h2o band1
 
             # crd Git commit 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             # Spectral info
             vmin, vmax = 20, 340
@@ -67,7 +67,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '2':
             # h2o band2
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 340, 540
             dv = .001
@@ -95,7 +95,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '3a':   
             # h2o band3a
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -122,7 +122,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3b
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -143,13 +143,13 @@ def kdist_params(molecule=None, band=None):
             conc = None
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '3c':
 
             # h2o band3c
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -174,7 +174,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '4':
             # h2o band4
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 800, 980
             dv = .001
@@ -201,7 +201,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band5
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -228,7 +228,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band6
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1100, 1215
             dv = .001
@@ -255,7 +255,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band7
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -276,13 +276,13 @@ def kdist_params(molecule=None, band=None):
             conc = None
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '8':
 
             # h2o band8
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1380, 1900
             dv = .001
@@ -309,7 +309,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band9
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -341,7 +341,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3a
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -369,7 +369,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3b
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -390,14 +390,14 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
 
         elif band == '3c':
 
             # co2 band3c
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -418,7 +418,7 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '4':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
@@ -434,7 +434,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band9
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -455,7 +455,7 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
 
     elif molecule == 'o3':
@@ -463,7 +463,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band5
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -491,7 +491,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band9
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -543,13 +543,13 @@ def kdist_params(molecule=None, band=None):
             conc = 3.2e-07
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '7':
 
             # n2o band7
 
-            commitnumber = '043bdfe'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -570,7 +570,7 @@ def kdist_params(molecule=None, band=None):
             conc = 3.2e-07
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         else:
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
@@ -580,7 +580,7 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band6
 
-            commitnumber = 'd5931a1'
+            commitnumber = 'd2f6fe2'
 
             vmin, vmax = 1100, 1215
             dv = .001
@@ -628,7 +628,7 @@ def kdist_params(molecule=None, band=None):
             conc = 1.8e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         else:
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
