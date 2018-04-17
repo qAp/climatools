@@ -633,17 +633,17 @@ def kdist_params(molecule=None, band=None):
             commitnumber = 'd62b618'
 
             vmin, vmax = 1100, 1215
-            dv = .001
-            nv = 1000
+            dv = .005
+            nv = 200
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [8, 7]
+            ng_refs = [2, 4]
             ng_adju = [0, 0]
             klin = 0
             option_wgt_k = 1
-            wgt = [8 * (1,), 7 * (1,)]
+            wgt = [(1, 1), (1, 1, 1, 1)]
 
-            w_diffuse = [8 * (1,), 7 * (1,)]
+            w_diffuse = [(1.66, 1.66), (1.66, 1.66, 1.66, 1.66)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
@@ -651,7 +651,7 @@ def kdist_params(molecule=None, band=None):
             conc = None
 
             option_compute_btable = 0
-            option_compute_ktable = 1
+            option_compute_ktable = 0
 
         elif band == '7':
 
