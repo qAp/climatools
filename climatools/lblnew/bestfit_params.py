@@ -431,13 +431,13 @@ def kdist_params(molecule=None, band=None):
             nv = 200
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [8, 8]
+            ng_refs = [1, 2]
             ng_adju = [0, 0]
-            klin = 0
+            klin = 6.5e-24
             option_wgt_k = 1
-            wgt = [8 * (1,), 8 * (1,)]
+            wgt = [(.5,), (.5, .7)]
 
-            w_diffuse = [8 * (1.66,), 8 * (1.66,)]
+            w_diffuse = [(1.66,), (1.66, 1.85)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
@@ -458,13 +458,13 @@ def kdist_params(molecule=None, band=None):
             nv = 200
 
             ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [8, 8]
+            ng_refs = [1, 2]
             ng_adju = [0, 0]
-            klin = 0
+            klin = 6.5e-24
             option_wgt_k = 1
-            wgt = [8 * (1,), 8 * (1,)]
+            wgt = [(.5,), (.5, .7)]
 
-            w_diffuse = [8 * (1.66,), 8 * (1.66,)]
+            w_diffuse = [(1.66,), (1.66, 1.85)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
