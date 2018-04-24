@@ -451,20 +451,20 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band5
 
-            commitnumber = 'd62b618'
+            commitnumber = '861ec5d'
 
             vmin, vmax = 980, 1100
-            dv = .005
-            nv = 200
+            dv = .001
+            nv = 1000
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
             ng_adju = [0, 0]
             klin = 6.5e-24
             option_wgt_k = 1
-            wgt = [(.5,), (.5, .7)]
+            wgt = [(.75,), (.75, .95)]
 
-            w_diffuse = [(1.66,), (1.66, 1.85)]
+            w_diffuse = [(1.75,), (1.66, 1.90)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
@@ -630,20 +630,20 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band6
 
-            commitnumber = 'd62b618'
+            commitnumber = '861ec5d'
 
             vmin, vmax = 1100, 1215
             dv = .005
             nv = 200
 
-            ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [2, 4]
-            ng_adju = [0, 0]
-            klin = 0
+            ref_pts = [(500, 250)]
+            ng_refs = [4]
+            ng_adju = [0]
+            klin = 2e-21
             option_wgt_k = 1
-            wgt = [(1, 1), (1, 1, 1, 1)]
+            wgt = [(1, 1, 1, 1)]
 
-            w_diffuse = [(1.66, 1.66), (1.66, 1.66, 1.66, 1.66)]
+            w_diffuse = [(1.66, 1.66, 1.66, 1.66)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
