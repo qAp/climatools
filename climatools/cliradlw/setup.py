@@ -177,7 +177,7 @@ def commit_msg(param):
         are the names and values of the input parameters.        
     '''
 
-    title = '{molecule} band{band} {atmpro}'
+    title = 'clirad-lw {molecule} band{band} {atmpro}'
     title = title.format(
         **{n: param[n] for n in ['molecule', 'band', 'atmpro']})
     
