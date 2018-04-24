@@ -424,20 +424,20 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band4
 
-            commitnumber = 'd62b618'
+            commitnumber = '775a129'
 
             vmin, vmax = 800, 980
-            dv = .005
-            nv = 200
+            dv = .001
+            nv = 1000
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
             ng_adju = [0, 0]
             klin = 6.5e-24
             option_wgt_k = 1
-            wgt = [(.5,), (.5, .7)]
+            wgt = [(.75,), (.75, .95)]
 
-            w_diffuse = [(1.66,), (1.66, 1.85)]
+            w_diffuse = [(1.75,), (1.66, 1.90)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
