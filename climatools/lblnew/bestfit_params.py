@@ -34,7 +34,7 @@ def kdist_params(molecule=None, band=None):
             # h2o band1
 
             # crd Git commit 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             # Spectral info
             vmin, vmax = 20, 340
@@ -66,8 +66,7 @@ def kdist_params(molecule=None, band=None):
 
         elif band == '2':
             # h2o band2
-
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 340, 540
             dv = .001
@@ -94,8 +93,7 @@ def kdist_params(molecule=None, band=None):
 
         elif band == '3a':   
             # h2o band3a
-
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -122,7 +120,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3b
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -149,7 +147,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3c
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -174,7 +172,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '4':
             # h2o band4
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 800, 980
             dv = .001
@@ -201,7 +199,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band5
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -228,7 +226,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band6
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1100, 1215
             dv = .001
@@ -255,7 +253,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band7
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -282,7 +280,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band8
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1380, 1900
             dv = .001
@@ -309,7 +307,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band9
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -341,7 +339,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3a
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -369,7 +367,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3b
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -397,7 +395,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3c
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -424,7 +422,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band4
 
-            commitnumber = '775a129'
+            commitnumber = '736df33'
 
             vmin, vmax = 800, 980
             dv = .001
@@ -451,7 +449,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band5
 
-            commitnumber = '861ec5d'
+            commitnumber = '736df33'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -484,7 +482,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band9
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -513,7 +511,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band5
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -541,7 +539,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band9
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -599,7 +597,7 @@ def kdist_params(molecule=None, band=None):
 
             # n2o band7
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -630,7 +628,7 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band6
 
-            commitnumber = '861ec5d'
+            commitnumber = '736df33'
 
             vmin, vmax = 1100, 1215
             dv = .005
@@ -657,7 +655,7 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band7
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 1215, 1380
             dv = .001
