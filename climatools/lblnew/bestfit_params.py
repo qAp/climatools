@@ -572,11 +572,11 @@ def kdist_params(molecule=None, band=None):
 
             # n2o band3a
 
-            commitnumber = 'd62b618'
+            commitnumber = '736df33'
 
             vmin, vmax = 540, 620
-            dv = .005
-            nv = 200
+            dv = .001
+            nv = 1000
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
