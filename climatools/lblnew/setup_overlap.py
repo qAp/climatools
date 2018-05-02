@@ -21,6 +21,8 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src',
                        'lblnew_-_overlap')
 
+FNAME_CODE = 'lblnew-overlap.f'
+
 FNAME_IPYNB = 'results_overlap.ipynb'
 
 # Path for the template analysis notebook.

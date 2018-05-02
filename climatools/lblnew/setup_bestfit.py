@@ -22,6 +22,8 @@ DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation/crd',
                        'LW/src', 'lblnew_-_bestfit',
                        'lblnew_-_nref_-_autoabsth_klin_-_gasc_kdesc')
 
+FNAME_CODE = 'lblnew-bestfit.f'
+
 FNAME_IPYNB = 'results.ipynb'
 
 # Path for the template analysis notebook.

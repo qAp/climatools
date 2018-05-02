@@ -69,7 +69,7 @@ def run_fortran(param=None, setup=None):
         print()
         return None
         
-    fname_code = 'lblnew.f'
+    fname_code = setup.FNAME_CODE 
         
     os.chdir(dir_case)
     setup.enter_input_params(fname_code, params=param)
