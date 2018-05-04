@@ -34,7 +34,7 @@ def kdist_params(molecule=None, band=None):
             # h2o band1
 
             # crd Git commit 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             # Spectral info
             vmin, vmax = 20, 340
@@ -67,7 +67,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '2':
             # h2o band2
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 340, 540
             dv = .001
@@ -95,7 +95,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '3a':   
             # h2o band3a
             
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -122,7 +122,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3b
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -149,7 +149,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band3c
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -174,7 +174,7 @@ def kdist_params(molecule=None, band=None):
         elif band == '4':
             # h2o band4
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 800, 980
             dv = .001
@@ -201,7 +201,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band5
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -228,7 +228,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band6
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1100, 1215
             dv = .001
@@ -255,7 +255,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band7
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -282,7 +282,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band8
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1380, 1900
             dv = .001
@@ -309,7 +309,7 @@ def kdist_params(molecule=None, band=None):
 
             # h2o band9
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -341,7 +341,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3a
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 540, 620
             dv = .001
@@ -369,7 +369,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3b
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 620, 720
             dv = .001
@@ -380,12 +380,12 @@ def kdist_params(molecule=None, band=None):
             ng_adju = [0, 0]
             klin = 0
             option_wgt_k = 1
-            wgt = [(0, .6, .5, .7, .8), (.9, .6)]
+            wgt = [(0, .6, .5, .7, .8), (.8, .7)]
 
             w_diffuse = [(1.66, 1.66, 1.66, 1.66, 1.66), (1.66, 1.66)]
             option_wgt_flux = 1
 
-            atmpro = 'trp'
+            atmpro = 'mls'
             tsfc = 294
             conc = 400e-6
 
@@ -397,7 +397,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band3c
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 720, 800
             dv = .001
@@ -424,7 +424,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band4
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 800, 980
             dv = .001
@@ -445,13 +445,13 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '5':
 
             # co2 band5
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -472,7 +472,7 @@ def kdist_params(molecule=None, band=None):
             conc = 400e-6
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '6':
             raise ValueError('{} {} best-fit not available'.format(molecule, band))
@@ -484,7 +484,7 @@ def kdist_params(molecule=None, band=None):
 
             # co2 band9
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -492,8 +492,8 @@ def kdist_params(molecule=None, band=None):
 
             ref_pts = [(1, 250), (50, 250)]
             ng_refs = [3, 3]
-            ng_adju = [2, 0]
-            klin = 1e-23
+            ng_adju = [0, 0]
+            klin = 6.5e-24
             option_wgt_k = 1
             wgt = [(.7, .8, .7), (.8, .7, .8)]
 
@@ -513,7 +513,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band5
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 980, 1100
             dv = .001
@@ -541,7 +541,7 @@ def kdist_params(molecule=None, band=None):
 
             # o3 band9
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1900, 3000
             dv = .001
@@ -572,20 +572,20 @@ def kdist_params(molecule=None, band=None):
 
             # n2o band3a
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 540, 620
             dv = .001
             nv = 1000
 
-            ref_pts = [(1, 250)]
-            ng_refs = [2]
-            ng_adju = [0]
-            klin = 2.7167e-20
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [1, 2]
+            ng_adju = [0, 0]
+            klin = 2.22e-20
             option_wgt_k = 1
-            wgt = [(1, 1)]
+            wgt = [(.9,), (.5, .95)]
 
-            w_diffuse = [(1.8, 1.66)]
+            w_diffuse = [(1.8,), (1.66, 1.8)]
             option_wgt_flux = 1
 
             atmpro = 'mls'
@@ -599,7 +599,7 @@ def kdist_params(molecule=None, band=None):
 
             # n2o band7
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1215, 1380
             dv = .001
@@ -630,11 +630,11 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band6
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1100, 1215
-            dv = .005
-            nv = 200
+            dv = .001
+            nv = 1000
 
             ref_pts = [(500, 250)]
             ng_refs = [4]
@@ -657,7 +657,7 @@ def kdist_params(molecule=None, band=None):
 
             # ch4 band7
 
-            commitnumber = '2e4d60a'
+            commitnumber = '443e4ac'
 
             vmin, vmax = 1215, 1380
             dv = .001
