@@ -133,8 +133,8 @@ def analyse_case(param, setup=None):
     with open('param.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
         
-    
     pprint.pprint(param)
+    print()
         
     return subprocess.Popen(['jupyter', 'nbconvert', 
                              '--execute',
