@@ -266,7 +266,7 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
         except FileNotFoundError:
             continue
 
-    print('Submitting radiation calculation for cases')
+    print('Running Fortran for cases')
     procs = [run_fortran(param, setup=setup) for param in params]
     print()
 
