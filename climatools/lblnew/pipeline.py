@@ -85,7 +85,12 @@ def run_fortran(param=None, setup=None):
         return None
         
     proc = subprocess.Popen(['./lblnew.exe'], stdout=subprocess.PIPE)
+
+    # Print the following to screen in the process
+    print('Run {} for:'.format(setup.FNAME_CODE))
     pprint.pprint(param)
+    print()
+
     return proc
 
 
@@ -121,7 +126,6 @@ def analyse_case(param, setup=None):
 
     # Write .py file, used as input for analysis notebook
     dir_crd = get_dir_case(param, setup=setup)
-    print(dir_crd)
     lines=[]
     lines.append("DIR_FORTRAN = '{}'".format(dir_crd))
     lines.append("PARAM = {}".format(param))
@@ -129,6 +133,7 @@ def analyse_case(param, setup=None):
     with open('param.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
         
+    
     pprint.pprint(param)
         
     return subprocess.Popen(['jupyter', 'nbconvert', 
