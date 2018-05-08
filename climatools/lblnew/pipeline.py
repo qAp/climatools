@@ -282,6 +282,12 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
                 if proc.pid in aprocs:
                     continue
                 else:
+                    out, err = proc.communicate()
+                    if err:
+                        print('Warning: The following Fortran run finished with errors.')
+                        pprint.pprint(param)
+                        print(err.decode('utf-8'))
+
                     aproc = analyse_case(param, setup=setup)
                     aprocs[proc.pid] = (aproc, param)
                 
