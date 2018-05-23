@@ -40,8 +40,8 @@ def kdist_params(molecule=None, band=None):
 
             # Spectral info
             vmin, vmax = 20, 340
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             # k-distribution parameterization
             ref_pts = [(1, 250), (30, 250), (300, 250)]
@@ -72,8 +72,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 340, 540
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (10, 250), (500, 250)]
             ng_refs = [2, 3, 6]
@@ -100,8 +100,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 540, 620
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(10, 250), (600, 250)]
             ng_refs = [2, 6]
@@ -127,8 +127,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 620, 720
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(600, 250)]
             ng_refs = [6]
@@ -154,8 +154,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 720, 800
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
             ref_pts = [(600, 250)]
             ng_refs = [5]
             ng_adju = [0]
@@ -179,8 +179,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 800, 980
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(600, 250)]
             ng_refs = [3]
@@ -206,8 +206,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 980, 1100
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(600, 250)]
             ng_refs = [3]
@@ -233,8 +233,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1100, 1215
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(600, 250)]
             ng_refs = [4]
@@ -260,8 +260,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1215, 1380
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(600, 250)]
             ng_refs = [7]
@@ -287,8 +287,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1380, 1900
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (10, 250), (500, 250)]
             ng_refs = [3, 2, 3]
@@ -314,8 +314,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1900, 3000
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(500, 250)]
             ng_refs = [5]
@@ -346,8 +346,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 540, 620
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (10, 250), (500, 250)]
             ng_refs = [3, 2, 4]
@@ -374,8 +374,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 620, 720
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (10, 250)]
             ng_refs = [5, 2]
@@ -402,8 +402,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 720, 800
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (10, 250), (500, 250)]
             ng_refs = [3, 2, 4]
@@ -429,8 +429,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 800, 980
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
@@ -456,8 +456,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 980, 1100
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
@@ -489,8 +489,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1900, 3000
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (50, 250)]
             ng_refs = [3, 3]
@@ -518,8 +518,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 980, 1100
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (50, 250)]
             ng_refs = [2, 5]
@@ -546,8 +546,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1900, 3000
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (50, 250)]
             ng_refs = [2, 5]
@@ -577,8 +577,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 540, 620
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [1, 2]
@@ -604,8 +604,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1215, 1380
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [2, 2]
@@ -635,8 +635,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1100, 1215
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(500, 250)]
             ng_refs = [4]
@@ -662,8 +662,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = '5014a19'
 
             vmin, vmax = 1215, 1380
-            dv = .001
-            nv = 1000
+            dv = .01
+            nv = 100
 
             ref_pts = [(1, 250), (500, 250)]
             ng_refs = [2, 3]
