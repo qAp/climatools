@@ -341,7 +341,7 @@ def commit_msg(param):
 
 
 
-def implemented_bandmolecules():
+def implemented_moleculebands():
     return [('h2o', '1'), 
             ('h2o', '2'),
             ('h2o', '3a'),
