@@ -71,7 +71,7 @@ def run_fortran(param=None, setup=None):
     
     try:
         os.chdir(dir_case)
-        os.system('ifort -g -traceback -fpe0 {} -o cliradlw.exe'.format(fname_code))
+        os.system('ifort -g -traceback -fpe0 -r8 {} -o cliradlw.exe'.format(fname_code))
         assert os.path.exists('cliradlw.exe') == True
     except AssertionError:
         pprint.pprint(param)
