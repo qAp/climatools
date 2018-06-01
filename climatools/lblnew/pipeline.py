@@ -328,6 +328,76 @@ def pipeline_fortran2ipynb2git(params=None, setup=None):
 
 
 
+
+def pipeline_fortran_ipynb_git(param=None, setup=None):
+    '''
+    Run Fortran code, followed by analysis notebook, then
+    commit the analysis notebook to Git depository for 
+    a case.
+
+    Parameters
+    ----------
+    param: dict
+        A set of lblnew input values.
+    setup: python module
+        `setup_overlap` for the overlap calculation.
+        `setup_bestfit` for the best-fitting calculation for a single gas.
+    gprocs: subprocess.Subprocess
+        Subprocess for the Git commit of the input case.
+    '''
+    try:
+        shutil.rmtree(get_dir_case(param, setup=setup))
+    except FileNotFoundError:
+        continue
+        
+    try:
+        shutil.rmtree(get_analysis_dir(param, setup=setup))
+    except FileNotFoundError:
+        continue
+
+    print('Running Fortran for case')
+    proc = run_fortran(param, setup=setup)
+    print()
+
+    print('Submitting analysis for case')
+    being_analysed = False
+    while not being_analysed:
+        if proc.poll() is None:
+            continue
+        else:
+            out, err = proc.communicate()
+            if err:
+                print('Warning: The following Fortran'
+                      ' run finished with errors.')
+                pprint.pprint(param)
+                print(err.decode('utf-8'))
+            
+            aproc = analyse_case(param, setup=setup)
+            being_analysed = True
+            proc.kill()
+            break 
+        time.sleep(5)
+    print()
+
+    print('Committing analysis to Git repository for cases')
+    been_committed = False
+    while not been_committed:
+        if aproc.poll() is None:
+            continue
+        else:
+            gproc = git_addcommit(param, setup=setup)
+            out, err = gproc.communicate()
+            been_committed = True
+            out, err = aproc.communicate()
+            break
+        time.sleep(10)
+    print()
+
+    return gproc
+
+
+
+
 def nbviewer_url(param=None, setup=None):
     '''
     Returns the url for the notebook on nbviewer.jupyter.org
