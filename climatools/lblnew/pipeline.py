@@ -234,7 +234,7 @@ def run_fortran_bsub(param=None, setup=None):
         print()
         raise
 
-    jobname = 'lblnew-bestfit_{}_{}'.format(param['molecule'], param['band'])
+    jobname = 'lblnew_{}_{}'.format(param['molecule'], param['band'])
     lines = ['#!/bin/bash',
              '#BSUB -J {}'.format(jobname),
              '#BSUB -n 1',
@@ -245,12 +245,12 @@ def run_fortran_bsub(param=None, setup=None):
              '',
              'sleep 10']
 
-    with open('lblnew-bestfit.sub', mode='w', encoding='utf-8') as f:
+    with open('lblnew.sub', mode='w', encoding='utf-8') as f:
         s = '\n'.join(lines)
         f.write(s)
 
     try:
-        assert os.system('bsub < lblnew-bestfit.sub') == 0
+        assert os.system('bsub < lblnew.sub') == 0
     except AssertionError:
         print('Problem submitting job for this case')
         raise
