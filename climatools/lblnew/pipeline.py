@@ -193,6 +193,92 @@ def pipeline_git(params=None, setup=None):
 
 
 
+
+def run_fortran_bsub(param=None, setup=None):
+    '''
+    (1) Sets up directory to run a case.
+    (2) Copy needed file to that directory.
+    (3) Compile the fortran.
+    (4) Write a submit file and submits a job.
+    '''
+    dir_fortran = get_dir_case(param, setup=setup)
+    
+    try:
+        os.makedirs(dir_fortran)
+    except FileExistsError:
+        pprint.pprint(param)
+        print('This case already exists.')
+        print()
+        raise
+    
+    try:
+        os.chdir(dir_fortran)
+        assert os.system('cp {}/*.f .'.format(setup.DIR_SRC)) == 0
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem copying source to case directory in this case.')
+        print()
+        raise
+
+    fname_code = setup.FNAME_CODE
+    os.chdir(dir_fortran)
+    setup.enter_input_params(fname_code, params=param)
+
+    try:
+        os.chdir(dir_fortran)
+        os.system('ifort -g -traceback -fpe0 {} -o lblnew.exe'.format(fname_code))
+        assert os.path.exists('lblnew.exe') == True
+    except AssertionError:
+        pprint.pprint(param)
+        print('Problem compiling source code for this case.')
+        print()
+        raise
+
+    jobname = 'lblnew-bestfit_{}_{}'.format(param['molecule'], param['band'])
+    lines = ['#!/bin/bash',
+             '#BSUB -J {}'.format(jobname),
+             '#BSUB -n 1',
+             '#BSUB -o out_%J',
+             '#BSUB -e err_%J',
+             '',
+             './lblnew.exe',
+             '',
+             'sleep 10']
+
+    with open('lblnew-bestfit.sub', mode='w', encoding='utf-8') as f:
+        s = '\n'.join(lines)
+        f.write(s)
+
+    try:
+        assert os.system('bsub < lblnew-bestfit.sub') == 0
+    except AssertionError:
+        print('Problem submitting job for this case')
+        raise
+    
+
+    
+def pipeline_fortran_bsub(params=None, setup=None):
+    '''
+    Submit jobs to run the Fortran code for a list of 
+    specified cases.
+    '''
+    for param in params:
+
+        dir_fortran = get_dir_case(param, setup=setup)        
+        try:
+            shutil.rmtree(dir_fortran)
+        except FileNotFoundError:
+            pass
+
+        run_fortran_bsub(param=param, setup=setup)
+
+
+    
+
+    
+
+
+
 def pipeline_ipynb2git(params=None, setup=None):
 
     for param in params:
