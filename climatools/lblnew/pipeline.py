@@ -348,12 +348,12 @@ def pipeline_fortran_ipynb_git(param=None, setup=None):
     try:
         shutil.rmtree(get_dir_case(param, setup=setup))
     except FileNotFoundError:
-        continue
+        pass
         
     try:
         shutil.rmtree(get_analysis_dir(param, setup=setup))
     except FileNotFoundError:
-        continue
+        pass
 
     print('Running Fortran for case')
     proc = run_fortran(param, setup=setup)
