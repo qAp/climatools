@@ -32,7 +32,7 @@ def get_analysis_dir(param, setup=None):
     dir_case =  os.path.join(
         '/chia_cluster/home/jackyu/radiation',
         'analysis_-_new_kdist_param',
-        'crd',
+        'lblnew',
         setup.get_dir_from_param(param))
     return dir_case
 
@@ -491,7 +491,7 @@ def nbviewer_url(param=None, setup=None):
         'qap',
         'analysis_-_new_kdist_param',
         'blob/master',
-        'crd',
+        'lblnew',
         setup.get_dir_from_param(param),
         setup.FNAME_IPYNB)
 
