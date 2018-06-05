@@ -71,7 +71,7 @@ def pattern_assign(name):
     parameter variable assignment.
     '''
     return ''' 
-    parameter .* :: \s* &? \s* ({} \s* = (.*) \n)
+    (parameter .* :: \s* &? \s* {} \s* = )(.*)
     '''.format(name)
 
 
@@ -82,7 +82,7 @@ def pattern_data(name):
     'data' variable assignment
     '''
     return '''
-    (data [^/{name}]+ {name}[^,] [^/{name}]+ / ([^/]+) /)
+    (data [^/{name}]+ {name}[^,] [^/{name}]+ / )([^/]+)
     '''.format(name=name)
 
 
@@ -94,7 +94,7 @@ def pattern_atmpro():
     used in lblnew.f.
     '''
     return '''
-    (atmosphere_profiles/(.*)75_r8.pro)
+    (atmosphere_profiles/)([a-z]{3,3})
     '''
 
 
@@ -111,13 +111,35 @@ def pattern_molecule():
     flgch4 \s*,\s* flgo2
     \n 
     \s* \* \s* / \s* 
+    )
     (
     [01] \s* , \s* [01] \s* , \s*  [01] \s* , \s* [01] \s* , \s* [01] 
     \s* , \s* [01]
     )
-    \s* / 
-     )
     '''
+
+
+
+def pattern_conc(name):
+    '''
+    Returns regular expression that matches where
+    the assignment of the concentration of a molecule
+    can be inserted such that it will override anything
+    else provided.
+    '''
+    d = {'h2o': {'gasid': 1, 'concname': 'wlayer'},
+         'co2': {'gasid': 2, 'concname': 'clayer'}, 
+         'o3' : {'gasid': 3, 'concname': 'olayer'},
+         'n2o': {'gasid': 4, 'concname': 'qlayer'},
+         'ch4': {'gasid': 5, 'concname': 'rlayer'}}
+
+    assert name in d
+
+    return '''
+      (if \s+ \(flag\( {gasid} \)\) \s+ then \s+        
+      {concname} \s+ = \s+ ) (.*) 
+    '''.format(gasid=d[name]['gasid'], 
+               concname=d[name]['concname'])
 
 
 
@@ -146,6 +168,29 @@ def enter_input_params(path_lblnew, params=None):
     d_in['molecule']['regex'] = pattern_molecule()
     d_in['molecule']['input_value'] = input_value
 
+    'Gas concentration. We leave out o2 for now.'
+    molecule_conc = {}
+    for name in molecules[:-1]:
+        if name in params['molecule']:
+            if  name == 'h2o' and params['molecule'][name] == 'atmpro':
+                molecule_conc[name] = 'wlayer'
+            elif name == 'o3' and params['molecule'][name] == 'atmpro':
+                molecule_conc[name] = 'olayer'
+            elif params['molecule'][name] == 'atmpro':
+                # If 'atmpro' is specified for molecules other than h2o and o3,
+                # the concentration is set to 0.
+                molecule_conc[name] = '0._r8'
+            else:
+                molecule_conc[name] = (str(float(params['molecule'][name])) 
+                                       + '_r8')
+        else:
+            molecule_conc[name] = '0._r8'
+              
+    for name, conc in molecule_conc.items():
+        d_in[name]['regex'] = pattern_conc(name=name)
+        d_in[name]['input_value'] = str(conc)
+
+
     vmin, vmax = CLIRADLW_BANDS[params['band']][0]
 
     vstar = vmin
@@ -166,11 +211,10 @@ def enter_input_params(path_lblnew, params=None):
     d_in['tsfc']['regex'] = pattern_assign(name='tsfc')
     d_in['tsfc']['input_value'] = str(params['tsfc']) + '_r8'
     
+
     for name, d in d_in.items():
         regex = re.compile(d['regex'], re.VERBOSE)
-        statement, value = regex.findall(code)[0]
-        input_statement = statement.replace(value, d['input_value'])
-        code = code.replace(statement, input_statement)
+        code = regex.sub(r'\g<1>' + d['input_value'], code)
 
     with open(path_lblnew, mode='w', encoding='utf-8') as f:
         f.write(code)    
