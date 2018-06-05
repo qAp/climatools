@@ -27,8 +27,8 @@ def get_analysis_dir(param, setup=None):
     '''   
     dir_case =  os.path.join(
         '/chia_cluster/home/jackyu/radiation',
-        'offline_radiation_notebooks/longwave', 
-        'lblnew_20160916/clirad',
+        'analysis_-_new_kdist_param',
+        'clirad',
         setup.get_dir_from_param(param))
     return dir_case
 
@@ -331,7 +331,9 @@ def nbviewer_url(param=None, setup=None):
     '''
     return os.path.join(
         'http://nbviewer.jupyter.org/github',
-        'qap/offline_radiation_notebooks/blob/master',
-        'longwave/lblnew_20160916/clirad',
+        'qap',
+        'analysis_-_new_kdist_param',
+        'blob/master',
+        'clirad',
         setup.get_dir_from_param(param),
         setup.FNAME_IPYNB)
