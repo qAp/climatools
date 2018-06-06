@@ -42,7 +42,7 @@ def get_dir_from_param(param):
     param: dict
            Dictionary containing the keys and values of input parameters.
     '''
-    molecules = ['h2o', 'co2', 'o3', 'n2o', 'ch4', 'o2']
+    molecules = ('h2o', 'co2', 'o3', 'n2o', 'ch4', 'o2')
 
     template = os.path.join( 
         'h2o_{h2o}_co2_{co2}_o3_{o3}_n2o_{n2o}_ch4_{ch4}_o2_{o2}',
@@ -52,7 +52,12 @@ def get_dir_from_param(param):
         'crd_{commitnumber}',
         'atmpro_{atmpro}')
 
-    molecules = {m: 1 if m in param['molecule'] else 0 for m in molecules}
+    molecule_concs = {}
+    for m in molecules:
+        if m in param['molecule']:
+            molecule_concs[m] = str(param['molecule'][m])
+        else:
+            molecule_concs[m] = '0'    
 
     vmin, vmax = CLIRADLW_BANDS[param['band']][0]
 
@@ -61,7 +66,7 @@ def get_dir_from_param(param):
                            dv=param['dv'],
                            commitnumber=param['commitnumber'],
                            atmpro=param['atmpro'],
-                           **molecules)
+                           **molecule_concs)
 
 
 
