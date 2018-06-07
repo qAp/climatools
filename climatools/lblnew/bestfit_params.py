@@ -597,6 +597,33 @@ def kdist_params(molecule=None, band=None):
             option_compute_btable = 0
             option_compute_ktable = 1
 
+        elif band == '6':
+
+            # n2o band6
+
+            commitnumber = 'bca49ce'
+
+            vmin, vmax = 1100, 1215
+            dv = .005
+            nv = 200
+
+            ref_pts = [(1, 250), (500, 250)]
+            ng_refs = [1, 2]
+            ng_adju = [0, 0]
+            klin = 2.22e-20
+            option_wgt_k = 1
+            wgt = [(1,), (1, 1)]
+
+            w_diffuse = [(1.66,), (1.66, 1.66)]
+            option_wgt_flux = 1
+
+            atmpro = 'mls'
+            tsfc = 294
+            conc = 3.2e-07
+
+            option_compute_btable = 0
+            option_compute_ktable = 0
+
         elif band == '7':
 
             # n2o band7
