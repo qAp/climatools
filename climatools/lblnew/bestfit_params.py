@@ -607,14 +607,14 @@ def kdist_params(molecule=None, band=None):
             dv = .005
             nv = 200
 
-            ref_pts = [(1, 250), (500, 250)]
-            ng_refs = [1, 2]
-            ng_adju = [0, 0]
-            klin = 2.22e-20
+            ref_pts = [(500, 250),]
+            ng_refs = [1]
+            ng_adju = [0]
+            klin = 0
             option_wgt_k = 1
-            wgt = [(1,), (1, 1)]
+            wgt = [(.95,),]
 
-            w_diffuse = [(1.66,), (1.66, 1.66)]
+            w_diffuse = [(1.7,),]
             option_wgt_flux = 1
 
             atmpro = 'mls'
@@ -622,7 +622,7 @@ def kdist_params(molecule=None, band=None):
             conc = 3.2e-07
 
             option_compute_btable = 0
-            option_compute_ktable = 0
+            option_compute_ktable = 1
 
         elif band == '7':
 
