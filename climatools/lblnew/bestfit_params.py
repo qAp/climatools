@@ -614,7 +614,7 @@ def kdist_params(molecule=None, band=None):
             option_wgt_k = 1
             wgt = [(.95,),]
 
-            w_diffuse = [(1.7,),]
+            w_diffuse = [(1.66,),]
             option_wgt_flux = 1
 
             atmpro = 'mls'
