@@ -362,6 +362,7 @@ def implemented_moleculebands():
             ('o3', '5'),
             ('o3', '9'),
             ('n2o', '3a'), 
+            ('n2o', '6'),
             ('n2o', '7'),
             ('ch4', '6'),
             ('ch4', '7')]
