@@ -604,8 +604,8 @@ def kdist_params(molecule=None, band=None):
             commitnumber = 'bca49ce'
 
             vmin, vmax = 1100, 1215
-            dv = .005
-            nv = 200
+            dv = .001
+            nv = 1000
 
             ref_pts = [(500, 250),]
             ng_refs = [1]
