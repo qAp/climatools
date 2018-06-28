@@ -108,7 +108,6 @@ def run_analysis(param, param_lblnew=None, setup=None):
     try:
         os.chdir(dir_case)
         path_ipynb = setup.PATH_IPYNB
-        print(path_ipynb)
         assert os.system('cp {} .'.format(path_ipynb)) == 0
     except AssertionError:
         pprint.pprint(param)
@@ -118,7 +117,6 @@ def run_analysis(param, param_lblnew=None, setup=None):
 
     # Write .py file, used as input for analysis notebook
     dir_fortran = get_fortran_dir(param, setup=setup)
-    print(dir_fortran)
     lines=[]
     lines.append("PARAM = {}".format(param))
     lines.append("PARAM_LBLNEW = {}".format(param_lblnew))
