@@ -152,11 +152,18 @@ def git_addcommit(param, setup=None):
         get_analysis_dir(param, setup=setup), setup.FNAME_IPYNB)
     fpath_parampy = os.path.join(
         get_analysis_dir(param, setup=setup), 'param.py')
+    fpath_coolr_bylayer = os.path.join(
+        get_analysis_dir(param, setup=setup), 'coolr_bylayer.csv')
+    fpath_fluxes_bylayer = os.path.join(
+        get_analysis_dir(param, setup=setup), 'fluxes_bylayer.csv')
     
     os.chdir(get_analysis_dir(param, setup=setup)) 
 
     proc_gitadd = subprocess.Popen(['git', 'add', 
-                                    fpath_results, fpath_parampy],
+                                    fpath_results, 
+                                    fpath_parampy,
+                                    fpath_coolr_bylayer,
+                                    fpath_fluxes_bylayer],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
     
@@ -201,7 +208,7 @@ def pipeline_ipynb2git(parampairs=None, setup=None):
             shutil.rmtree(
                 get_analysis_dir(param, setup=setup))
         except FileNotFoundError:
-            continue
+            pass
 
         aproc = run_analysis(param, 
                              param_lblnew=param_lblnew, 
