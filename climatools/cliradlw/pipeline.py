@@ -208,7 +208,7 @@ def pipeline_ipynb2git(parampairs=None, setup=None):
             shutil.rmtree(
                 get_analysis_dir(param, setup=setup))
         except FileNotFoundError:
-            continue
+            pass
 
         aproc = run_analysis(param, 
                              param_lblnew=param_lblnew, 
