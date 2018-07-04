@@ -185,8 +185,12 @@ def load_ktable(fpath):
         Absorption coefficient values calculated at selected 
         (pressure, temperature) pairs.
     '''
-    print(fpath)
-    df = pd.read_csv(fpath, sep=r'\s+')
+    try:
+        df = pd.read_csv(fpath, sep=r'\s+')
+    except pd.errors.EmptyDataError:
+        print('No data at:', fpath)
+        return np.zeros((3, 3, 4))
+
     df = df.set_index(['g', 'pressure', 'temperature'])
     ng = len(df.index.levels[0].value_counts())
     nl = len(df.index.levels[1].value_counts())
