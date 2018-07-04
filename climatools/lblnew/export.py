@@ -230,15 +230,29 @@ def ktable_to_F77(ktable, name):
 
     
 def ktable(param):
+    ng = sum(param['ng_refs'])
+
     d = fpath_ktable(param=param)
-    
+
+    wgt = np.array([v for vs in param['wgt'] for v in vs])
+    w_diffuse = np.array([v for vs in param['w_diffuse'] for v in vs])
+    wgt = wgt.reshape(-1, ng)
+    w_diffuse = w_diffuse.reshape(-1, ng)
+
     kg_lin = load_ktable(d['kg_lin'])
-    ls_kg_lin = ktable_to_F77(kg_lin, 'kg_lin')
-    
     kg_nonlin = load_ktable(d['kg_nonlin'])
-    ls_kg_nonlin = ktable_to_F77(kg_nonlin, 'kg_nonlin')
+
+    kg = w_diffuse * (wgt * kg_lin + (1 - wgt) * kg_nonlin)
+
+    ls_kg = ktable_to_F77(kg, 'kg')
+
+#    print('molecule', param['molecule'], 'band', param['band'])
+#    print('wgt', wgt)
+#    print('w_diffuse', w_diffuse)
+#    print()
+#    print(kg_lin.shape, kg_nonlin.shape, kg.shape)
     
-    return ls_kg_lin + [''] + ls_kg_nonlin
+    return ls_kg
     
 
 
@@ -340,7 +354,7 @@ def kdist_param():
 
 
 def subroutine():
-    ls = ('subroutine get_kdist_ktable(mid, ib, dgs, kg_lin, kg_nonlin)',
+    ls = ('subroutine get_kdist_ktable(mid, ib, dgs, kg)',
           '! Get the dgs and k-tables corresponding to the lblnew bestfit parameters',
           '',
           'implicit none',
@@ -352,8 +366,7 @@ def subroutine():
           'integer :: mid ! gas id',
           'integer :: ib  ! spectral band number',
           'real :: dgs(max_ng)    ! Planck-weighted k-distribution function',
-          'real :: kg_lin(nl, nt, max_ng)  ! table of k_linear',
-          'real :: kg_nonlin(nl, nt, max_ng)  ! table of k_nonlinear',
+          'real :: kg(nl, nt, max_ng)  ! table of k (wgt & w_diffuse included.)',
           '',
           '',
           'integer :: ng ! number of g-intervals',
