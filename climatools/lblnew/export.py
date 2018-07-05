@@ -262,7 +262,7 @@ def kdist_param_gasband(param):
     Returns list of strings for some gas and band.
     '''
     lines = []
-    for f in (comment_header, ng, dgs):
+    for f in (comment_header,):
         lines.append(f(param))
         
     lines.extend(ktable(param))
@@ -354,7 +354,7 @@ def kdist_param():
 
 
 def subroutine():
-    ls = ('subroutine get_kdist_ktable(mid, ib, dgs, kg)',
+    ls = ('subroutine get_kdist_ktable(mid, ib, kg)',
           '! Get the dgs and k-tables corresponding to the lblnew bestfit parameters',
           '',
           'implicit none',
@@ -365,11 +365,8 @@ def subroutine():
           '',
           'integer :: mid ! gas id',
           'integer :: ib  ! spectral band number',
-          'real :: dgs(max_ng)    ! Planck-weighted k-distribution function',
           'real :: kg(nl, nt, max_ng)  ! table of k (wgt & w_diffuse included.)',
           '',
-          '',
-          'integer :: ng ! number of g-intervals',
           '',
           '')
     
