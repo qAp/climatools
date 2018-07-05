@@ -385,3 +385,155 @@ def file_content():
     lines = [6 * ' ' + l for l in lines]
     s = '\n'.join(lines)
     return s
+
+
+
+
+def wgt(param):
+    vs = [v for ref in param['wgt'] for v in ref]
+    s = vector_to_F77(vs, 
+                      num_values_per_line=3, dtype=float)
+    ls = ['wgt(1:ng) = (/',
+          s,
+          5 * ' ' + '&' + '/)']
+    return '\n'.join(ls)
+
+
+
+def w_diffuse(param):
+    vs = [v for ref in param['w_diffuse'] for v in ref]
+    s = vector_to_F77(vs, 
+                      num_values_per_line=3, dtype=float)
+    ls = ['w_diffuse(1:ng) = (/',
+          s,
+          5 * ' ' + '&' + '/)']
+    return '\n'.join(ls)
+
+
+
+def gasband_str_funcs():
+    return (comment_header,
+            ng,
+            wgt,
+            w_diffuse,)
+
+
+
+def kdist_param_gasband_kdist_bestfits(param):
+    '''
+    Returns list of strings for some gas and band.
+    '''
+    print(param['molecule'], param['band'])
+    return [f(param) for f in gasband_str_funcs()]
+
+
+
+def kdist_param_gas_kdist_bestfits(params):
+    '''
+    Returns list of strings for some gas.
+    '''
+    molecules = [param['molecule'] for param in params]
+    try:
+        assert all([molecule == molecules[0] for molecule in molecules])
+    except AssertionError:
+        raise('All input param dicts should be for the same gas.')
+        
+    ls_gas = []
+    for i, param in enumerate(params):
+        if i == 0:
+            s_if = 'if (ib == {}) then'
+        else:
+            s_if = 'else if (ib == {}) then'
+        
+        s_if = s_if.format(band_map()[param['band']])
+                 
+        ls = kdist_param_gasband_kdist_bestfits(param)
+        ls = [3 * ' ' + l for l in ls]
+        ls = [s_if] + ls
+        
+        ls_gas.extend(ls)
+       
+    s = "write (*, *) 'k-dist bestfits unavailable for {} band', ib"
+    s = s.format(molecules[0].upper())
+    ls_else = []
+    ls_else.append(s)
+    ls_else.append('stop')
+    ls_else = [3 * ' ' + l for l in ls_else]
+    
+    ls_gas.append('else')
+    ls_gas.extend(ls_else)
+    ls_gas.append('end if')      
+    return ls_gas
+
+
+
+def kdist_param_kdist_bestfits():
+    'Returns list of strings covering all gases and their bands'
+    gasband_gs = [h2o_gasbands(), co2_gasbands(), o3_gasbands(),
+                  n2o_gasbands(), ch4_gasbands()]
+    
+    lines = []
+    for i, gasbands in enumerate(gasband_gs):
+        
+        params = [bestfit.kdist_params(molecule=gas, band=band)
+                  for gas, band in gasbands]
+        
+        gas = params[0]['molecule']
+        mid = gas2mid(gas)
+        
+        if i == 0:
+            s_if = 'if (mid == {}) then'
+        else:
+            s_if = 'else if (mid == {}) then'
+        s_if = s_if.format(mid)
+        
+        ls = kdist_param_gas_kdist_bestfits(params)
+        ls = [3 * ' ' + l for l in ls]
+        ls = [s_if] + ls
+        
+        lines.extend(ls)
+    
+    s = "write (*, *) 'k-dist bestfits unavailable for gas id:', mid"
+    s = s.format(mid)
+    ls_else = []
+    ls_else.append(s)
+    ls_else.append('stop')
+    ls_else = [3 * ' ' + l for l in ls_else]
+    
+    lines.append('else')
+    lines.extend(ls_else)
+    lines.append('end if')     
+    return lines
+
+
+
+def subroutine_kdist_bestfits():
+    ls = ('subroutine get_kdist_bestfits(mid, ib, ng, wgt, w_diffuse)',
+          '!     Get the lblnew bestfit parameters',
+          '',
+          'implicit none',
+          '',
+          'integer, parameter :: max_ng = 15  ! max number of g-interval allowed',
+          '',
+          'integer :: mid ! gas id',
+          'integer :: ib  ! spectral band number',
+          'integer :: ng ! number of g-intervals', 
+          'real :: wgt(max_ng)',
+          'real :: w_diffuse(max_ng)',)
+    
+    lines = list(ls)
+    lines = lines + kdist_param_kdist_bestfits()
+    lines.append('return')
+    lines.append('end')
+    return lines
+
+
+
+def file_content_kdist_bestfits():
+    lines = subroutine_kdist_bestfits()
+    lines = [6 * ' ' + l for l in lines]
+    s = '\n'.join(lines)
+    return s
+
+
+
