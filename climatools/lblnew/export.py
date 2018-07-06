@@ -126,9 +126,13 @@ def comment_header(param):
     return s.format(param['molecule'], param['band'])
 
 
-def ng(param):
-    s = "ng = {:d}"
-    return s.format(sum(param['ng_refs']))
+def getl_ng(param):
+    mid = gas2mid(param['molecule'])
+    band = band_map()[param['band']]
+    ng = sum(param['ng_refs'])
+    
+    l_ng = 'ng({mid}, {band}) = {ng}'.format(mid=mid, band=band, ng=ng)
+    return l_ng
 
 
 def load_dgdgs(path):
@@ -151,13 +155,20 @@ def dgdgs_to_F77(dgdgs):
 
 
 def dgs(param):
+
+    mid = gas2mid(param['molecule'])
+    band = band_map()[param['band']]
+    ng = sum(param['ng_refs'])
+
     fpath = os.path.join(
         pipeline.get_dir_case(param, setup=setup_bestfit),
         'dgdgs.dat')
     dgdgs = load_dgdgs(fpath)
     s = vector_to_F77(dgdgs['dgs'], 
                       num_values_per_line=4, dtype=float)
-    ls = ['dgs(1:ng) = (/',
+
+    l0 = 'dgs({mid}, {band}, 1:{ng}) = (/'
+    ls = [l0.format(mid=mid, band=band, ng=ng),
           s,
           5 * ' ' + '&' + '/)']
     return '\n'.join(ls)
@@ -410,9 +421,8 @@ def w_diffuse(param):
 
 def gasband_str_funcs():
     return (comment_header,
-            ng,
-            wgt,
-            w_diffuse,)
+            getl_ng,
+            dgs)
 
 
 
@@ -468,55 +478,31 @@ def kdist_param_kdist_bestfits():
     'Returns list of strings covering all gases and their bands'
     gasband_gs = [h2o_gasbands(), co2_gasbands(), o3_gasbands(),
                   n2o_gasbands(), ch4_gasbands()]
-    
-    lines = []
-    for i, gasbands in enumerate(gasband_gs):
-        
-        params = [bestfit.kdist_params(molecule=gas, band=band)
-                  for gas, band in gasbands]
-        
-        gas = params[0]['molecule']
-        mid = gas2mid(gas)
-        
-        if i == 0:
-            s_if = 'if (mid == {}) then'
-        else:
-            s_if = 'else if (mid == {}) then'
-        s_if = s_if.format(mid)
-        
-        ls = kdist_param_gas_kdist_bestfits(params)
-        ls = [3 * ' ' + l for l in ls]
-        ls = [s_if] + ls
-        
-        lines.extend(ls)
-    
-    s = "write (*, *) 'k-dist bestfits unavailable for gas id:', mid"
-    s = s.format(mid)
-    ls_else = []
-    ls_else.append(s)
-    ls_else.append('stop')
-    ls_else = [3 * ' ' + l for l in ls_else]
-    
-    lines.append('else')
-    lines.extend(ls_else)
-    lines.append('end if')     
-    return lines
+
+    params = [bestfit.kdist_params(molecule=molecule, band=band)
+              for l in gasband_gs for molecule, band in l]
+
+    ls = []
+    for param in params:
+        ls_param = kdist_param_gasband_kdist_bestfits(param)
+        ls.extend(ls_param)
+        ls.append('')
+    return ls
 
 
 
 def subroutine_kdist_bestfits():
-    ls = ('subroutine get_kdist_bestfits(mid, ib, ng, wgt, w_diffuse)',
+    ls = ('subroutine get_kdist_bestfits(ng, dgs)',
           '!     Get the lblnew bestfit parameters',
           '',
           'implicit none',
           '',
+          'integer, parameter :: ngas = 5',
+          'integer, parameter :: nband = 11',
           'integer, parameter :: max_ng = 15  ! max number of g-interval allowed',
           '',
-          'integer :: mid ! gas id',
-          'integer :: ib  ! spectral band number',
-          'integer :: ng ! number of g-intervals', 
-          'real :: wgt(max_ng)',
-          'real :: w_diffuse(max_ng)',)
+          'integer :: ng(ngas, nband) ! number of g-intervals', 
+          'real :: dgs(ngas, nband, max_ng) ! Planck-weighted k-dist function',)
     
     lines = list(ls)
     lines = lines + kdist_param_kdist_bestfits()
