@@ -80,7 +80,32 @@ def into_chunks(l, chunksize):
 
 def vector_to_F77list(array, num_values_per_line=4, dtype=float):
     '''
-    
+    Divides a list of numbers into chunks of a given size, turn
+    each chunk into a string in which the numbers in the chunk
+    are separated by commas, and returns a list of such strings
+    for all chunks.
+
+    Parameters
+    ----------
+    array: list-like
+           List/array of numbers.
+    num_values_per_line: int
+                         Number of numbers in each chunk. The
+                         final chunk will have equal or fewer
+                         numbers than this.
+    dtype: string format specifier
+           int or float[default]
+    lines: list
+           List of strings containing comma-separated numbers.
+
+    Example
+    -------
+    >> vector_to_F77list(range(17))
+    ['   0.000000e+00,   1.000000e+00,   2.000000e+00,   3.000000e+00,',
+ '   4.000000e+00,   5.000000e+00,   6.000000e+00,   7.000000e+00,',
+ '   8.000000e+00,   9.000000e+00,   1.000000e+01,   1.100000e+01,',
+ '   1.200000e+01,   1.300000e+01,   1.400000e+01,   1.500000e+01,',
+ '   1.600000e+01']
     '''
     if dtype == float:
         strfmt = '{:15.6e}'
@@ -103,12 +128,40 @@ def vector_to_F77list(array, num_values_per_line=4, dtype=float):
     vs = [strfmt.format(v) for v in chunks[-1] if v != None]
     line = ','.join(vs)
     lines.append(line)
-    
     return lines
 
 
 
-def vector_to_F77(array=None, num_values_per_line=None, dtype=None):
+def vector_to_F77(array=None, num_values_per_line=4, dtype=float):
+    '''
+    Returns the fortran of what goes in between the delimiters `(/`
+    and `/)` for an array of numbers.  Fortran 77 delimiters for
+    newline, `&`s, are used after a specified number of numbers per
+    line.
+
+    Parameters
+    ----------
+    array: list-like
+           List/array of numbers.
+    num_values_per_line: int
+                         Number of numbers in each chunk. The
+                         final chunk will have equal or fewer
+                         numbers than this.
+    dtype: string format specifier
+           int or float[default]
+    fortran: string
+             Fortran for an array of numbers over one or more
+             lines. 
+
+    Example
+    -------
+    >> print(export.vector_to_F77(range(17), dtype=float))
+     &   0.000000e+00,   1.000000e+00,   2.000000e+00,   3.000000e+00,
+     &   4.000000e+00,   5.000000e+00,   6.000000e+00,   7.000000e+00,
+     &   8.000000e+00,   9.000000e+00,   1.000000e+01,   1.100000e+01,
+     &   1.200000e+01,   1.300000e+01,   1.400000e+01,   1.500000e+01,
+     &   1.600000e+01
+    '''
     lines = vector_to_F77list(array=array, 
                               num_values_per_line=num_values_per_line,
                               dtype=dtype)
@@ -120,13 +173,31 @@ def vector_to_F77(array=None, num_values_per_line=None, dtype=None):
 
 
 
-
 def comment_header(param):
+    '''
+    Returns a fortran comment showing the molecule and
+    spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    '''
     s = "! {} band{}"
     return s.format(param['molecule'], param['band'])
 
 
+
 def getl_ng(param):
+    '''
+    Returns fortran for the assignment of `ng` for
+    a particular molecule and spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    '''
     mid = gas2mid(param['molecule'])
     band = band_map()[param['band']]
     ng = sum(param['ng_refs'])
@@ -135,14 +206,36 @@ def getl_ng(param):
     return l_ng
 
 
-def load_dgdgs(path):
-    df = pd.read_csv(path, sep=r'\s+')
 
+def load_dgdgs(path):
+    '''
+    Load `dg` and `dgs` data from output file "dgdgs.dat"
+    from lblnew-bestfit.
+
+    Parameters
+    ----------
+    path: string
+          The file path to 'dgdgs.dat'.
+
+    df: pandas.DataFrame
+        `dg` and `dgs`.
+    '''
+    df = pd.read_csv(path, sep=r'\s+')
     df = df.set_index('g')    
     return df
 
 
+
 def dgdgs_to_F77(dgdgs):
+    '''
+    Returns the fortran for what goes in between array
+    delimiters `(/` and `/)` for a list of `dgs` values.
+
+    Parameters
+    ----------
+    dgdgs: list-like
+           A list of `dgs` values.
+    '''
     lines = vector_to_F77list(dgdgs, num_values_per_line=3)
     
     rlines = []
@@ -154,8 +247,26 @@ def dgdgs_to_F77(dgdgs):
     return '\n'.join(rlines)
 
 
-def dgs(param):
 
+def dgs(param):
+    '''
+    Returns fortran for the assignment statement
+    of `dgs` for a molecule and a spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+
+    Example
+    -------
+    For molecule=1, band=3, where ng=8:
+    
+    dgs(1, 3, 1:8) = (/                                                       
+     &   5.648506e-04,   1.581680e-03,   9.087519e-03,   4.067653e-02,         
+     &   7.966731e-02,   1.881423e-01,   4.535149e-01,   2.267649e-01          
+     &/)
+    '''
     mid = gas2mid(param['molecule'])
     band = band_map()[param['band']]
     ng = sum(param['ng_refs'])
@@ -174,14 +285,24 @@ def dgs(param):
     return '\n'.join(ls)
     
 
+
 def fpath_ktable(param=None):
-    
+    '''
+    Returns the file paths to the output files 'kg_lin.dat' 
+    and 'kg_nonlin.dat' for a lblnew-bestfit run.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    '''
     fortran_dir = pipeline.get_dir_case(param, setup=setup_bestfit)
           
     fpath_lin = os.path.join(fortran_dir, 'kg_lin.dat')
     fpath_nonlin = os.path.join(fortran_dir, 'kg_nonlin.dat')
     fpath = {'kg_lin': fpath_lin, 'kg_nonlin': fpath_nonlin}
     return fpath
+
 
 
 def load_ktable(fpath):
@@ -191,10 +312,10 @@ def load_ktable(fpath):
     Parameter
     ---------
     fpath: string
-        Path to the file 'ktable.dat', generated by "lblnew.f".
-    ktable: array (number of (p, t) pairs, number of g-intervals)
-        Absorption coefficient values calculated at selected 
-        (pressure, temperature) pairs.
+        File path to either 'kg_lin.dat' or 'kg_nonlin.dat',
+        containing the linear or non-linear k-tables.
+    ktable: numpy.array. [pressure, temperature, g]
+        k-table.
     '''
     try:
         df = pd.read_csv(fpath, sep=r'\s+')
@@ -210,7 +331,47 @@ def load_ktable(fpath):
     return ktable
 
 
+
 def ktable_to_F77(ktable, name):
+    '''
+    Return a list of fortran assignment statements, each for
+    a temperature and g.
+
+    Parameters
+    ----------
+    ktable: numpy.array. [pressure, temperature, g]
+        k-table.
+    name: string
+        Variable name for the k-table.
+
+    Example
+    -------
+            [kg(:, 1, 1) = (/                                                  
+     &   1.343974e-15,   1.350713e-15,   1.357494e-15,   1.364311e-15,         
+     &   1.371176e-15,   1.378072e-15,   1.385008e-15,   1.392013e-15,         
+     &   1.399067e-15,   1.406183e-15,   1.413397e-15,   1.420697e-15,         
+     &   1.428097e-15,   1.435642e-15,   1.443312e-15,   1.451093e-15,
+     ...
+     &   1.765126e-17,   1.485894e-17,   1.247649e-17,   1.038610e-17,         
+     &   8.562328e-18,   7.076162e-18                                          
+     &/),
+            kg(:, 2, 1) = (/                                                   
+     &   1.487328e-15,   1.493143e-15,   1.498963e-15,   1.504783e-15,         
+     &   1.510611e-15,   1.516431e-15,   1.522252e-15,   1.528094e-15,         
+     &   1.533940e-15,   1.539799e-15,   1.545698e-15,   1.551625e-15, 
+     ...
+     &   1.956012e-17,   1.630528e-17,   1.356653e-17,   1.121399e-17,         
+     &   9.203174e-18,   7.572534e-18                                          
+     &/),
+     ...
+            kg(:, 5, 12) = (/                                                  
+     &   1.345960e-23,   1.383604e-23,   1.422751e-23,   1.463427e-23,         
+     &   1.505761e-23,   1.549696e-23,   1.595347e-23,   1.642938e-23,
+     ...
+     &   1.124578e-21,   1.455117e-21,   1.871587e-21,   2.367312e-21,    
+     &   2.927146e-21,   3.585720e-21                                          
+     &/)]
+    '''
     nl, nt, ng = ktable.shape
     
     num_values_per_line = 4
@@ -220,12 +381,9 @@ def ktable_to_F77(ktable, name):
     lines = []
     for ig in range(ng):
         for it in range(nt):
-            
             first_line = '{}(:, {}, {}) = (/'.format(name, it + 1, ig + 1)
-        
             lines_itg = vector_to_F77list(ktable[:, it, ig], 
                             num_values_per_line=num_values_per_line)
-        
             lines_itg = [first_line] + lines_itg + [last_line]
         
             lines_itg_amp = []
@@ -239,8 +397,48 @@ def ktable_to_F77(ktable, name):
       
     return lines
 
+
     
 def ktable(param):
+    '''
+    Combines linear and non-linear k-tables together using `wgt`,
+    then scale it with the diffusivity `w_diffuse`.  Then,
+    return a list of fortran assignment statements, each for
+    a temperature and g.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+
+    Example
+    -------
+            [kg(:, 1, 1) = (/                                                  
+     &   1.343974e-15,   1.350713e-15,   1.357494e-15,   1.364311e-15,         
+     &   1.371176e-15,   1.378072e-15,   1.385008e-15,   1.392013e-15,         
+     &   1.399067e-15,   1.406183e-15,   1.413397e-15,   1.420697e-15,         
+     &   1.428097e-15,   1.435642e-15,   1.443312e-15,   1.451093e-15,
+     ...
+     &   1.765126e-17,   1.485894e-17,   1.247649e-17,   1.038610e-17,         
+     &   8.562328e-18,   7.076162e-18                                          
+     &/),
+            kg(:, 2, 1) = (/                                                   
+     &   1.487328e-15,   1.493143e-15,   1.498963e-15,   1.504783e-15,         
+     &   1.510611e-15,   1.516431e-15,   1.522252e-15,   1.528094e-15,         
+     &   1.533940e-15,   1.539799e-15,   1.545698e-15,   1.551625e-15, 
+     ...
+     &   1.956012e-17,   1.630528e-17,   1.356653e-17,   1.121399e-17,         
+     &   9.203174e-18,   7.572534e-18                                          
+     &/),
+     ...
+            kg(:, 5, 12) = (/                                                  
+     &   1.345960e-23,   1.383604e-23,   1.422751e-23,   1.463427e-23,         
+     &   1.505761e-23,   1.549696e-23,   1.595347e-23,   1.642938e-23,
+     ...
+     &   1.124578e-21,   1.455117e-21,   1.871587e-21,   2.367312e-21,    
+     &   2.927146e-21,   3.585720e-21                                          
+     &/)]
+    '''
     ng = sum(param['ng_refs'])
 
     d = fpath_ktable(param=param)
@@ -267,10 +465,17 @@ def ktable(param):
     
 
 
-
 def kdist_param_gasband(param):
     '''
-    Returns list of strings for some gas and band.
+    Return a list that contains a fortran comment
+    indicating the molecule and spectral band, followed by 
+    assignment statements for k-tables for a temperature
+    and a g.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
     '''
     lines = []
     for f in (comment_header,):
@@ -281,9 +486,38 @@ def kdist_param_gasband(param):
     return lines
 
 
+
 def kdist_param_gas(params):
     '''
-    Returns list of strings for some gas.
+    Return a list of fortran statements that form
+    an if statement covering the k-tables for all 
+    spectral bands for a given molecule.  
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    ls_gas: list
+        List of fortran statements when joined assigns all the
+        k-table values for all spectral bands for the SAME molecule.
+
+    Example
+    -------
+
+         if (ib == 1) then                                                     
+            ! h2o band1                                                        
+            kg(:, 1, 1) = (/                                                   
+     &   1.343974e-15,   1.350713e-15,   1.357494e-15,   1.364311e-15,         
+     &   1.371176e-15,   1.378072e-15,   1.385008e-15,   1.392013e-15,         
+     ...
+         else if (ib == 11) then                                               
+            ! h2o band9                                                        
+            kg(:, 1, 1) = (/                                                   
+     &   1.547249e-20,   1.579948e-20,   1.613146e-20,   1.646807e-20,         
+     &   1.680980e-20,   1.715557e-20,   1.750571e-20,   1.786126e-20, 
+     ...
+     &   3.872232e-20,   3.693864e-20                                          
+     &/) 
     '''
     molecules = [param['molecule'] for param in params]
     try:
@@ -319,13 +553,28 @@ def kdist_param_gas(params):
     return ls_gas
 
 
+
 def gas2mid(gas):
     d = {'h2o': 1, 'co2': 2, 'o3': 3, 'n2o': 4, 'ch4': 5, 'o2':6}
     return d[gas]
 
 
 def kdist_param():
-    'Returns list of strings covering all gases and their bands'
+    '''
+    Return list of fortran statements that, when joined with '\n',
+    form if-statements that assign k-table values for all spectral
+    bands of all molecules.
+
+    Example
+    -------
+    if (mid == 1) then                                                   
+      if (ib == 1) then 
+        ...
+    else if (mid == 5) then                                                   
+      if (ib == 8) then 
+        ...
+    end if
+    '''
     gasband_gs = [h2o_gasbands(), co2_gasbands(), o3_gasbands(),
                   n2o_gasbands(), ch4_gasbands()]
     
@@ -364,7 +613,13 @@ def kdist_param():
     return lines
 
 
+
 def subroutine():
+    '''
+    Return list of lines of fortran which, when joined by '\n', form
+    the subroutine `get_kdist_ktable()`.  This subroutine returns
+    the k-table given `mid` and `ib`.
+    '''
     ls = ('subroutine get_kdist_ktable(mid, ib, kg)',
           '! Get the dgs and k-tables corresponding to the lblnew bestfit parameters',
           '',
@@ -388,7 +643,12 @@ def subroutine():
     return lines
 
 
+
 def file_content():
+    '''
+    Return a piece of fortran that defines the
+    subroutine get_kdist_ktable().
+    '''
     lines = subroutine()
     lines = [6 * ' ' + l for l in lines]
     s = '\n'.join(lines)
@@ -396,8 +656,17 @@ def file_content():
 
 
 
-
 def wgt(param):
+    '''
+    Return a fortran assignment statement for
+    the `wgt` values for a particular molecule
+    and spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    '''
     vs = [v for ref in param['wgt'] for v in ref]
     s = vector_to_F77(vs, 
                       num_values_per_line=3, dtype=float)
@@ -409,6 +678,16 @@ def wgt(param):
 
 
 def w_diffuse(param):
+    '''
+    Return a fortran assignment statement for
+    the `w_diffuse` values for a particular molecule
+    and spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
+    '''
     vs = [v for ref in param['w_diffuse'] for v in ref]
     s = vector_to_F77(vs, 
                       num_values_per_line=3, dtype=float)
@@ -428,7 +707,15 @@ def gasband_str_funcs():
 
 def kdist_param_gasband_kdist_bestfits(param):
     '''
-    Returns list of strings for some gas and band.
+    Return the following list of fortran statements:
+    1. Comment that indicates which molecule and spectral band.
+    2. Assign the value of `ng` for molecule and spectral band.
+    3. Assign the values of `dgs` for molecule and spectral band.
+
+    Parameters
+    ----------
+    param: dict
+           Dictionary of input parameters for lblnew-bestfit.
     '''
     print(param['molecule'], param['band'])
     return [f(param) for f in gasband_str_funcs()]
@@ -437,7 +724,13 @@ def kdist_param_gasband_kdist_bestfits(param):
 
 def kdist_param_gas_kdist_bestfits(params):
     '''
-    Returns list of strings for some gas.
+    Return list of fortran statements which, when
+    joined by '\n', form an if-statement that covers
+    the assignment of values for `ng` and `dgs` for
+    all spectral bands of some molecule.  
+    
+    (Deprecated: The format described in this function
+     is currently not used.)
     '''
     molecules = [param['molecule'] for param in params]
     try:
@@ -475,7 +768,11 @@ def kdist_param_gas_kdist_bestfits(params):
 
 
 def kdist_param_kdist_bestfits():
-    'Returns list of strings covering all gases and their bands'
+    '''
+    Return list of fortran assignment statements that cover
+    all `ng` and `dgs` for all spectral bands and for all
+    molecule.
+    '''
     gasband_gs = [h2o_gasbands(), co2_gasbands(), o3_gasbands(),
                   n2o_gasbands(), ch4_gasbands()]
 
@@ -492,6 +789,10 @@ def kdist_param_kdist_bestfits():
 
 
 def subroutine_kdist_bestfits():
+    '''
+    Return list of fortran statements which, when joined
+    by '\n', form a subroutine which returns `ng` and `dgs`.
+    '''
     ls = ('subroutine get_kdist_bestfits(ng, dgs)',
           '!     Get the lblnew bestfit parameters',
           '',
