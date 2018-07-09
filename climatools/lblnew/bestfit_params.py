@@ -511,7 +511,37 @@ def kdist_params(molecule=None, band=None):
 
 
     elif molecule == 'o3':
-        if band == '5':
+
+        if band == '3b':
+
+            # o3 band3b
+
+            commitnumber = 'a22ab94'
+
+            vmin, vmax = 620, 720
+            dv = .005
+            nv = 200
+
+            ref_pts = [(10, 250)]
+            ng_refs = [1]
+            ng_adju = [0]
+            klin = 0
+            option_wgt_k = 1
+            wgt = [(1,)]
+
+            w_diffuse = [(1.66,)]
+            option_wgt_flux = 1
+
+            atmpro = 'mls'
+            tsfc = 294
+            conc = None
+
+            option_compute_btable = 0
+            option_compute_ktable = 1
+
+
+
+        elif band == '5':
 
             # o3 band5
 
