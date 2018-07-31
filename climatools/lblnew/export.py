@@ -323,6 +323,7 @@ def load_ktable(fpath):
         print('No data at:', fpath)
         return np.zeros((3, 3, 4))
 
+    df = df[df['pressure'] >= 1e-2]
     df = df.set_index(['g', 'pressure', 'temperature'])
     ng = len(df.index.levels[0].value_counts())
     nl = len(df.index.levels[1].value_counts())
@@ -626,7 +627,7 @@ def subroutine():
           'implicit none',
           '',
           'integer, parameter :: max_ng = 15  ! max number of g-interval allowed',
-          'integer, parameter :: nl = 62  ! number of pressures',
+          'integer, parameter :: nl = 52  ! number of pressures',
           'integer, parameter :: nt = 5   ! number of temperatures',
           '',
           'integer :: mid ! gas id',
