@@ -262,7 +262,7 @@ def dgs(param):
     -------
     For molecule=1, band=3, where ng=8:
     
-    dgs(1, 3, 1:8) = (/                                                       
+    dgs(1:8, 1, 3) = (/                                                       
      &   5.648506e-04,   1.581680e-03,   9.087519e-03,   4.067653e-02,         
      &   7.966731e-02,   1.881423e-01,   4.535149e-01,   2.267649e-01          
      &/)
@@ -278,7 +278,7 @@ def dgs(param):
     s = vector_to_F77(dgdgs['dgs'], 
                       num_values_per_line=4, dtype=float)
 
-    l0 = 'dgs({mid}, {band}, 1:{ng}) = (/'
+    l0 = 'dgs(1:{ng}, {mid}, {band}) = (/'
     ls = [l0.format(mid=mid, band=band, ng=ng),
           s,
           5 * ' ' + '&' + '/)']
@@ -804,7 +804,7 @@ def subroutine_kdist_bestfits():
           'integer, parameter :: max_ng = 15  ! max number of g-interval allowed',
           '',
           'integer :: ng(ngas, nband) ! number of g-intervals', 
-          'real :: dgs(ngas, nband, max_ng) ! Planck-weighted k-dist function',)
+          'real :: dgs(max_ng, ngas, nband) ! Planck-weighted k-dist function',)
     
     lines = list(ls)
     lines = lines + kdist_param_kdist_bestfits()
