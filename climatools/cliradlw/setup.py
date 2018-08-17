@@ -122,9 +122,9 @@ def enter_input_params(path_cliradlw, param=None):
         if name in param['molecule']:
             if param['molecule'][name] == 'atmpro' and name in ('h2o', 'o3'):
                 if name == 'h2o':
-                    molecule[name] = 'wa(i,k)'
+                    molecule[name] = 'wa(1,k)'
                 else:
-                    molecule[name] = 'oa(i,k)'
+                    molecule[name] = 'oa(1,k)'
             elif param['molecule'][name] == 'atmpro':
                 molecule[name] = 0
             else:
@@ -134,7 +134,7 @@ def enter_input_params(path_cliradlw, param=None):
 
     for name, conc in molecule.items():
         d_in[name]['regex'] = pattern_conc(name=name)
-        if conc in ('wa(i,k)', 'oa(i,k)'):
+        if conc in ('wa(1,k)', 'oa(1,k)'):
             d_in[name]['input_value'] = conc
         else:
             d_in[name]['input_value'] = str(float(conc))
