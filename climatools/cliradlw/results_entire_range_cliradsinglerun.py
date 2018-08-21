@@ -577,24 +577,7 @@ def show_cool(atmpro='mls'):
 # In[1208]:
 
 
-def fmt(da_in):
-    da = da_in.copy(deep=True)
-    
-    if 'i' in da.dims:
-        da = da.sel(i=len(da['i']))
-    
-    if 'igg' in da.dims:
-        da = da.sel(igg=1)
-            
-    if 'g' in da.dims:
-        da = da.sum('g')
-        
-    if 'band' in da.dims:
-        try:
-            da = da.squeeze('band')
-        except ValueError:
-            da = da.sum('band')                
-    return da
+
 
 
 def hist_band_vs_flux(da, title='Title'):
@@ -615,6 +598,20 @@ def hist_band_vs_flux(da, title='Title'):
 
 
 def show_hist_flux(atmpro='mls'):
+
+    def fmt(da_in):
+        da = da_in.copy(deep=True)
+        
+        if 'i' in da.dims:
+            da = da.sel(i=len(da['i']))
+        
+        if 'igg' in da.dims:
+            da = da.sel(igg=1)
+                
+        if 'g' in da.dims:
+            da = da.sum('g')
+        return da
+
     ds_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
     ds_clirad = clirad_data_atm(
         clirad_params_atm(atmpro=atmpro))['flux']
@@ -623,11 +620,13 @@ def show_hist_flux(atmpro='mls'):
     
     ip, varname = 0, 'flug'
     da = (ds_clirad_singlerun - ds_crd).isel(pressure=ip)[varname]
+    da = fmt(da)
     p_toa = hist_band_vs_flux(da, 
         title='TOA flux. CLIRAD (single-run) - CRD.')
 
     ip, varname = -1, 'fldg'
     da = (ds_clirad_singlerun - ds_crd).isel(pressure=ip)[varname]
+    da = fmt(da)
     p_sfc = hist_band_vs_flux(da, 
         title='SFC flux. CLIRAD (single-run) - CRD.')    
     
@@ -636,7 +635,6 @@ def show_hist_flux(atmpro='mls'):
     atm_clirad_singlerun = (ds_clirad_singlerun.isel(pressure=0) 
                   - ds_clirad_singlerun.isel(pressure=-1))['fnetg']
     da = atm_clirad_singlerun - atm_crd
-    
     da = fmt(da)
     p_atm = hist_band_vs_flux(da, 
         title='Atmosphere heating. CLIRAD (single-run) - CRD.')
@@ -654,7 +652,24 @@ def show_hist_flux(atmpro='mls'):
     
 def show_tb_flux(atmpro='mls'):
     
-
+    def fmt(da_in):
+        da = da_in.copy(deep=True)
+        
+        if 'i' in da.dims:
+            da = da.sel(i=len(da['i']))
+        
+        if 'igg' in da.dims:
+            da = da.sel(igg=1)
+                
+        if 'g' in da.dims:
+            da = da.sum('g')
+            
+        if 'band' in da.dims:
+            try:
+                da = da.squeeze('band')
+            except ValueError:
+                da = da.sum('band')                
+        return da
     
     ds_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
     olr_crd = ds_crd['flug'].isel(pressure=0)
@@ -776,7 +791,7 @@ def script():
         show_html(climahtml.getHTML_idanchor(s_flux.format(atmpro)))
         show_markdown(
             climahtml.getMarkdown_sectitle(s_flux.format(atmpro)))
-#        show_hist_flux(atmpro=atmpro)
+        show_hist_flux(atmpro=atmpro)
         show_tb_flux(atmpro=atmpro)
     
     
