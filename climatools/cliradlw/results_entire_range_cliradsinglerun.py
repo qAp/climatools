@@ -581,7 +581,7 @@ def fmt(da_in):
     da = da_in.copy(deep=True)
     
     if 'i' in da.dims:
-        da = da.sel(i=da.dims['i'])    
+        da = da.sel(i=len(da['i']))
     
     if 'igg' in da.dims:
         da = da.sel(igg=1)
@@ -776,7 +776,7 @@ def script():
         show_html(climahtml.getHTML_idanchor(s_flux.format(atmpro)))
         show_markdown(
             climahtml.getMarkdown_sectitle(s_flux.format(atmpro)))
-        show_hist_flux(atmpro=atmpro)
+#        show_hist_flux(atmpro=atmpro)
         show_tb_flux(atmpro=atmpro)
     
     
