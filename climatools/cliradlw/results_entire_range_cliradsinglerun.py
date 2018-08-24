@@ -32,6 +32,7 @@ import climatools.lblnew.pipeline as pipe_lblnew
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
 from climatools.cliradlw import runrecord
+from climatools.atm.absorbers import *
 
 import climatools.html.html as climahtml
 from climatools.lblnew.dataio import *
@@ -63,18 +64,6 @@ These are returned by functions `clirad_params_atm` and
 `lblnew_params_atm`, respectively.
 '''
 
-def molecules_byband_atm():
-    return {1: {'h2o': 'atmpro'},
-            2: {'h2o': 'atmpro'}, 
-            3: {'co2': 0.0004, 'h2o': 'atmpro', 'n2o': 3.2e-07},
-            4: {'co2': 0.0004, 'h2o': 'atmpro'},
-            5: {'co2': 0.0004, 'h2o': 'atmpro'},
-            6: {'co2': 0.0004, 'h2o': 'atmpro'},
-            7: {'co2': 0.0004, 'h2o': 'atmpro', 'o3': 'atmpro'},
-            8: {'h2o': 'atmpro'},
-            9: {'ch4': 1.8e-06, 'h2o': 'atmpro', 'n2o': 3.2e-07},
-            10: {'h2o': 'atmpro'},
-            11: {'co2': 0.0004, 'h2o': 'atmpro'}}
 
 
 def greyabsorbers_by_band_atm():
@@ -96,7 +85,7 @@ def clirad_params_atm(atmpro='mls'):
     '''
     Return the input parameter dictionaries for the
     (band, molecule)s in the toy atmosphere
-    (defined in molecules_byband_atm()).  Note that
+    (defined in nongreys_byband()).  Note that
     molecule here refers to a dictionary containing 
     the concentration for one or more gases.
 
@@ -108,7 +97,7 @@ def clirad_params_atm(atmpro='mls'):
         Dictionary of {band: param} type.
     '''
     d = {}
-    for band, molecule in molecules_byband_atm().items():
+    for band, molecule in nongreys_byband().items():
         for param in runrecord.test_cases():
             if [band] == param['band'] and molecule == param['molecule']:
                 param['atmpro'] = atmpro
@@ -173,7 +162,7 @@ def lblnew_params_atm(atmpro='mls'):
     radiation is computed.  
     
     The toy atmosphere's content is 
-    defined by molecules_byband_atm().
+    defined by nongreys_byband().
 
     Parameters
     ----------
@@ -203,7 +192,7 @@ def show_makeup():
     '''
     df = pd.DataFrame()
 
-    for band, molecule in molecules_byband_atm().items():
+    for band, molecule in nongreys_byband().items():
         for name, conc in molecule.items():
             df.loc[name, band] = str(conc)
 
