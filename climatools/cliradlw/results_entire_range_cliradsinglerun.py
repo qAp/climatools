@@ -31,6 +31,7 @@ from climatools.lblnew import setup_bestfit, setup_overlap
 import climatools.lblnew.pipeline as pipe_lblnew
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
+from climatools.cliradlw import runrecord
 
 import climatools.html.html as climahtml
 from climatools.lblnew.dataio import *
@@ -108,7 +109,7 @@ def clirad_params_atm(atmpro='mls'):
     '''
     d = {}
     for band, molecule in molecules_byband_atm().items():
-        for param in setup_cliradlw.test_cases():
+        for param in runrecord.test_cases():
             if [band] == param['band'] and molecule == param['molecule']:
                 param['atmpro'] = atmpro
                 d[band] = param
