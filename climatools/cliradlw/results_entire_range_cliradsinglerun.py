@@ -194,39 +194,6 @@ def lblnew_params_atm(atmpro='mls'):
     return d
 
 
-# In[1200]:
-
-
-def db_getdir():
-    atmpro = 'mls'
-    params = clirad_params_atm_singlerun(atmpro=atmpro)
-    param = params['all']
-    
-    fdir = pipe_cliradlw.get_fortran_dir(param=param, 
-                                         setup=setup_cliradlw)
-    return fdir
-
-
-def db_ktable():
-    fdir = db_getdir()    
-    fpath = os.path.join(fdir, 'ktable.dat')
-    
-    df = pd.read_csv(fpath, sep=r'\s+')
-    df = df.set_index(['band', 'mid', 'il', 'it', 'g'])
-    ds = xr.Dataset.from_dataframe(df)
-    return ds
-
-
-def db_ng_dgs():
-    fdir = db_getdir()
-    fpath = os.path.join(fdir, 'ng_dgs.dat')
-    
-    df = pd.read_csv(fpath, sep=r'\s+')
-    df = df.set_index(['band', 'mid', 'g'])
-    ds = xr.Dataset.from_dataframe(df)
-    return ds
-
-
 
 def show_makeup():
     '''
