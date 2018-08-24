@@ -90,7 +90,22 @@ def greyabsorbers_by_band_atm():
             11: None}
 
 
+
 def clirad_params_atm(atmpro='mls'):
+    '''
+    Return the input parameter dictionaries for the
+    (band, molecule)s in the toy atmosphere
+    (defined in molecules_byband_atm()).  Note that
+    molecule here refers to a dictionary containing 
+    the concentration for one or more gases.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile: 'mls', 'saw' or 'trp'.
+    d: dict
+        Dictionary of {band: param} type.
+    '''
     d = {}
     for band, molecule in molecules_byband_atm().items():
         for param in setup_cliradlw.test_cases():
@@ -101,12 +116,16 @@ def clirad_params_atm(atmpro='mls'):
     return d
 
 
+
 def clirad_params_atm_singlerun(atmpro='mls'):
     '''
-    Returns param of clirad-lw run that is equivalent to the total
-    of all the runs listed in molecules_byband_atm().  In order
-    for the output to be compatible with clirad_data_atm(), it will
-    be a list.
+    Define the input parameter dictionary (or `param`) of
+    a clirad-lw run and return it.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
     '''
     param0 = {'band': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
               'commitnumber': '8f82f9b',
@@ -127,14 +146,41 @@ def clirad_params_atm_singlerun(atmpro='mls'):
     return d
 
 
+
 def analysis_dirs_atm(atmpro='mls'):
+    '''
+    Maps spectral band to the absolute path of the
+    clirad-lw run in which the toy atmosphere's
+    radiation is computed.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    '''
     params = clirad_params_atm(atmpro=atmpro)
     return {band: pipe_cliradlw.get_analysis_dir(param=param,
                                                  setup=setup_cliradlw) 
             for band, param in params.items()}
 
 
+
 def lblnew_params_atm(atmpro='mls'):
+    '''
+    Maps band to absolute path of the 
+    lblnew run in which the toy atmosphere's
+    radiation is computed.  
+    
+    The toy atmosphere's content is 
+    defined by molecules_byband_atm().
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    d: dict
+    {band: param} dictionary for the lblnew runs.
+    '''
     dirs = analysis_dirs_atm(atmpro=atmpro)
     
     d = {}
@@ -145,7 +191,6 @@ def lblnew_params_atm(atmpro='mls'):
         
         s = l.split('=')[1].strip()
         d[band] = ast.literal_eval(s)
-        
     return d
 
 
@@ -182,10 +227,12 @@ def db_ng_dgs():
     return ds
 
 
-# In[1201]:
-
 
 def show_makeup():
+    '''
+    Display table showing the concentrations
+    of the gases in each spectral band
+    '''
     df = pd.DataFrame()
 
     for band, molecule in molecules_byband_atm().items():
@@ -200,6 +247,7 @@ def show_makeup():
     
     display.display(
         display.Markdown('*TABLE.* Non-grey absorbers in the atmosphere.'))
+
 
 
 def show_grey_makeup():
@@ -227,7 +275,10 @@ def show_grey_makeup():
 
 def load_output_file(path_csv):
     '''
-    Load lblnew output .csv file to xarray.Dataset
+    Load output file to xarray.Dataset.  
+    The output file can be from either lblnew
+    or clirad, as long as it's .csv and multi-index
+    format.
     
     Parameters
     ----------
@@ -261,6 +312,18 @@ def load_output_file(path_csv):
 
 
 def lblnew_setup(param=None):
+    '''
+    Returns the setup module and output filenames for 
+    an lblnew input parameter dictionary, indicating
+    whether a filename is for 'crd' (line-by-line)
+    or 'wgt' (k-dist), these being different
+    for lblnew-bestfit and lblnew-overlap.
+    
+    Parameters
+    ----------
+    param: dict
+        lblnew input parameter dictionary.
+    '''
     if 'ng_refs' in param:
         return {'setup': setup_bestfit,
                 'fname_flux_crd': 'output_flux.dat',
@@ -275,8 +338,19 @@ def lblnew_setup(param=None):
                 'fname_cool_wgt': 'output_wcoolr.dat'}
 
     
+
 def load_lblnew_data(param):
-    
+    '''
+    Load all output files from a given lblnew run.
+
+    Parameters
+    ----------
+    param: dict
+        lblnew input parameter dictionary.
+    data_dict: dict
+        xr.Datasets for output 'crd' and 'wgt'
+        fluxes and cooling rates.
+    '''
     fname_dsname = [('fname_flux_crd', 'ds_flux_crd'),
                     ('fname_cool_crd', 'ds_cool_crd'),
                     ('fname_flux_wgt', 'ds_flux_wgt'),
@@ -297,18 +371,19 @@ def load_lblnew_data(param):
 
 def crd_data_atm(params_atm):
     '''
+    Gather together the 'crd' fluxes and cooling rates
+    from all spectral bands in the toy atmosphere.
+
     Parameters
     ----------
-    
     params_atm: dict
-                Parameter dictionary for each band.
+        {band: lblnew input parameter dictionary}
                 
     d: dict
        'flux': xr.Dataset. [pressure, band]
-               Fluxes.
+            Fluxes.
        'cool': xr.Dataset. [pressure, band]
-               Cooling rate.
-    
+            Cooling rate.
     '''
     
     results_atm = {band: load_lblnew_data(param) 
@@ -326,6 +401,21 @@ def crd_data_atm(params_atm):
         
 
 def clirad_data_atm(params_atm):
+    '''
+    Gather together clirad-lw's fluxes and cooling rates
+    from all spectral bands in the toy atmosphere. 
+    
+    Parameters
+    ----------
+    params_atm: dict
+        {band: cliradlw input parameter dictionary}
+
+    d: dict
+    'flux': xr.Dataset. [pressure, band]
+         Fluxes.
+    'cool': xr.Dataset. [pressure, band]
+         Cooling rate.
+    '''
     
     dirnames = [pipe_cliradlw.get_fortran_dir(param,
                                               setup=setup_cliradlw)
@@ -357,6 +447,14 @@ importlib.reload(cliradwrangle)
 def oldclirad_data_atm():
     '''
     Load the OLD clirad's results. mls only.
+
+    Parameters
+    ----------
+    d: dict
+    'flux': xr.Dataset. [pressure, band]
+         Fluxes.
+    'cool': xr.Dataset. [pressure, band]
+         Cooling rate.
     '''
     fpath = os.path.join('/chia_cluster/home/jackyu/radiation',
                          'clirad-lw',
@@ -390,6 +488,16 @@ def oldclirad_data_atm():
 
 
 def fmt_cool(ds_in):
+    '''
+    Deal with dimensions that are not the 'pressure/layer'
+    dimension, to prepare the dataset for 
+    pressure vs cooling rate plots.
+    
+    Parameters
+    ----------
+    ds_in: xarray.Dataset
+        Cooling rate.
+    '''
     ds = ds_in.copy(deep=True)
     if 'igg' in ds.dims:
         ds = ds.sel(igg=1)
@@ -411,7 +519,22 @@ def fmt_cool(ds_in):
 
 
 def nice_xlims(pltdata=None, prange=None):
-    
+    '''
+    For a line plot with the domain on the y-aixs
+    and the image on the x-axis, work out a suitable 
+    displayed range for the x-axis, given a domain 
+    range.  This also works when multiple lines plotted.
+
+    Parameters
+    ----------
+    pltdata: list
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.
+    prange: tuple
+        y-axis (domain) range over which the
+        x-axis (codomain) range will be based.
+    '''
     def get_slice(srs):
         return srs.sel(pressure=slice(*prange))
     
@@ -425,7 +548,24 @@ def nice_xlims(pltdata=None, prange=None):
     
 def plt_cool_bokeh(pltdata=None, 
                    y_axis_type='linear', prange=(50, 1050)):
-    
+    '''
+    Make line plot(s) for dataset(s), with the domain 
+    on the y-aixs and the image on the x-axis.
+
+    Parameters
+    ----------
+    pltdata: list
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.
+    y_axis_type: string
+        Plot y-scale. 'linear', or 'log'.
+    prange: tuple
+        y-axis (domain) range over which the
+        x-axis (codomain) range will be based.
+    p2: bokeh.plotting.figure
+        Plotted figure.
+    '''
     ymin = 1e-2 
     ymax = 1020
     
@@ -469,7 +609,21 @@ def plt_cool_bokeh(pltdata=None,
 
 
 def pltdata_cool(atmpro='mls'):
-    
+    '''
+    Prepare the plotting data for plotting cooling
+    rate profiles that is compatible with
+    plot_cool_bokeh(), and set the plot attibutes 
+    for each curve.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    data: dict
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.            
+    '''
     d_clirad_singlerun = clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))
     d_clirad = clirad_data_atm(clirad_params_atm(atmpro=atmpro))
@@ -497,8 +651,6 @@ def pltdata_cool(atmpro='mls'):
 #         'line_dash': 'dashed', 'line_width': 5,
 #         'color': colors[0], 'alpha': .6}
         
-
-    
     # include old CLIRAD's results for mls profile
     if atmpro == 'mls':
         d_oldclirad = oldclirad_data_atm()
@@ -512,8 +664,23 @@ def pltdata_cool(atmpro='mls'):
     return data
 
 
+
 def pltdata_cooldiff(atmpro='mls'):
-    
+    '''
+    Prepare the plotting data for plotting cooling
+    rate difference profiles that is compatible with
+    plot_cool_bokeh(), and set the plot attibutes 
+    for each curve.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    data: dict
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.            
+    '''
     d_clirad_singlerun = clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))
     d_clirad = clirad_data_atm(clirad_params_atm(atmpro=atmpro))
@@ -550,8 +717,21 @@ def pltdata_cooldiff(atmpro='mls'):
     return data
 
 
+
 def show_cool(atmpro='mls'):
-    
+    '''
+    Produce figure with the following panes:
+      1. Cooling rate profiles with linear pressure-axis.
+      2. Cooling rate profile with log pressure-axis.
+      3. Coolling rate profile difference with log 
+         pressure-axis.
+    and display the figure.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    '''
     data_cool = pltdata_cool(atmpro=atmpro)
     p_cool_liny = plt_cool_bokeh(pltdata=data_cool)
     p_cool_logy = plt_cool_bokeh(pltdata=data_cool, 
@@ -582,6 +762,14 @@ def show_cool(atmpro='mls'):
 
 def hist_band_vs_flux(da, title='Title'):
     '''
+    Plot the histogram: spectral band vs flux
+
+    Parameters
+    ----------
+    da: xarray.DataArray (band,)
+        Flux.
+    p: bokeh.plotting.figure
+        Histogram plot.
     '''
     bands = [str(b.values) for b in da['band']]
 
@@ -597,8 +785,21 @@ def hist_band_vs_flux(da, title='Title'):
     return p
 
 
-def show_hist_flux(atmpro='mls'):
 
+
+def show_hist_flux(atmpro='mls'):
+    '''
+    Display figure with the following band-vs-flux
+    histograms:
+        1. Upward flux at TOA. CLIRAD - CRD.
+        2. Downward flux at surface. CLIRAD- CRD.
+        3. Atmosphere heating.  CLIRAD - CRD.
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    '''
     def fmt(da_in):
         da = da_in.copy(deep=True)
         
@@ -633,7 +834,7 @@ def show_hist_flux(atmpro='mls'):
     atm_crd = (ds_crd.isel(pressure=0) 
                - ds_crd.isel(pressure=-1))['fnetg']
     atm_clirad_singlerun = (ds_clirad_singlerun.isel(pressure=0) 
-                  - ds_clirad_singlerun.isel(pressure=-1))['fnetg']
+                  - ds_clirad_singlerun.isel(pressure=-1))['fnetg'] 
     da = atm_clirad_singlerun - atm_crd
     da = fmt(da)
     p_atm = hist_band_vs_flux(da, 
@@ -651,7 +852,21 @@ def show_hist_flux(atmpro='mls'):
 
     
 def show_tb_flux(atmpro='mls'):
-    
+    '''
+    Display the table:
+    --------------------------------------------------------------------
+                      | up flux at TOA | down flux at SFC | atm heating
+    --------------------------------------------------------------------
+    clirad (sum) - CRD|                |                  |
+    clirad - CRD      |                |                  |
+    CRD               |                |                  |
+    --------------------------------------------------------------------
+
+    Parameters
+    ----------
+    atmpro: string
+        Atmosphere profile.
+    '''    
     def fmt(da_in):
         da = da_in.copy(deep=True)
         
