@@ -2,6 +2,22 @@
 
 
 
+
+def greys_byband():
+    return {1: {'con': 'atmpro'},
+            2: {'con': 'atmpro'},
+            3: {'con': 'atmpro'},
+            4: {'con': 'atmpro'},
+            5: {'con': 'atmpro'},
+            6: {'con': 'atmpro'}, 
+            7: {'con': 'atmpro'},
+            8: {'con': 'atmpro', 'n2o': 3.2e-7}, 
+            9: {'con': 'atmpro'}, 
+            10: None,
+            11: None}
+
+
+
 def nongreys_byband():
     '''
     These are the concentrations of non-grey 
@@ -23,3 +39,7 @@ def nongreys_byband():
             9: {'ch4': 1.8e-06, 'h2o': 'atmpro', 'n2o': 3.2e-07},
             10: {'h2o': 'atmpro'},
             11: {'co2': 0.0004, 'h2o': 'atmpro'}}
+
+
+
+

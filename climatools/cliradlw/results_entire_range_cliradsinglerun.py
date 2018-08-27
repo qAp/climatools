@@ -3,7 +3,6 @@
 
 # In[1197]:
 
-
 import os
 import ast
 import json
@@ -32,7 +31,8 @@ import climatools.lblnew.pipeline as pipe_lblnew
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
 from climatools.cliradlw import runrecord
-from climatools.atm.absorbers import *
+from climatools.atm.absorbers import nongreys_byband
+from climatools.atm.absorbers import greys_byband
 
 import climatools.html.html as climahtml
 from climatools.lblnew.dataio import *
@@ -47,6 +47,7 @@ from IPython import display
 #importlib.reload(pipe_lblnew)
 #importlib.reload(setup_cliradlw)
 #importlib.reload(pipe_cliradlw)
+
 
 
 # In[1198]:
@@ -64,20 +65,6 @@ These are returned by functions `clirad_params_atm` and
 `lblnew_params_atm`, respectively.
 '''
 
-
-
-def greyabsorbers_by_band_atm():
-    return {1: {'con': 'atmpro'},
-            2: {'con': 'atmpro'},
-            3: {'con': 'atmpro'},
-            4: {'con': 'atmpro'},
-            5: {'con': 'atmpro'},
-            6: {'con': 'atmpro'}, 
-            7: {'con': 'atmpro'},
-            8: {'con': 'atmpro', 'n2o': 3.2e-7}, 
-            9: {'con': 'atmpro'}, 
-            10: None,
-            11: None}
 
 
 
@@ -210,7 +197,7 @@ def show_makeup():
 def show_grey_makeup():
     df = pd.DataFrame()
     
-    for band, molecule in greyabsorbers_by_band_atm().items():
+    for band, molecule in greys_byband().items():
         if molecule == None:
             pass
         else:
