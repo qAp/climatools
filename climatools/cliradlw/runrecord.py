@@ -2,7 +2,7 @@
 
 
 
-def test_cases():
+def params():
     return [
         {'atmpro': 'mls',
          'band': [1],

@@ -1,12 +1,18 @@
 import os
+import importlib
 
 import pandas as pd
 import xarray as xr
 
+from climatools.atm.absorbers import *
+
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
+import climatools.cliradlw.runrecord as runrecord
 
-
+importlib.reload(setup_cliradlw)
+importlib.reload(pipe_cliradlw)
+importlib.reload(runrecord)
 
 
 
@@ -69,7 +75,7 @@ def clirad_params_atm(atmpro='mls'):
     '''
     d = {}
     for band, molecule in nongreys_byband().items():
-        for param in runrecord.test_cases():
+        for param in runrecord.params():
             if [band] == param['band'] and molecule == param['molecule']:
                 param['atmpro'] = atmpro
                 d[band] = param
