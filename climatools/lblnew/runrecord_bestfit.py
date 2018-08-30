@@ -1,7 +1,26 @@
 
 
+import climatools.lblnew.bestfit_params as bestfit_params
+import climatools.lblnew.setup_bestfit as setup_bestfit
+
+
+
+
+
+
+
+
+
+
 def params():
-    return [
+    # Import input parameter dictionaries that
+    # are the best-fit parameters
+    mbs = setup_bestfit.implemented_moleculebands()
+    ps_best = [bestfit_params.kdist_params(molecule=molecule, band=band) 
+               for molecule, band in mbs]
+    
+
+    runs = [
         {'atmpro': 'mls',
          'band': '3a',
          'commitnumber': 'a22ab94',
@@ -723,3 +742,6 @@ def params():
          'w_diffuse': [(1.66, 1.66, 1.75), (1.75, 1.6, 1.85)],
          'wgt': [(0.7, 0.8, 0.7), (0.8, 0.7, 0.8)]}
         ]
+
+    runs.extend(ps_best)
+    return runs
