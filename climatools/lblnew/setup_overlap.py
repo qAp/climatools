@@ -250,6 +250,29 @@ def commit_msg(param):
 
 
 
+def output_datfile_name(fname):
+    '''
+    Map line-by-line (crd) or k-dist (wgt)
+    fluxes or cooling rate labels to
+    their .dat filenames.
+
+    Parameters
+    ----------
+    fname: string
+        'fname_flux_crd' for line-by-line fluxes.
+        'fname_cool_crd' for line-by-line cooling rate.
+        'fname_flux_wgt' for k-dist fluxes.
+        'fname_cool_wgt' for k-dist cooling rates.
+    '''
+    d = {'fname_flux_crd': 'output_flux.dat',
+         'fname_cool_crd': 'output_coolr.dat',
+         'fname_flux_wgt': 'output_wflux.dat',
+         'fname_cool_wgt': 'output_wcoolr.dat'}
+    return d[fname]
+
+
+
+
 def test_get_fortran_dir():
     param = {'molecule': ['h2o', 'co2'],
              'band': '3c',
