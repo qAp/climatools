@@ -42,12 +42,18 @@ from climatools.plot.plot import *
 
 from IPython import display
 
-#importlib.reload(bestfits)
-#importlib.reload(setup_bestfit)
-#importlib.reload(setup_overlap)
-#importlib.reload(pipe_lblnew)
-#importlib.reload(setup_cliradlw)
-#importlib.reload(pipe_cliradlw)
+importlib.reload(bestfits)
+importlib.reload(setup_bestfit)
+importlib.reload(setup_overlap)
+importlib.reload(pipe_lblnew)
+importlib.reload(setup_cliradlw)
+importlib.reload(pipe_cliradlw)
+importlib.reload(runrecord)
+importlib.reload(clirad_params_atm)
+importlib.reload(clirad_data_atm)
+importlib.reload(nongreys_byband)
+importlib.reload(greys_byband)
+
 
 
 
