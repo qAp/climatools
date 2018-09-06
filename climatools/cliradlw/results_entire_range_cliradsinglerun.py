@@ -31,6 +31,7 @@ import climatools.lblnew.pipeline as pipe_lblnew
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
 from climatools.cliradlw import runrecord
+from climatools.cliradlw.dataset import clirad_params_atm, clirad_data_atm
 from climatools.atm.absorbers import nongreys_byband
 from climatools.atm.absorbers import greys_byband
 
@@ -64,34 +65,6 @@ Get the clirad-lw and lblnew `param`s for all spectral bands.
 These are returned by functions `clirad_params_atm` and
 `lblnew_params_atm`, respectively.
 '''
-
-
-
-
-def clirad_params_atm(atmpro='mls'):
-    '''
-    Return the input parameter dictionaries for the
-    (band, molecule)s in the toy atmosphere
-    (defined in nongreys_byband()).  Note that
-    molecule here refers to a dictionary containing 
-    the concentration for one or more gases.
-
-    Parameters
-    ----------
-    atmpro: string
-        Atmosphere profile: 'mls', 'saw' or 'trp'.
-    d: dict
-        Dictionary of {band: param} type.
-    '''
-    d = {}
-    for band, molecule in nongreys_byband().items():
-        for param in runrecord.test_cases():
-            if [band] == param['band'] and molecule == param['molecule']:
-                param['atmpro'] = atmpro
-                d[band] = param
-                break                
-    return d
-
 
 
 def clirad_params_atm_singlerun(atmpro='mls'):
@@ -344,41 +317,6 @@ def crd_data_atm(params_atm):
         
         
 
-def clirad_data_atm(params_atm):
-    '''
-    Gather together clirad-lw's fluxes and cooling rates
-    from all spectral bands in the toy atmosphere. 
-    
-    Parameters
-    ----------
-    params_atm: dict
-        {band: cliradlw input parameter dictionary}
-
-    d: dict
-    'flux': xr.Dataset. [pressure, band]
-         Fluxes.
-    'cool': xr.Dataset. [pressure, band]
-         Cooling rate.
-    '''
-    
-    dirnames = [pipe_cliradlw.get_fortran_dir(param,
-                                              setup=setup_cliradlw)
-                for _, param in params_atm.items()]
-    
-    fpaths_flux = [os.path.join(n, 'output_flux.dat') for n in dirnames]
-    fpaths_cool = [os.path.join(n, 'output_coolr.dat') for n in dirnames]
-    
-    fluxs = [load_output_file(p) for p in fpaths_flux]    
-    cools = [load_output_file(p) for p in fpaths_cool]
-    
-    d = {}
-    d['flux'] = sum(fluxs)
-    d['cool'] = sum(cools)
-    return d
-
-
-
-# In[1205]:
 
 
 
