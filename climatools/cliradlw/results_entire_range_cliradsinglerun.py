@@ -512,10 +512,14 @@ def pltdata_cool(atmpro='mls'):
         each one containing the data and plot
         attributes for a curve.            
     '''
-    d_clirad_singlerun = clirad_data_atm(
-        clirad_params_atm_singlerun(atmpro=atmpro))
-    d_clirad = clirad_data_atm(clirad_params_atm(atmpro=atmpro))
-    d_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))
+    params_atm = clirad_params_atm_singlerun(atmpro=atmpro)
+    d_clirad_singlerun = clirad_data_atm(params_atm)
+    
+    params_atm = clirad_params_atm(atmpro=atmpro)
+    d_clirad = clirad_data_atm(params_atm)
+
+    params_atm = lblnew_params_atm(atmpro=atmpro)
+    d_crd = crd_data_atm(params_atm)
 
     ds_clirad_singlerun = d_clirad_singlerun['cool']
     ds_clirad = d_clirad['cool']
