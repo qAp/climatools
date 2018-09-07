@@ -193,50 +193,6 @@ def show_grey_makeup():
     )
 
 
-# In[1202]:
-
-
-def load_output_file(path_csv):
-    '''
-    Load output file to xarray.Dataset.  
-    The output file can be from either lblnew
-    or clirad, as long as it's .csv and multi-index
-    format.
-    
-    Parameters
-    ----------
-    path_csv: str
-              Path to the .csv file to be loaded.
-    ds: xarray.Dataset
-        Data in the input file in the form of an xarray.Dataset.
-    '''
-    toindex = ['i', 'band', 'pressure', 'igg', 'g']    
-    df = pd.read_csv(path_csv, sep=r'\s+')
-    df = df.set_index([i for i in toindex if i in df.columns])
-    df = df.rename(columns={'sfu': 'flug',
-                            'sfd': 'fldg',
-                            'fnet': 'fnetg',
-                            'coolr': 'coolrg'})
-    ds = xr.Dataset.from_dataframe(df)
-
-    for l in ('level', 'layer'):
-        if l in ds.data_vars:
-            if len(ds[l].dims) > 1:
-                surface = {d: 0 for d in ds.dims if d != 'pressure'}
-                coord_level = ds[l][surface]
-                ds.coords[l] = ('pressure', coord_level)
-            else:
-                ds.coords[l] = ('pressure', ds[l])
-    
-    return ds
-
-
-
-
-        
-        
-
-
 
 
 
