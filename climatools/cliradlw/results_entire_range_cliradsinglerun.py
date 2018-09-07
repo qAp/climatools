@@ -128,56 +128,6 @@ def show_grey_makeup():
 
 
 
-
-
-import rtmtools.clirad.sw.wrangle as cliradwrangle
-
-import importlib
-importlib.reload(cliradwrangle)
-
-def oldclirad_data_atm():
-    '''
-    Load the OLD clirad's results. mls only.
-
-    Parameters
-    ----------
-    d: dict
-    'flux': xr.Dataset. [pressure, band]
-         Fluxes.
-    'cool': xr.Dataset. [pressure, band]
-         Cooling rate.
-    '''
-    fpath = os.path.join('/chia_cluster/home/jackyu/radiation',
-                         'clirad-lw',
-                         'LW',
-                         'examples',
-                         'mls75_h2o_atmpro_co2_.0004_o3_atmpro_n2o_3.2e-7_ch4_1.8e-6_H2012',
-                         'OUTPUT_CLIRAD.dat')
-    
-    ds = cliradwrangle.load_OUTPUT_CLIRAD(readfrom=fpath)
-    
-    ds_cool = xr.Dataset()
-    ds_cool.coords['pressure'] = ('pressure', ds['layer_pressure'])
-    ds_cool.coords['band'] = ('band', ds['spectral_band'])
-    ds_cool['coolrg'] = (('band', 'pressure'), - ds['heating_rate'])
-    
-    ds_flux = xr.Dataset()
-    ds_flux.coords['pressure'] = ('pressure', ds['level_pressure'])
-    ds_flux.coords['band'] = ('band', ds['spectral_band'])
-    ds_flux['flug'] = (('band', 'pressure'), ds['flux_up'])
-    ds_flux['fldg'] = (('band', 'pressure'), ds['flux_down'])
-    ds_flux['fnetg'] = (('band', 'pressure'), ds['net_flux'])
-    
-    
-    d = {}
-    d['cool'] = ds_cool
-    d['flux'] = ds_flux
-    return d
-
-
-# In[1206]:
-
-
 def fmt_cool(ds_in):
     '''
     Deal with dimensions that are not the 'pressure/layer'
@@ -204,17 +154,8 @@ def fmt_cool(ds_in):
             ds = ds.squeeze('band')
         except ValueError:
             ds = ds.sum('band')
-                
     return ds['coolrg']
 
-
-
-
-
-    
-
-
-# In[1207]:
 
 
 def pltdata_cool(atmpro='mls'):
@@ -264,16 +205,6 @@ def pltdata_cool(atmpro='mls'):
 #         'line_dash': 'dashed', 'line_width': 5,
 #         'color': colors[0], 'alpha': .6}
         
-    # include old CLIRAD's results for mls profile
-    if atmpro == 'mls':
-        d_oldclirad = oldclirad_data_atm()
-        ds_oldclirad = d_oldclirad['cool']        
-        data.append(
-            {'label': 'old CLIRAD (H2012)',
-             'srs': fmt_cool(ds_oldclirad),
-             'line_dash': 'solid', 'line_width': 1.5,
-             'marker': 'square', 'marker_size': 3,
-             'color': colors[3], 'alpha': .5})
     return data
 
 
@@ -314,19 +245,6 @@ def pltdata_cooldiff(atmpro='mls'):
          'marker': 'circle', 'marker_size': 7,
          'color': colors[3], 'alpha': .8}
     ]
-    
-    # include old CLIRAD's results for mls profile
-    if atmpro == 'mls':
-        d_oldclirad = oldclirad_data_atm()
-        ds_oldclirad = d_oldclirad['cool']
-        ds_oldclirad.coords['pressure'] = ds_crd.coords['pressure']
-        ds_diff_old = ds_oldclirad.sum('band') - ds_crd.sum('band')
-        data.append(
-            {'label': 'old CLIRAD (H2012) - CRD',
-             'srs': fmt_cool(ds_diff_old),
-             'line_dash': 'dashed', 'line_width': 4,
-             'color': colors[1], 'alpha': .5}
-        )
     return data
 
 
@@ -362,19 +280,6 @@ def show_cool(atmpro='mls'):
     show(everything)
     display.display(
         display.Markdown('*FIGURE.* Cooling rates & difference.'))
-
-
-    
-
-
-# In[1208]:
-
-
-
-
-
-
-
 
 
 
@@ -497,29 +402,9 @@ def show_tb_flux(atmpro='mls'):
     atm_clirad_singlerun = (ds_clirad_singlerun.isel(pressure=0)
                   - ds_clirad_singlerun.isel(pressure=-1))['fnetg']
     
-    if atmpro == 'mls':
-        ds_oldclirad = oldclirad_data_atm()['flux']
-        ds_oldclirad['pressure'] = ds_crd['pressure']
-        olr_oldclirad = ds_oldclirad['flug'].isel(pressure=0)
-        sfc_oldclirad = ds_oldclirad['fldg'].isel(pressure=-1)
-        atm_oldclirad = (ds_oldclirad.isel(pressure=0)
-                         - ds_oldclirad.isel(pressure=-1))['fnetg']
-        
-    
     
     df = pd.DataFrame()
     df.index.name = 'Sum over bands'
-    
-    if atmpro == 'mls':
-        df.loc['old CLIRAD - CRD', 
-               'OLR flux'] = (fmt(olr_oldclirad)
-                              - fmt(olr_crd)).values
-        df.loc['old CLIRAD - CRD', 
-               'SFC flux'] = (fmt(sfc_oldclirad)
-                              - fmt(sfc_crd)).values
-        df.loc['old CLIRAD - CRD', 
-               'ATM heating'] = (fmt(atm_oldclirad)
-                                 - fmt(atm_crd)).values
     
     df.loc['CLIRAD (single-run) - CRD', 
            'OLR flux'] = (fmt(olr_clirad_singlerun) 
