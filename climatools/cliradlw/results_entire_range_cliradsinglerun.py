@@ -251,7 +251,7 @@ def nice_xlims(pltdata=None, prange=None):
 
 
     
-def plt_cool_bokeh(pltdata=None, 
+def plt_vert_profile_bokeh(pltdata=None, 
                    y_axis_type='linear', prange=(50, 1050)):
     '''
     Make line plot(s) for dataset(s), with the domain 
@@ -442,13 +442,13 @@ def show_cool(atmpro='mls'):
         Atmosphere profile.
     '''
     data_cool = pltdata_cool(atmpro=atmpro)
-    p_cool_liny = plt_cool_bokeh(pltdata=data_cool)
-    p_cool_logy = plt_cool_bokeh(pltdata=data_cool, 
+    p_cool_liny = plt_vert_profile_bokeh(pltdata=data_cool)
+    p_cool_logy = plt_vert_profile_bokeh(pltdata=data_cool, 
                                  y_axis_type='log',
                                  prange=(.01, 200))
     
     data_cooldiff = pltdata_cooldiff(atmpro=atmpro)
-    p_cooldiff_logy = plt_cool_bokeh(pltdata=data_cooldiff,
+    p_cooldiff_logy = plt_vert_profile_bokeh(pltdata=data_cooldiff,
                                      y_axis_type='log',
                                      prange=(.01, 200))
     
