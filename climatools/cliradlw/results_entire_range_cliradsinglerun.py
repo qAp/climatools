@@ -11,47 +11,36 @@ import itertools
 import collections
 import pprint
 
-from bokeh.io import output_notebook, show
-from bokeh.layouts import gridplot
-from bokeh.plotting import figure
-from bokeh.models import Range1d, Legend, ColumnDataSource, FactorRange
-from bokeh.palettes import all_palettes
-from bokeh.transform import factor_cmap
-
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import xarray as xr
 
+import matplotlib
+import matplotlib.pyplot as plt
 
-import climatools.lblnew.bestfit_params as bestfits
-from climatools.lblnew import setup_bestfit, setup_overlap
-import climatools.lblnew.pipeline as pipe_lblnew
+from bokeh.io import output_notebook, show
+from bokeh.palettes import all_palettes
+from bokeh.layouts import gridplot
+from bokeh.plotting import figure
+from bokeh.models import Range1d, Legend, ColumnDataSource, FactorRange
+from bokeh.transform import factor_cmap
+
+
 import climatools.lblnew.dataset as lbldata
-import climatools.cliradlw.setup as setup_cliradlw
-import climatools.cliradlw.pipeline as pipe_cliradlw
-from climatools.cliradlw import runrecord
 import climatools.cliradlw.dataset as cliraddata
 from climatools.atm.absorbers import nongreys_byband
 from climatools.atm.absorbers import greys_byband
 
 import climatools.html.html as climahtml
 from climatools.lblnew.dataio import *
-from climatools.plot.plot import *
+import climatools.plot.plot as plot
 
 
 from IPython import display
 
-importlib.reload(bestfits)
-importlib.reload(setup_bestfit)
-importlib.reload(setup_overlap)
-importlib.reload(pipe_lblnew)
 importlib.reload(lbldata)
-importlib.reload(setup_cliradlw)
-importlib.reload(pipe_cliradlw)
-importlib.reload(runrecord)
 importlib.reload(cliraddata)
+importlib.reload(plot)
 
 
 
@@ -223,91 +212,9 @@ def fmt_cool(ds_in):
 
 
 
-def nice_xlims(pltdata=None, prange=None):
-    '''
-    For a line plot with the domain on the y-aixs
-    and the image on the x-axis, work out a suitable 
-    displayed range for the x-axis, given a domain 
-    range.  This also works when multiple lines plotted.
-
-    Parameters
-    ----------
-    pltdata: list
-        Plotting data. A list of dictionaries, 
-        each one containing the data and plot
-        attributes for a curve.
-    prange: tuple
-        y-axis (domain) range over which the
-        x-axis (codomain) range will be based.
-    '''
-    def get_slice(srs):
-        return srs.sel(pressure=slice(*prange))
-    
-    srss = [d['srs'] for d in pltdata]
-    vmin = min([get_slice(srs).min() for srs in srss])
-    vmax = max([get_slice(srs).max() for srs in srss])
-    dv = (vmax - vmin) * .01
-    return float(vmin - dv), float(vmax + dv)
 
 
     
-def plt_vert_profile_bokeh(pltdata=None, 
-                   y_axis_type='linear', prange=(50, 1050)):
-    '''
-    Make line plot(s) for dataset(s), with the domain 
-    on the y-aixs and the image on the x-axis.
-
-    Parameters
-    ----------
-    pltdata: list
-        Plotting data. A list of dictionaries, 
-        each one containing the data and plot
-        attributes for a curve.
-    y_axis_type: string
-        Plot y-scale. 'linear', or 'log'.
-    prange: tuple
-        y-axis (domain) range over which the
-        x-axis (codomain) range will be based.
-    p2: bokeh.plotting.figure
-        Plotted figure.
-    '''
-    ymin = 1e-2 
-    ymax = 1020
-    
-    p2 = figure(y_axis_type=y_axis_type, plot_width=300)
-    xmin, xmax = nice_xlims(pltdata, prange=prange)
-    
-    rs = []
-    for d in pltdata:
-        rd = []
-        if 'marker' in d:
-            r_mark = getattr(p2, d['marker'])(d['srs'].values, 
-                        d['srs'].coords['pressure'].values,
-                        color=d['color'], alpha=.7)
-            rd.append(r_mark)
-        r_line = p2.line(d['srs'].values, 
-                         d['srs'].coords['pressure'].values,
-                         color=d['color'], alpha=d['alpha'], 
-                         line_width=d['line_width'], 
-                         line_dash=d['line_dash'])
-        rd.append(r_line)
-      
-        rs.append(rd)
-        
-    p2.y_range = Range1d(ymax, ymin)  
-    p2.yaxis.axis_label = 'pressure [mb]'
-    
-    p2.x_range = Range1d(xmin, xmax)
-    p2.xaxis.axis_label = 'cooling rate [K/day]'
-    
-    items = [(d['label'], r) for r, d in zip(rs, pltdata)]
-    legend = Legend(items=items, location=(10, 0))
-    legend.label_text_font_size = '8pt'
-    p2.add_layout(legend, 'above')
-    p2.legend.orientation = 'horizontal'
-    p2.legend.location = 'top_center'
-    
-    return p2
 
 
 # In[1207]:
@@ -442,13 +349,13 @@ def show_cool(atmpro='mls'):
         Atmosphere profile.
     '''
     data_cool = pltdata_cool(atmpro=atmpro)
-    p_cool_liny = plt_vert_profile_bokeh(pltdata=data_cool)
-    p_cool_logy = plt_vert_profile_bokeh(pltdata=data_cool, 
+    p_cool_liny = plot.plt_vert_profile_bokeh(pltdata=data_cool)
+    p_cool_logy = plot.plt_vert_profile_bokeh(pltdata=data_cool, 
                                  y_axis_type='log',
                                  prange=(.01, 200))
     
     data_cooldiff = pltdata_cooldiff(atmpro=atmpro)
-    p_cooldiff_logy = plt_vert_profile_bokeh(pltdata=data_cooldiff,
+    p_cooldiff_logy = plot.plt_vert_profile_bokeh(pltdata=data_cooldiff,
                                      y_axis_type='log',
                                      prange=(.01, 200))
     
