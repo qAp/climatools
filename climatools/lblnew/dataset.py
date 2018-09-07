@@ -68,7 +68,7 @@ def load_output_file(path_csv):
 
 
 
-def params_atm(atmpro=None):
+def lblnew_params_atm(atmpro=None):
     '''
     Search the run records and return 
     the input parameter dictionary of each spectral 
@@ -141,7 +141,16 @@ def lblnew_setup(param=None):
 
 def load_lblnew_data(param):
     '''
-        
+    Load the data from all output files from a given
+    lblnew run.
+
+    Parameters
+    ----------
+    param: dict
+        lblnew input parameter dictionary.
+    data_dict: dict
+        xr.Datasets for output 'crd' and 'wgt'
+        fluxes and cooling rates.
     '''
     fname_dsname = [('fname_flux_crd', 'ds_flux_crd'),
                     ('fname_cool_crd', 'ds_cool_crd'),
@@ -159,3 +168,32 @@ def load_lblnew_data(param):
     return data_dict
 
 
+
+def crd_data_atm(params_atm):
+    '''
+    Gather together the 'crd' fluxes and cooling rates
+    from all spectral bands in the toy atmosphere.
+
+    Parameters
+    ----------
+    params_atm: dict
+        {band: lblnew input parameter dictionary}
+                
+    d: dict
+       'flux': xr.Dataset. [pressure, band]
+            Fluxes.
+       'cool': xr.Dataset. [pressure, band]
+            Cooling rate.
+    '''
+    
+    results_atm = {band: load_lblnew_data(param) 
+                   for band, param in params_atm.items()}
+    
+    bands = [band for band, _ in params_atm.items()]
+    fluxs = [d['ds_flux_crd'] for _, d in results_atm.items()]
+    cools = [d['ds_cool_crd'] for _, d in results_atm.items()]
+    
+    d = {}
+    d['flux'] = xr.concat(fluxs, dim=bands).rename({'concat_dim': 'band'})
+    d['cool'] = xr.concat(cools, dim=bands).rename({'concat_dim': 'band'})
+    return d        

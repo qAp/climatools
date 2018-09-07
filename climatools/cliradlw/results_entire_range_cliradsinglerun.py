@@ -28,10 +28,11 @@ import xarray as xr
 import climatools.lblnew.bestfit_params as bestfits
 from climatools.lblnew import setup_bestfit, setup_overlap
 import climatools.lblnew.pipeline as pipe_lblnew
+import climatools.lblnew.dataset as lbldata
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
 from climatools.cliradlw import runrecord
-from climatools.cliradlw.dataset import clirad_params_atm, clirad_data_atm
+import climatools.cliradlw.dataset as cliraddata
 from climatools.atm.absorbers import nongreys_byband
 from climatools.atm.absorbers import greys_byband
 
@@ -46,13 +47,12 @@ importlib.reload(bestfits)
 importlib.reload(setup_bestfit)
 importlib.reload(setup_overlap)
 importlib.reload(pipe_lblnew)
+importlib.reload(lbldata)
 importlib.reload(setup_cliradlw)
 importlib.reload(pipe_cliradlw)
 importlib.reload(runrecord)
-importlib.reload(clirad_params_atm)
-importlib.reload(clirad_data_atm)
-importlib.reload(nongreys_byband)
-importlib.reload(greys_byband)
+importlib.reload(cliraddata)
+
 
 
 
@@ -114,7 +114,7 @@ def analysis_dirs_atm(atmpro='mls'):
     atmpro: string
         Atmosphere profile.
     '''
-    params = clirad_params_atm(atmpro=atmpro)
+    params = cliraddata.clirad_params_atm(atmpro=atmpro)
     return {band: pipe_cliradlw.get_analysis_dir(param=param,
                                                  setup=setup_cliradlw) 
             for band, param in params.items()}
@@ -231,95 +231,8 @@ def load_output_file(path_csv):
     return ds
 
 
-# In[1203]:
 
 
-def lblnew_setup(param=None):
-    '''
-    Returns the setup module and output filenames for 
-    an lblnew input parameter dictionary, indicating
-    whether a filename is for 'crd' (line-by-line)
-    or 'wgt' (k-dist), these being different
-    for lblnew-bestfit and lblnew-overlap.
-    
-    Parameters
-    ----------
-    param: dict
-        lblnew input parameter dictionary.
-    '''
-    if 'ng_refs' in param:
-        return {'setup': setup_bestfit,
-                'fname_flux_crd': 'output_flux.dat',
-                'fname_cool_crd': 'output_coolr.dat',
-                'fname_flux_wgt': 'output_wfluxg.dat',
-                'fname_cool_wgt': 'output_wcoolrg.dat'}
-    else:
-        return {'setup': setup_overlap,
-                'fname_flux_crd': 'output_flux.dat',
-                'fname_cool_crd': 'output_coolr.dat',
-                'fname_flux_wgt': 'output_wflux.dat',
-                'fname_cool_wgt': 'output_wcoolr.dat'}
-
-    
-
-def load_lblnew_data(param):
-    '''
-    Load all output files from a given lblnew run.
-
-    Parameters
-    ----------
-    param: dict
-        lblnew input parameter dictionary.
-    data_dict: dict
-        xr.Datasets for output 'crd' and 'wgt'
-        fluxes and cooling rates.
-    '''
-    fname_dsname = [('fname_flux_crd', 'ds_flux_crd'),
-                    ('fname_cool_crd', 'ds_cool_crd'),
-                    ('fname_flux_wgt', 'ds_flux_wgt'),
-                    ('fname_cool_wgt', 'ds_cool_wgt')]
-    
-    d = lblnew_setup(param)
-    dir_fortran = pipe_lblnew.get_dir_case(param, setup=d['setup'])
-    
-    data_dict = {}
-    for fname, dsname in fname_dsname:
-        fpath = os.path.join(dir_fortran, d[fname])
-        data_dict[dsname] = load_output_file(fpath)
-    return data_dict
-
-
-# In[1204]:
-
-
-def crd_data_atm(params_atm):
-    '''
-    Gather together the 'crd' fluxes and cooling rates
-    from all spectral bands in the toy atmosphere.
-
-    Parameters
-    ----------
-    params_atm: dict
-        {band: lblnew input parameter dictionary}
-                
-    d: dict
-       'flux': xr.Dataset. [pressure, band]
-            Fluxes.
-       'cool': xr.Dataset. [pressure, band]
-            Cooling rate.
-    '''
-    
-    results_atm = {band: load_lblnew_data(param) 
-                   for band, param in params_atm.items()}
-    
-    bands = [band for band, _ in params_atm.items()]
-    fluxs = [d['ds_flux_crd'] for _, d in results_atm.items()]
-    cools = [d['ds_cool_crd'] for _, d in results_atm.items()]
-    
-    d = {}
-    d['flux'] = xr.concat(fluxs, dim=bands).rename({'concat_dim': 'band'})
-    d['cool'] = xr.concat(cools, dim=bands).rename({'concat_dim': 'band'})
-    return d        
         
         
 
@@ -513,13 +426,13 @@ def pltdata_cool(atmpro='mls'):
         attributes for a curve.            
     '''
     params_atm = clirad_params_atm_singlerun(atmpro=atmpro)
-    d_clirad_singlerun = clirad_data_atm(params_atm)
+    d_clirad_singlerun = cliraddata.clirad_data_atm(params_atm)
     
-    params_atm = clirad_params_atm(atmpro=atmpro)
-    d_clirad = clirad_data_atm(params_atm)
+    params_atm = cliraddata.clirad_params_atm(atmpro=atmpro)
+    d_clirad = cliraddata.clirad_data_atm(params_atm)
 
     params_atm = lblnew_params_atm(atmpro=atmpro)
-    d_crd = crd_data_atm(params_atm)
+    d_crd = lbldata.crd_data_atm(params_atm)
 
     ds_clirad_singlerun = d_clirad_singlerun['cool']
     ds_clirad = d_clirad['cool']
@@ -573,10 +486,10 @@ def pltdata_cooldiff(atmpro='mls'):
         each one containing the data and plot
         attributes for a curve.            
     '''
-    d_clirad_singlerun = clirad_data_atm(
+    d_clirad_singlerun = cliraddata.clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))
-    d_clirad = clirad_data_atm(clirad_params_atm(atmpro=atmpro))
-    d_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))
+    d_clirad = cliraddata.clirad_data_atm(cliraddata.clirad_params_atm(atmpro=atmpro))
+    d_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))
     
     ds_clirad_singlerun = d_clirad_singlerun['cool']
     ds_clirad = d_clirad['cool']
@@ -705,10 +618,10 @@ def show_hist_flux(atmpro='mls'):
             da = da.sum('g')
         return da
 
-    ds_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
-    ds_clirad = clirad_data_atm(
-        clirad_params_atm(atmpro=atmpro))['flux']
-    ds_clirad_singlerun = clirad_data_atm(
+    ds_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
+    ds_clirad = cliraddata.clirad_data_atm(
+        cliraddata.clirad_params_atm(atmpro=atmpro))['flux']
+    ds_clirad_singlerun = cliraddata.clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))['flux']
     
     ip, varname = 0, 'flug'
@@ -778,20 +691,20 @@ def show_tb_flux(atmpro='mls'):
                 da = da.sum('band')                
         return da
     
-    ds_crd = crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
+    ds_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
     olr_crd = ds_crd['flug'].isel(pressure=0)
     sfc_crd = ds_crd['fldg'].isel(pressure=-1)
     atm_crd = (ds_crd.isel(pressure=0)
                - ds_crd.isel(pressure=-1))['fnetg']
     
-    ds_clirad = clirad_data_atm(
-        clirad_params_atm(atmpro=atmpro))['flux']
+    ds_clirad = cliraddata.clirad_data_atm(
+        cliraddata.clirad_params_atm(atmpro=atmpro))['flux']
     olr_clirad = ds_clirad['flug'].isel(pressure=0)
     sfc_clirad = ds_clirad['fldg'].isel(pressure=-1)
     atm_clirad = (ds_clirad.isel(pressure=0)
                   - ds_clirad.isel(pressure=-1))['fnetg']
 
-    ds_clirad_singlerun = clirad_data_atm(
+    ds_clirad_singlerun = cliraddata.clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))['flux']
     olr_clirad_singlerun = ds_clirad_singlerun['flug'].isel(pressure=0)
     sfc_clirad_singlerun = ds_clirad_singlerun['fldg'].isel(pressure=-1)
