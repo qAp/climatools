@@ -88,36 +88,43 @@ def lblnew_params_atm(atmpro=None):
 
     # Search constraints
     nv, dv = 1000, .001
+    atmpro = 'mls' if not atmpro else atmpro
 
-    params = []
+    params = {}
     for band, dmol in param_bands.items():
-        band = utils.mapband_new2old()[band]
+
+        oldband = utils.mapband_new2old()[band]
     
         if len(dmol.keys()) == 1:
             # Search in lblnew-bestfit records
             molecule, conc = [(molecule, conc)
                               for molecule, conc in dmol.items()][0]
-    
             conc = None if conc == 'atmpro' else conc
-    
-            params.extend(
-                [param for param in runrecord_bestfit.params()
-                 if param['band'] == band
-                 if param['molecule'] == molecule
-                 if param['conc'] == conc])
+            search_results = [param
+                              for param in runrecord_bestfit.params()
+                              if param['commitnumber'] == '5014a19'
+                              if param['band'] == oldband
+                              if param['nv'] == nv
+                              if param['dv'] == dv
+                              if param['molecule'] == molecule
+                              if param['conc'] == conc
+                              if param['atmpro'] == atmpro]
+
+            assert len(search_results) == 1
+            params[band] = search_results[0]
     
         if len(dmol.keys()) > 1:
             # Search in lblnew-overlap records
-            params.extend(
-                [param for param in runrecord_overlap.params()
-                 if param['band'] == band
-                 if param['molecule'] == dmol
-                 if param['nv'] == nv
-                 if param['dv'] == dv])
-
-    if atmpro:
-        for param in params:
-            param['atmpro'] = atmpro
+            search_results = [param 
+                              for param in runrecord_overlap.params()
+                              if param['commitnumber'] == '5014a19'
+                              if param['band'] == oldband
+                              if param['nv'] == nv
+                              if param['dv'] == dv
+                              if param['molecule'] == dmol
+                              if param['atmpro'] == atmpro]
+            assert len(search_results) == 1
+            params[band] = search_results[0]
 
     return params
 

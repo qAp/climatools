@@ -57,13 +57,9 @@ importlib.reload(cliraddata)
 
 
 
-# In[1198]:
-
-
 output_notebook()
 
 
-# In[1199]:
 
 
 '''
@@ -99,54 +95,6 @@ def clirad_params_atm_singlerun(atmpro='mls'):
     
     d = {}
     d['all'] = param
-    return d
-
-
-
-def analysis_dirs_atm(atmpro='mls'):
-    '''
-    Maps spectral band to the absolute path of the
-    clirad-lw run in which the toy atmosphere's
-    radiation is computed.
-
-    Parameters
-    ----------
-    atmpro: string
-        Atmosphere profile.
-    '''
-    params = cliraddata.clirad_params_atm(atmpro=atmpro)
-    return {band: pipe_cliradlw.get_analysis_dir(param=param,
-                                                 setup=setup_cliradlw) 
-            for band, param in params.items()}
-
-
-
-def lblnew_params_atm(atmpro='mls'):
-    '''
-    Maps band to absolute path of the 
-    lblnew run in which the toy atmosphere's
-    radiation is computed.  
-    
-    The toy atmosphere's content is 
-    defined by nongreys_byband().
-
-    Parameters
-    ----------
-    atmpro: string
-        Atmosphere profile.
-    d: dict
-    {band: param} dictionary for the lblnew runs.
-    '''
-    dirs = analysis_dirs_atm(atmpro=atmpro)
-    
-    d = {}
-    for band, dirname in dirs.items():
-        with open(os.path.join(dirname, 'param.py'), 
-                  mode='r', encoding='utf-8') as f:
-            _, l = f.readlines()
-        
-        s = l.split('=')[1].strip()
-        d[band] = ast.literal_eval(s)
     return d
 
 
@@ -387,7 +335,7 @@ def pltdata_cool(atmpro='mls'):
     params_atm = cliraddata.clirad_params_atm(atmpro=atmpro)
     d_clirad = cliraddata.clirad_data_atm(params_atm)
 
-    params_atm = lblnew_params_atm(atmpro=atmpro)
+    params_atm = lbldata.lblnew_params_atm(atmpro=atmpro)
     d_crd = lbldata.crd_data_atm(params_atm)
 
     ds_clirad_singlerun = d_clirad_singlerun['cool']
@@ -445,7 +393,7 @@ def pltdata_cooldiff(atmpro='mls'):
     d_clirad_singlerun = cliraddata.clirad_data_atm(
         clirad_params_atm_singlerun(atmpro=atmpro))
     d_clirad = cliraddata.clirad_data_atm(cliraddata.clirad_params_atm(atmpro=atmpro))
-    d_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))
+    d_crd = lbldata.crd_data_atm(lbldata.lblnew_params_atm(atmpro=atmpro))
     
     ds_clirad_singlerun = d_clirad_singlerun['cool']
     ds_clirad = d_clirad['cool']
@@ -574,7 +522,7 @@ def show_hist_flux(atmpro='mls'):
             da = da.sum('g')
         return da
 
-    ds_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
+    ds_crd = lbldata.crd_data_atm(lbldata.lblnew_params_atm(atmpro=atmpro))['flux']
     ds_clirad = cliraddata.clirad_data_atm(
         cliraddata.clirad_params_atm(atmpro=atmpro))['flux']
     ds_clirad_singlerun = cliraddata.clirad_data_atm(
@@ -647,7 +595,7 @@ def show_tb_flux(atmpro='mls'):
                 da = da.sum('band')                
         return da
     
-    ds_crd = lbldata.crd_data_atm(lblnew_params_atm(atmpro=atmpro))['flux']
+    ds_crd = lbldata.crd_data_atm(lbldata.lblnew_params_atm(atmpro=atmpro))['flux']
     olr_crd = ds_crd['flug'].isel(pressure=0)
     sfc_crd = ds_crd['fldg'].isel(pressure=-1)
     atm_crd = (ds_crd.isel(pressure=0)
@@ -770,7 +718,8 @@ def script():
         show_hist_flux(atmpro=atmpro)
         show_tb_flux(atmpro=atmpro)
     
-    
+
+
 script()  
 
 
