@@ -22,9 +22,6 @@ from bokeh.io import output_notebook, show
 from bokeh.palettes import all_palettes
 from bokeh.layouts import gridplot
 from bokeh.plotting import figure
-from bokeh.models import Range1d, Legend, ColumnDataSource, FactorRange
-from bokeh.transform import factor_cmap
-
 
 import climatools.lblnew.dataset as lbldata
 import climatools.cliradlw.dataset as cliraddata
@@ -376,29 +373,7 @@ def show_cool(atmpro='mls'):
 
 
 
-def hist_band_vs_flux(da, title='Title'):
-    '''
-    Plot the histogram: spectral band vs flux
 
-    Parameters
-    ----------
-    da: xarray.DataArray (band,)
-        Flux.
-    p: bokeh.plotting.figure
-        Histogram plot.
-    '''
-    bands = [str(b.values) for b in da['band']]
-
-    source = ColumnDataSource(
-        data={'band': bands, 'flux': da.values})
-
-    p = figure(x_range=bands, title=title)
-    p.vbar(source=source, x='band', top='flux', width=.9)
-
-    p.yaxis.axis_label = 'flux (W m-2)'
-    p.xaxis.axis_label = 'spectral band'
-    
-    return p
 
 
 
@@ -438,13 +413,13 @@ def show_hist_flux(atmpro='mls'):
     ip, varname = 0, 'flug'
     da = (ds_clirad_singlerun - ds_crd).isel(pressure=ip)[varname]
     da = fmt(da)
-    p_toa = hist_band_vs_flux(da, 
+    p_toa = plot.hist_band_vs_flux(da, 
         title='TOA flux. CLIRAD (single-run) - CRD.')
 
     ip, varname = -1, 'fldg'
     da = (ds_clirad_singlerun - ds_crd).isel(pressure=ip)[varname]
     da = fmt(da)
-    p_sfc = hist_band_vs_flux(da, 
+    p_sfc = plot.hist_band_vs_flux(da, 
         title='SFC flux. CLIRAD (single-run) - CRD.')    
     
     atm_crd = (ds_crd.isel(pressure=0) 
@@ -453,7 +428,7 @@ def show_hist_flux(atmpro='mls'):
                   - ds_clirad_singlerun.isel(pressure=-1))['fnetg'] 
     da = atm_clirad_singlerun - atm_crd
     da = fmt(da)
-    p_atm = hist_band_vs_flux(da, 
+    p_atm = plot.hist_band_vs_flux(da, 
         title='Atmosphere heating. CLIRAD (single-run) - CRD.')
 
     everything = gridplot(p_toa, p_sfc, p_atm, ncols=3, 

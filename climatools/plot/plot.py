@@ -8,7 +8,6 @@ import xarray as xr
 
 from bokeh.plotting import figure
 from bokeh.models import Range1d, Legend, ColumnDataSource, FactorRange
-
 from bokeh.transform import factor_cmap
 
 from ..viz import set_xaxis_datetime_ticklocs_ticklabels
@@ -331,3 +330,25 @@ def plt_vert_profile_bokeh(pltdata=None,
 
 
         
+def hist_band_vs_flux(da, title='Title'):
+    '''
+    Plot the histogram: spectral band vs flux
+
+    Parameters
+    ----------
+    da: xarray.DataArray (band,)
+        Flux.
+    p: bokeh.plotting.figure
+        Histogram plot.
+    '''
+    bands = [str(b.values) for b in da['band']]
+
+    source = ColumnDataSource(
+        data={'band': bands, 'flux': da.values})
+
+    p = figure(x_range=bands, title=title)
+    p.vbar(source=source, x='band', top='flux', width=.9)
+
+    p.yaxis.axis_label = 'flux (W m-2)'
+    p.xaxis.axis_label = 'spectral band'
+    return p
