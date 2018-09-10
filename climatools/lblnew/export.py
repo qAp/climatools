@@ -78,7 +78,8 @@ def into_chunks(l, chunksize):
 
 
 
-def vector_to_F77list(array, num_values_per_line=4, dtype=float):
+def vector_to_F77list(array, num_values_per_line=4, dtype=float,
+                      float_format=False):
     '''
     Divides a list of numbers into chunks of a given size, turn
     each chunk into a string in which the numbers in the chunk
@@ -108,7 +109,10 @@ def vector_to_F77list(array, num_values_per_line=4, dtype=float):
  '   1.600000e+01']
     '''
     if dtype == float:
-        strfmt = '{:15.6e}'
+        if float_format:
+            strfmt = '{:5.0f}.'
+        else:
+            strfmt = '{:15.6e}'
     elif dtype == int:
         strfmt = '{:15d}'
     else:
@@ -132,7 +136,8 @@ def vector_to_F77list(array, num_values_per_line=4, dtype=float):
 
 
 
-def vector_to_F77(array=None, num_values_per_line=4, dtype=float):
+def vector_to_F77(array=None, num_values_per_line=4, dtype=float,
+                  float_format=False):
     '''
     Returns the fortran of what goes in between the delimiters `(/`
     and `/)` for an array of numbers.  Fortran 77 delimiters for
@@ -164,7 +169,7 @@ def vector_to_F77(array=None, num_values_per_line=4, dtype=float):
     '''
     lines = vector_to_F77list(array=array, 
                               num_values_per_line=num_values_per_line,
-                              dtype=dtype)
+                              dtype=dtype, float_format=float_format)
     
     rlines = [5 * ' ' + '&' + l for l in lines]
     
