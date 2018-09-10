@@ -85,46 +85,6 @@ def clirad_params_atm_singlerun(atmpro='mls'):
 
 
 
-def show_makeup():
-    '''
-    Display table showing the concentrations
-    of the gases in each spectral band
-    '''
-    df = pd.DataFrame()
-
-    for band, molecule in nongreys_byband().items():
-        for name, conc in molecule.items():
-            df.loc[name, band] = str(conc)
-
-    df = df.fillna(0)
-    df.columns.name = 'clirad band'
-    df.index.name = 'molecule'
-    
-    display.display(df)
-    
-    display.display(
-        display.Markdown('*TABLE.* Non-grey absorbers in the atmosphere.'))
-
-
-
-def show_grey_makeup():
-    df = pd.DataFrame()
-    
-    for band, molecule in greys_byband().items():
-        if molecule == None:
-            pass
-        else:
-            for name, conc in molecule.items():
-                df.loc[name, band] = str(conc)
-                
-    df = df.fillna(0)
-    df.columns.name = 'clirad band'
-    df.index.name = 'absorber'
-    
-    display.display(df)
-    display.display(
-        display.Markdown('*TABLE.* Grey absorbers in the atmosphere.')
-    )
 
 
 
@@ -431,19 +391,61 @@ def show_tb_flux(atmpro='mls'):
           ' over all spectral bands.'))
 
 
-# In[1209]:
+
+def show_makeup():
+    '''
+    Display table showing the concentrations
+    of the gases in each spectral band
+    '''
+    df = pd.DataFrame()
+
+    for band, molecule in nongreys_byband().items():
+        for name, conc in molecule.items():
+            df.loc[name, band] = str(conc)
+
+    df = df.fillna(0)
+    df.columns.name = 'clirad band'
+    df.index.name = 'molecule'
+    
+    display.display(df)
+    
+    display.display(
+        display.Markdown('*TABLE.* Non-grey absorbers in the atmosphere.'))
+
+
+
+def show_grey_makeup():
+    df = pd.DataFrame()
+    
+    for band, molecule in greys_byband().items():
+        if molecule == None:
+            pass
+        else:
+            for name, conc in molecule.items():
+                df.loc[name, band] = str(conc)
+                
+    df = df.fillna(0)
+    df.columns.name = 'clirad band'
+    df.index.name = 'absorber'
+    
+    display.display(df)
+    display.display(
+        display.Markdown('*TABLE.* Grey absorbers in the atmosphere.')
+        )
+
 
 
 def show_html(s):
     display.display(display.HTML(s))
+
 
     
 def show_markdown(s):
     display.display(display.Markdown(s))
 
 
+
 def script():
-    
     d_atm = {'mls': 'mid-latitude summer',
              'saw': 'sub-arctic winter',
              'trp': 'tropical'}
