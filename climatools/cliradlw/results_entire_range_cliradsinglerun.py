@@ -474,7 +474,6 @@ def script():
     show_html(climahtml.getHTML_idanchor(s_makeup))
     show_markdown(climahtml.getMarkdown_sectitle(s_makeup))
     show_makeup()
-    show_grey_makeup()
         
     for atmpro in atmpros:
         show_html(climahtml.getHTML_idanchor(s_cool.format(atmpro)))
