@@ -4,19 +4,12 @@
 # In[1197]:
 
 import os
-import ast
-import json
 import importlib 
-import itertools
-import collections
 import pprint
 
 import numpy as np
 import pandas as pd
 import xarray as xr
-
-import matplotlib
-import matplotlib.pyplot as plt
 
 from bokeh.io import output_notebook, show
 from bokeh.palettes import all_palettes
