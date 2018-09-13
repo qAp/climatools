@@ -14,6 +14,8 @@ import climatools.lblnew.bestfit_params as bestfit
 import climatools.lblnew.setup_bestfit as setup_bestfit
 import climatools.lblnew.pipeline as pipeline
 from climatools.cliradlw import setup as setup_cliradlw
+import climatools.cliradlw.utils as utils_cliradlw
+
 
 
 # These are the gases and spectral bands
@@ -188,8 +190,14 @@ def comment_header(param):
     param: dict
            Dictionary of input parameters for lblnew-bestfit.
     '''
+    mapband = utils_cliradlw.mapband_old2new()
+
+    molecule = param['molecule']
+    lblnew_band = param['band']
+    clirad_band = mapband[lblnew_band]
     s = "! {} band{}"
-    return s.format(param['molecule'], param['band'])
+    return f"! {molecule} band{clirad_band}"
+
 
 
 
