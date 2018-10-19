@@ -458,6 +458,9 @@ def ktable(param):
     d = fpath_ktable(param=param)
 
     wgt = np.array([v for vs in param['wgt'] for v in vs])
+    if param['molecule'] == 'co2' and param['band'] == '3b':
+        wgt += .05
+
     w_diffuse = np.array([v for vs in param['w_diffuse'] for v in vs])
     wgt = wgt.reshape(-1, ng)
     w_diffuse = w_diffuse.reshape(-1, ng)
