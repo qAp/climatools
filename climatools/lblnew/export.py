@@ -413,7 +413,7 @@ def ktable_to_F77(ktable, name):
 
 
     
-def ktable(param):
+def ktable(param, adjust_wgt=None):
     '''
     Combines linear and non-linear k-tables together using `wgt`,
     then scale it with the diffusivity `w_diffuse`.  Then,
@@ -458,6 +458,13 @@ def ktable(param):
     d = fpath_ktable(param=param)
 
     wgt = np.array([v for vs in param['wgt'] for v in vs])
+
+    # Adjust wgt for specified (molecule, band)
+    if adjust_wgt:
+        if (param['molecule'] == adjust_wgt['molecule'] 
+            and param['band'] == adjust_wgt['band']):
+            wgt += adjust_wgt['dwgt']
+
     w_diffuse = np.array([v for vs in param['w_diffuse'] for v in vs])
     wgt = wgt.reshape(-1, ng)
     w_diffuse = w_diffuse.reshape(-1, ng)
@@ -479,7 +486,7 @@ def ktable(param):
     
 
 
-def kdist_param_gasband(param):
+def kdist_param_gasband(param, adjust_wgt=None):
     '''
     Return a list that contains a fortran comment
     indicating the molecule and spectral band, followed by 
@@ -495,13 +502,13 @@ def kdist_param_gasband(param):
     for f in (comment_header,):
         lines.append(f(param))
         
-    lines.extend(ktable(param))
+    lines.extend(ktable(param, adjust_wgt=adjust_wgt))
     
     return lines
 
 
 
-def kdist_param_gas(params):
+def kdist_param_gas(params, adjust_wgt=None):
     '''
     Return a list of fortran statements that form
     an if statement covering the k-tables for all 
@@ -548,7 +555,7 @@ def kdist_param_gas(params):
         
         s_if = s_if.format(band_map()[param['band']])
                  
-        ls = kdist_param_gasband(param)
+        ls = kdist_param_gasband(param, adjust_wgt=adjust_wgt)
         ls = [3 * ' ' + l for l in ls]
         ls = [s_if] + ls
         
@@ -573,7 +580,7 @@ def gas2mid(gas):
     return d[gas]
 
 
-def kdist_param():
+def kdist_param(adjust_wgt=None):
     '''
     Return list of fortran statements that, when joined with '\n',
     form if-statements that assign k-table values for all spectral
@@ -609,7 +616,7 @@ def kdist_param():
                 s_if = 'else if (mid == {}) then'
             s_if = s_if.format(mid)
         
-            ls = kdist_param_gas(params)
+            ls = kdist_param_gas(params, adjust_wgt=adjust_wgt)
             ls = [3 * ' ' + l for l in ls]
             ls = [s_if] + ls
         
@@ -628,7 +635,7 @@ def kdist_param():
 
 
 
-def subroutine():
+def subroutine(adjust_wgt=None):
     '''
     Return list of lines of fortran which, when joined by '\n', form
     the subroutine `get_kdist_ktable()`.  This subroutine returns
@@ -651,19 +658,19 @@ def subroutine():
           '')
     
     lines = list(ls)
-    lines = lines + kdist_param()
+    lines = lines + kdist_param(adjust_wgt=adjust_wgt)
     lines.append('return')
     lines.append('end')
     return lines
 
 
 
-def file_content():
+def file_content(adjust_wgt=None):
     '''
     Return a piece of fortran that defines the
     subroutine get_kdist_ktable().
     '''
-    lines = subroutine()
+    lines = subroutine(adjust_wgt=adjust_wgt)
     lines = [6 * ' ' + l for l in lines]
     s = '\n'.join(lines)
     return s
