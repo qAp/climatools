@@ -267,6 +267,8 @@ def nice_xlims(pltdata=None, prange=None):
     vmin = min([get_slice(srs).min() for srs in srss])
     vmax = max([get_slice(srs).max() for srs in srss])
     dv = (vmax - vmin) * .01
+    if dv == 0:
+        dv = 1e-7
     return float(vmin - dv), float(vmax + dv)
 
 
