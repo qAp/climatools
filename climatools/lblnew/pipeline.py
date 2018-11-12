@@ -131,8 +131,7 @@ def analyse_case(param, setup=None):
     with open('param.py', encoding='utf-8', mode='w') as f:
         f.write('\n'.join(lines))
         
-    pprint.pprint(param)
-    print()
+    print(param['molecule'], param['band'], param['commitnumber'])
         
     return subprocess.Popen(['jupyter', 'nbconvert', 
                              '--execute',
@@ -176,7 +175,7 @@ def git_addcommit(param, setup=None):
                                       stdout=subprocess.PIPE,
                                       stderr=subprocess.PIPE)
 
-    pprint.pprint(param)
+    print(param['molecule'], param['band'], param['commitnumber'])
     return proc_gitcommit
 
 
