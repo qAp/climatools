@@ -235,6 +235,7 @@ def run_fortran_bsub(param=None, setup=None):
     lines = ['#!/bin/bash',
              '#BSUB -J {}'.format(jobname),
              '#BSUB -n 1',
+             '#BSUB -q serial',
              '#BSUB -o out_%J',
              '#BSUB -e err_%J',
              '',
