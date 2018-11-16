@@ -329,10 +329,11 @@ def fpath_ktable(param=None):
     '''
     query = make_query(param=param)
     rs = client.lblnew.bestfit_lw.find(query)
-    r = next(rs)
-    fpath = {'kg_lin': io.StringIO(r['kg_lin']),
-             'kg_nonlin': io.StringIO(r['kg_nonlin'])}
-    return fpath
+    for r in rs:
+        if all([k in r for k in ('kg_lin', 'kg_nonlin')]):
+            fpath = {'kg_lin': io.StringIO(r['kg_lin']),
+                     'kg_nonlin': io.StringIO(r['kg_nonlin'])}
+            return fpath
 
 
 
