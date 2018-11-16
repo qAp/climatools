@@ -4,9 +4,11 @@ This module is for exporting the data from lblnew-bestfit.
 '''
 
 import os
+import io
 import itertools
 import importlib
 
+import pymongo
 import numpy as np
 import pandas as pd
 
@@ -17,6 +19,22 @@ from climatools.cliradlw import setup as setup_cliradlw
 import climatools.cliradlw.utils as utils_cliradlw
 
 
+
+client = pymongo.MongoClient('localhost', 27017, connect=False)
+
+
+
+def make_query(param=None):
+    '''
+    Returns the MongoDB query for a lblnew-bestfit 
+    run's document.
+    
+    Parameters
+    ----------
+    param: dict
+    lblnew-bestfit input parameters.
+    '''
+    return {'param.' + name: value for name, value in param.items()}
 
 # These are the gases and spectral bands
 # that have been fitted using the k-distribution method
@@ -309,11 +327,11 @@ def fpath_ktable(param=None):
     param: dict
            Dictionary of input parameters for lblnew-bestfit.
     '''
-    fortran_dir = pipeline.get_dir_case(param, setup=setup_bestfit)
-          
-    fpath_lin = os.path.join(fortran_dir, 'kg_lin.dat')
-    fpath_nonlin = os.path.join(fortran_dir, 'kg_nonlin.dat')
-    fpath = {'kg_lin': fpath_lin, 'kg_nonlin': fpath_nonlin}
+    query = make_query(param=param)
+    rs = client.lblnew.bestfit_lw.find(query)
+    r = next(rs)
+    fpath = {'kg_lin': io.StringIO(r['kg_lin']),
+             'kg_nonlin': io.StringIO(r['kg_nonlin'])}
     return fpath
 
 
