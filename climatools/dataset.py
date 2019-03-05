@@ -4,7 +4,6 @@ import pandas as pd
 import xarray as xr
 
 
-
 def load_output_file(path_csv):
     '''
     Load output file to xarray.Dataset.  
@@ -57,8 +56,23 @@ class LBLnewModelData():
         self.wgt_flux, self.wgt_cool = wgt_flux, wgt_cool
         self.crd_flux, self.crd_cool = crd_flux, crd_cool
 
+    def __add__(self, other):
+        ns = ['wgt_flux', 'wgt_cool', 'crd_flux', 'crd_cool']
+        sums = []
+        for n in ns:
+            vself = getattr(self, n)
+            vother = getattr(other, n)
+            if 'g' in vself: vself = vself.sum('g')
+            if 'g' in vother: vother = vother.sum('g')
+            sums.append(vself + vother)
+        return LBLnewModelData(None, *sums)
+
+    def __radd__(self, other):
+        if other == 0: return self
+        else: return self.__add__(other)
 
 
+    
 class LBLnewBestfitModelData(LBLnewModelData):
     def __init__(self, param, 
                  wgt_flux, wgt_cool, crd_flux, crd_cool, dgdgs, abscom):
