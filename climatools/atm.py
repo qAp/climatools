@@ -36,14 +36,16 @@ class AtmComposition():
     def to_lblnewparam(self, bestfitonly=False, **kwargs):
         params = []
         for b, gs in self.gasinbands.items():
-            band = mapband_new2old()[b] # lblnew has a different set of spectral band labels.
+            band = mapband_new2old()[b] 
             if len(gs) == 1:
                 mol = gs[0]
                 conc = None if self.gasconcs[mol] else self.gasconcs[mol]
                 params.append(
                     LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
             else:
-                params.append(LBLnewOverlapParam(band=[band], molecule=gs, **kwargs))
+                molecule = {g: self.gasconcs[g] for g in gs}
+                params.append(
+                    LBLnewOverlapParam(band=band, molecule=molecule, **kwargs))
         return params
         
     @classmethod
