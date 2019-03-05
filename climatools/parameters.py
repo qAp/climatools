@@ -1,5 +1,6 @@
 import pymongo
 from .cliradlw.utils import *
+from .pymongo import *
 from .dataset import *
 
 
@@ -10,31 +11,22 @@ class Param():
         self.commitnumber = commitnumber
         self.band, self.molecule = band, molecule
         self.atmpro, self.tsfc = atmpro, tsfc
-
+        
+    def pymongo_query(self): return make_query(vars(self))
 
 
 class CliradnewLWParam(Param):
     model_name = 'cliradnew-lw'
     def __init__(self, **kwargs): super().__init__(**kwargs)
+
+    def modeldata_pymongo(self, collection=None):
+        if not collection:
+            raise ValueError(('You need to specify a pymongo collection '
+                              'containing cliradnew-lw model data.'))
+        qry = self.pymongo_query()
+        doc = collection.find_one(qry)
+        return CliradnewLWModelData.from_mongodoc(doc)
         
-    def to_lblnewparam(self, squeeze=False, dv=None, nv=None):
-        '''
-
-        '''
-        if len(self.molecule == 1):
-            # There is only one absorber.
-            if squeeze == True:
-                # Return lblnew-bestfit parameter
-                band = mapband_new2old(self.band[0])
-                
-                return LBLnewBestfitParam
-            else:
-                # Return lblnew-overlap parameter
-                return LBLnewOverlapParam
-        else:
-            # There is absorber overlapping
-            return LBLnewOverlapParam
-
     def __repr__(self):
         d = dict(commitnumber=self.commitnumber,
                  band=self.band, molecule=self.molecule,
@@ -52,7 +44,18 @@ class LBLnewParam(Param):
 
 
 class LBLnewOverlapParam(LBLnewParam):
+    model_name = 'lblnew-overlap'
     def __init__(self, **kwargs): super().__init__(**kwargs)
+
+    def modeldata_pymongo(self, collection=None):
+        if not collection:
+            raise ValueError(('You need to specify a pymongo collection '
+                              'containing lblnew-overlap model data.'))
+        qry = self.pymongo_query()
+        doc = collection.find_one(qry)
+        if not doc: print('Nothing found for:\n', qry)
+        return LBLnewOverlapModelData.from_mongodoc(doc)        
+    
     def __repr__(self):
         d = dict(commitnumber=self.commitnumber,
                  band=self.band, molecule=self.molecule,
@@ -64,6 +67,7 @@ class LBLnewOverlapParam(LBLnewParam):
 
     
 class LBLnewBestfitParam(LBLnewParam):
+    model_name = 'lblnew-bestfit'
     def __init__(self, conc=None, klin=None, ng_adju=None, ng_refs=None,
                  option_compute_btable=None, option_compute_ktable=None,
                  option_wgt_flux=None, option_wgt_k=None, ref_pts=None,
@@ -78,6 +82,14 @@ class LBLnewBestfitParam(LBLnewParam):
         self.option_compute_ktable = option_compute_ktable
         self.option_compute_btable = option_compute_btable
         super().__init__(**kwargs)
+
+    def modeldata_pymongo(self, collection=None):
+        if not collection:
+            raise ValueError(('You need to specify a pymongo collection '
+                              'containing lblnew-besfit model data.'))
+        qry = self.pymongo_query()
+        doc = collection.find_one(qry)
+        return LBLnewBestfitModelData.from_mongodoc(doc)        
 
     def __repr__(self):
         d = dict(commitnumber=self.commitnumber,
