@@ -39,7 +39,7 @@ class AtmComposition():
             band = mapband_new2old()[b] 
             if len(gs) == 1:
                 mol = gs[0]
-                conc = None if self.gasconcs[mol] else self.gasconcs[mol]
+                conc = None if self.gasconcs[mol] == 'atmpro' else self.gasconcs[mol]
                 params.append(
                     LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
             else:
