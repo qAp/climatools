@@ -1,19 +1,18 @@
+'''
+Manages parameters associated with clirad-lw, lblnew-bestfit, and lblnew-overlap.
+'''
 import pymongo
 from .cliradlw.utils import *
 from .pymongo import *
 from .dataset import *
 
-
-
 class Param():
-    def __init__(self, commitnumber=None, band=None, molecule=None,
-                 atmpro=None, tsfc=None):
+    def __init__(self, commitnumber=None, band=None, molecule=None, atmpro=None, tsfc=None):
         self.commitnumber = commitnumber
         self.band, self.molecule = band, molecule
         self.atmpro, self.tsfc = atmpro, tsfc
         
     def pymongo_query(self): return make_query(vars(self))
-
 
 class CliradnewLWParam(Param):
     model_name = 'cliradnew-lw'
@@ -28,20 +27,14 @@ class CliradnewLWParam(Param):
         return CliradnewLWModelData.from_mongodoc(doc)
         
     def __repr__(self):
-        d = dict(commitnumber=self.commitnumber,
-                 band=self.band, molecule=self.molecule,
+        d = dict(commitnumber=self.commitnumber, band=self.band, molecule=self.molecule,
                  atmpro=self.atmpro, tsfc=self.tsfc)
-        return (f'{self.__class__}\n'
-                + '\n'.join(sorted(f'{n}: {v}' for n, v in d.items())))
-
-    
+        return f'{self.__class__}\n' + '\n'.join(sorted(f'{n}: {v}' for n, v in d.items()))
 
 class LBLnewParam(Param):
     def __init__(self, dv=None, nv=None, **kwargs):
         self.dv, self.nv = dv, nv
         super().__init__(**kwargs)
-
-
 
 class LBLnewOverlapParam(LBLnewParam):
     model_name = 'lblnew-overlap'
@@ -57,14 +50,10 @@ class LBLnewOverlapParam(LBLnewParam):
         return LBLnewOverlapModelData.from_mongodoc(doc)        
     
     def __repr__(self):
-        d = dict(commitnumber=self.commitnumber,
-                 band=self.band, molecule=self.molecule,
-                 atmpro=self.atmpro, tsfc=self.tsfc,
-                 nv=self.nv, dv=self.dv)
+        d = dict(commitnumber=self.commitnumber, band=self.band, molecule=self.molecule,
+                 atmpro=self.atmpro, tsfc=self.tsfc, nv=self.nv, dv=self.dv)
         body = '\n'.join(sorted(f'{n}: {v}' for n, v in d.items()))
         return f'{self.__class__}\n{body}\n'
-    
-
     
 class LBLnewBestfitParam(LBLnewParam):
     model_name = 'lblnew-bestfit'
