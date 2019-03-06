@@ -1,9 +1,8 @@
-
-
+'''
+Manages atmosphere composition: temperature, pressure, gas concentrations, etc. 
+'''
 from .cliradlw.utils import *
 from .parameters import *
-
-
 
 def greys_byband():
     return {1: {'con': 'atmpro'},
@@ -18,17 +17,13 @@ def greys_byband():
             10: None,
             11: None}
 
-
-
 class AtmComposition():
     def __init__(self, gasinbands, gasconcs):
         self.gasinbands = gasinbands
         self.gasconcs = gasconcs
 
     def to_cliradparam(self, **kwargs):
-        '''
-        Return clirad input parameter dictionary.
-        '''
+        "Return clirad input parameter dictionary."
         band = list(self.gasinbands.keys())
         molecule = self.gasconcs
         return CliradnewLWParam(band=band, molecule=molecule, **kwargs)
@@ -42,7 +37,7 @@ class AtmComposition():
                 conc = None if self.gasconcs[mol] == 'atmpro' else self.gasconcs[mol]
                 params.append(LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
             else:
-                molecule = {g: self.gasconcs[g] for g in gs}
+                molecule = {g:self.gasconcs[g] for g in gs}
                 params.append(LBLnewOverlapParam(band=band, molecule=molecule, **kwargs))
         return params
         
@@ -53,31 +48,19 @@ class AtmComposition():
         only the 'non-grey' absorbers.  This was used as the 'overall'
         test for the new k-distribution method
         '''
-        gasinbands = {1: ['h2o'],
-                      2: ['h2o'],
-                      3: ['h2o', 'co2', 'n2o'],
-                      4: ['h2o', 'co2'],
-                      5: ['h2o', 'co2'],
-                      6: ['h2o', 'co2'],
-                      7: ['h2o', 'co2', 'o3'],
-                      8: ['h2o'],
-                      9: ['h2o', 'n2o', 'ch4'],
-                      10: ['h2o'],
-                      11: ['h2o', 'co2']}
-        gasconcs = {'h2o': 'atmpro',
-                    'co2': 400e-6,
-                    'o3': 'atmpro',
-                    'n2o': 3.2e-7,
-                    'ch4': 1.8e-6}
+        gasinbands = {1:['h2o'], 2:['h2o'], 3:['h2o', 'co2', 'n2o'], 4:['h2o', 'co2'],
+                      5:['h2o', 'co2'], 6:['h2o', 'co2'], 7:['h2o', 'co2', 'o3'],
+                      8:['h2o'], 9:['h2o', 'n2o', 'ch4'], 10:['h2o'], 11:['h2o', 'co2']}
+        gasconcs = {'h2o':'atmpro', 'co2':400e-6, 'o3':'atmpro', 'n2o':3.2e-7, 'ch4':1.8e-6}
         if (onlygas and onlygas in gasconcs) and not onlyband:
-            gasinbands = {b: [onlygas] for b, gs in gasinbands.items() if onlygas in gs}
-            gasconcs = {onlygas: gasconcs[onlygas]}
+            gasinbands = {b:[onlygas] for b, gs in gasinbands.items() if onlygas in gs}
+            gasconcs = {onlygas:gasconcs[onlygas]}
         elif (onlyband and onlyband in gasinbands.keys()) and not onlygas:
-            gasinbands = {onlyband: gasinbands[onlyband]}
-            gasconcs = {g: conc for g, conc in gasconcs.items() if g in gasinbands[onlyband]}
+            gasinbands = {onlyband:gasinbands[onlyband]}
+            gasconcs = {g:conc for g, conc in gasconcs.items() if g in gasinbands[onlyband]}
         elif (onlygas in gasconcs) and (onlyband in gasinbands.keys()):
-            gasinbands = {onlyband: [onlygas]}
-            gasconcs = {onlygas: gasconcs[onlygas]}
+            gasinbands = {onlyband:[onlygas]}
+            gasconcs = {onlygas:gasconcs[onlygas]}
         return cls(gasinbands, gasconcs)
 
     def __repr__(self):
