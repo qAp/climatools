@@ -49,7 +49,7 @@ class AtmComposition():
         return params
         
     @classmethod
-    def cliradlw_nongreys(cls, onlygas=None):
+    def cliradlw_nongreys(cls, onlygas=None, onlyband=None):
         '''
         Returns the composition for an atmosphere that contains
         only the 'non-grey' absorbers.  This was used as the 'overall'
@@ -71,8 +71,15 @@ class AtmComposition():
                     'o3': 'atmpro',
                     'n2o': 3.2e-7,
                     'ch4': 1.8e-6}
-        if onlygas and onlygas in gasconcs:
+        if (onlygas and onlygas in gasconcs) and not onlyband:
             gasinbands = {b: [onlygas] for b, gs in gasinbands.items() if onlygas in gs}
+            gasconcs = {onlygas: gasconcs[onlygas]}
+        elif (onlyband and onlyband in gasinbands.keys()) and not onlygas:
+            gasinbands = {onlyband: gasinbands[onlyband]}
+            gasconcs = {g: conc
+                        for g, conc in gasconcs.items() if g in gasinbands[onlyband]}
+        elif (onlygas in gasconcs) and (onlyband in gasinbands.keys()):
+            gasinbands = {onlyband: [onlygas]}
             gasconcs = {onlygas: gasconcs[onlygas]}
         return cls(gasinbands, gasconcs)
 
