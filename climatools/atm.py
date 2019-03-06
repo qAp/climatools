@@ -40,12 +40,10 @@ class AtmComposition():
             if len(gs) == 1:
                 mol = gs[0]
                 conc = None if self.gasconcs[mol] == 'atmpro' else self.gasconcs[mol]
-                params.append(
-                    LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
+                params.append(LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
             else:
                 molecule = {g: self.gasconcs[g] for g in gs}
-                params.append(
-                    LBLnewOverlapParam(band=band, molecule=molecule, **kwargs))
+                params.append(LBLnewOverlapParam(band=band, molecule=molecule, **kwargs))
         return params
         
     @classmethod
@@ -76,8 +74,7 @@ class AtmComposition():
             gasconcs = {onlygas: gasconcs[onlygas]}
         elif (onlyband and onlyband in gasinbands.keys()) and not onlygas:
             gasinbands = {onlyband: gasinbands[onlyband]}
-            gasconcs = {g: conc
-                        for g, conc in gasconcs.items() if g in gasinbands[onlyband]}
+            gasconcs = {g: conc for g, conc in gasconcs.items() if g in gasinbands[onlyband]}
         elif (onlygas in gasconcs) and (onlyband in gasinbands.keys()):
             gasinbands = {onlyband: [onlygas]}
             gasconcs = {onlygas: gasconcs[onlygas]}
