@@ -68,7 +68,14 @@ class LBLnewModelData():
         return LBLnewModelData(None, *sums)
 
     def __radd__(self, other):
-        if other == 0: return self
+        if other == 0:
+            ns = ['wgt_flux', 'wgt_cool', 'crd_flux', 'crd_cool']
+            sums = []
+            for n in ns:
+                vself = getattr(self, n)
+                if 'g' in vself: vself = vself.sum('g')
+                sums.append(vself)
+            return LBLnewModelData(None, *sums)
         else: return self.__add__(other)
 
 
