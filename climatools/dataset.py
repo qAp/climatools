@@ -2,6 +2,7 @@
 import io
 import pandas as pd
 import xarray as xr
+from .spectrum import *
 
 
 def load_output_file(path_csv):
@@ -35,7 +36,18 @@ def load_output_file(path_csv):
                 ds.coords[l] = ('pressure', ds[l])
     return ds
 
-
+def concat(*datas):
+    '''
+    Concatenate LBLnewBestfitModelData()s along a newly created
+    'band' dimension.
+    '''
+    ns = ['wgt_flux', 'wgt_cool', 'crd_flux', 'crd_cool']
+    bands = [mapband_old2new()[d.param['band']] for d in datas]
+    params = [d.param for d in datas]
+    rename = {'concat_dim': 'band'}
+    vs = [xr.concat([getattr(d, n) for d in datas], dim=bands).rename(rename) for n in ns]
+    data = LBLnewModelData(params, *vs)
+    return data
 
 class CliradnewLWModelData():
     def __init__(self, param, wgt_flux, wgt_cool):
