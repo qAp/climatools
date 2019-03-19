@@ -3,6 +3,7 @@ Manages atmosphere composition: temperature, pressure, gas concentrations, etc.
 '''
 from .cliradlw.utils import *
 from .parameters import *
+from .lblnew.bestfit_params import *
 
 def greys_byband():
     return {1: {'con': 'atmpro'},
@@ -28,17 +29,21 @@ class AtmComposition():
         molecule = self.gasconcs
         return CliradnewLWParam(band=band, molecule=molecule, **kwargs)
 
-    def to_lblnewparam(self, bestfitonly=False, **kwargs):
+    def to_lblnewparam(self, bestfit_values=False, **kwargs):
         params = []
         for b, gs in self.gasinbands.items():
-            band = mapband_new2old()[b] 
-            if len(gs) == 1:
-                mol = gs[0]
-                conc = None if self.gasconcs[mol] == 'atmpro' else self.gasconcs[mol]
-                params.append(LBLnewBestfitParam(band=band, molecule=mol, conc=conc, **kwargs))
-            else:
-                molecule = {g:self.gasconcs[g] for g in gs}
-                params.append(LBLnewOverlapParam(band=band, molecule=molecule, **kwargs))
+            band = mapband_new2old()[b]
+            for g in gs:
+                conc = None if self.gasconcs[g] == 'atmpro' else self.gasconcs[g]
+                p = LBLnewBestfitParam(band=band, molecule=g, conc=conc)
+                if bestfit_values:
+                    bfv = kdist_params(molecule=p.molecule, band=p.band)
+                    for n in ['vmin', 'vmax', 'dv', 'nv', 'ref_pts', 'ng_refs', 'ng_adju', 'klin',
+                              'option_wgt_k', 'option_wgt_flux', 'wgt', 'w_diffuse']:
+                        setattr(p, n, bfv[n])
+                for n, v in kwargs.items():
+                    setattr(p, n, v)
+                params.append(p)
         return params
         
     @classmethod
