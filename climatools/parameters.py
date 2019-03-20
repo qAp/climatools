@@ -14,16 +14,28 @@ class Param():
         
     def pymongo_query(self): return make_query(vars(self))
 
+    def avail_commits(self, collection):
+        q = self.pymongo_query()
+        rs = collection.find(q, projection=['param.commitnumber'])
+        return sorted([r['param']['commitnumber'] for r in rs])
+        
 class CliradnewLWParam(Param):
     model_name = 'cliradnew-lw'
     def __init__(self, **kwargs): super().__init__(**kwargs)
 
-    def modeldata_pymongo(self, collection=None):
+    def modeldata_pymongo(self, collection=None, commits=None):
         if not collection:
             raise ValueError(('You need to specify a pymongo collection '
                               'containing cliradnew-lw model data.'))
         qry = self.pymongo_query()
-        doc = collection.find_one(qry)
+        if commits != None:
+            for c in commits:
+                qry['param.commitnumber'] = c
+                doc = collection.find_one(qry)
+                if doc: break
+        else:
+            doc = collection.find_one(qry)
+        if not doc: print('Nothing found for:\n', qry)            
         return CliradnewLWModelData.from_mongodoc(doc)
         
     def __repr__(self):
@@ -40,12 +52,17 @@ class LBLnewOverlapParam(LBLnewParam):
     model_name = 'lblnew-overlap'
     def __init__(self, **kwargs): super().__init__(**kwargs)
 
-    def modeldata_pymongo(self, collection=None):
+    def modeldata_pymongo(self, collection=None, commits=None):
         if not collection:
             raise ValueError(('You need to specify a pymongo collection '
                               'containing lblnew-overlap model data.'))
         qry = self.pymongo_query()
-        doc = collection.find_one(qry)
+        if commits != None:
+            for c in commits:
+                qry['param.commitnumber'] = c
+                doc = collection.find_one(qry)
+                if doc: break
+        else: doc = collection.find_one(qry)
         if not doc: print('Nothing found for:\n', qry)
         return LBLnewOverlapModelData.from_mongodoc(doc)        
     
@@ -72,13 +89,19 @@ class LBLnewBestfitParam(LBLnewParam):
         self.option_compute_btable = option_compute_btable
         super().__init__(**kwargs)
 
-    def modeldata_pymongo(self, collection=None):
+    def modeldata_pymongo(self, collection=None, commits=None):
         if not collection:
             raise ValueError(('You need to specify a pymongo collection '
                               'containing lblnew-besfit model data.'))
         qry = self.pymongo_query()
-        doc = collection.find_one(qry)
-        return LBLnewBestfitModelData.from_mongodoc(doc)        
+        if commits != None:
+            for c in commits:
+                qry['param.commitnumber'] = c
+                doc = collection.find_one(qry)
+                if doc: break
+        else: doc = collection.find_one(qry)
+        if not doc: print('Nothing found for:\n', qry)
+        return LBLnewBestfitModelData.from_mongodoc(doc)
 
     def __repr__(self):
         d = dict(commitnumber=self.commitnumber,
