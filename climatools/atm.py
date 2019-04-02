@@ -18,6 +18,13 @@ def greys_byband():
             10: None,
             11: None}
 
+def tropopause_pressures():
+    '''
+    These are the pressures, in mb, of the tropopause region
+    in mls, saw and trp profiles.  
+    '''
+    return dict(mls=180.875, saw=299.75, trp=109.55)
+
 class AtmComposition():
     def __init__(self, gasinbands, gasconcs):
         self.gasinbands = gasinbands
