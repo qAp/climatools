@@ -37,19 +37,29 @@ class AtmComposition():
         return CliradnewLWParam(band=band, molecule=molecule, **kwargs)
 
     def to_lblnewparam(self, bestfit_values=False, **kwargs):
+        '''
+        bestfit_values: boolean
+            When lblnew-bestfit parameters are sought, whether to use the best-fit values
+            saved in bestfit_params.py.
+        '''
         params = []
         for b, gs in self.gasinbands.items():
             band = mapband_new2old()[b]
-            for g in gs:
-                conc = None if self.gasconcs[g] == 'atmpro' else self.gasconcs[g]
-                p = LBLnewBestfitParam(band=band, molecule=g, conc=conc)
-                if bestfit_values:
-                    bfv = kdist_params(molecule=p.molecule, band=p.band)
-                    for n in ['vmin', 'vmax', 'dv', 'nv', 'ref_pts', 'ng_refs', 'ng_adju', 'klin',
-                              'option_wgt_k', 'option_wgt_flux', 'wgt', 'w_diffuse']:
-                        setattr(p, n, bfv[n])
-                for n, v in kwargs.items():
-                    setattr(p, n, v)
+
+            if len(gs) == 1:
+                for g in gs:
+                    conc = None if self.gasconcs[g] == 'atmpro' else self.gasconcs[g]
+                    p = LBLnewBestfitParam(band=band, molecule=g, conc=conc)
+                    if bestfit_values:
+                        bfv = kdist_params(molecule=p.molecule, band=p.band)
+                        for n in ['vmin', 'vmax', 'dv', 'nv', 'ref_pts', 'ng_refs', 'ng_adju', 'klin',
+                                  'option_wgt_k', 'option_wgt_flux', 'wgt', 'w_diffuse']:
+                            setattr(p, n, bfv[n])
+                    for n, v in kwargs.items(): setattr(p, n, v)
+                    params.append(p)
+            else:
+                p = LBLnewOverlapParam(band=band, molecule={g: self.gasconcs[g] for g in gs})
+                for n, v in kwargs.items(): setattr(p, n, v)
                 params.append(p)
         return params
         
