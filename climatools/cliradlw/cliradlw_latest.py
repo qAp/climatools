@@ -1,6 +1,10 @@
-
-
 from IPython import display
+from bokeh.io import show
+from bokeh.palettes import all_palettes
+from bokeh.layouts import gridplot
+from ..lblnew.bestfit_params import *
+from ..atm import *
+from ..plot.plot import *
 
 
 
@@ -55,18 +59,18 @@ def pltdata_diffcool(dlbl=None, dcli=None):
 
 def show_results(dlbl=None, dcli=None):
     display.display(display.Markdown('-----------------------------'))
-    markdown_anchor(dlbl=data_lbl, dcli=data_cli)
+    markdown_anchor(dlbl=dlbl, dcli=dcli)
 
     # Parameters
-    gs = data_lbl.param['molecule'].keys() if isinstance(data_lbl.param['molecule'], dict) else [data_lbl.param['molecule']]
-    ps_cliradfit = {f"({g}, {data_lbl.param['band']})": kdist_params(molecule=g, band=data_lbl.param['band']) for g in gs}
+    gs = dlbl.param['molecule'].keys() if isinstance(dlbl.param['molecule'], dict) else [dlbl.param['molecule']]
+    ps_cliradfit = {f"({g}, {dlbl.param['band']})": kdist_params(molecule=g, band=dlbl.param['band']) for g in gs}
     fitparams = pd.DataFrame({molgas: pd.Series(p) for molgas, p in ps_cliradfit.items()})
-    runparams = pd.concat([pd.Series(data_cli.param), pd.Series(data_lbl.param)], axis=1, sort=True, keys=['CLIRAD', 'LBLNEW'])
+    runparams = pd.concat([pd.Series(dcli.param), pd.Series(dlbl.param)], axis=1, sort=True, keys=['CLIRAD', 'LBLNEW'])
     display.display(pd.concat([runparams, fitparams], axis=1, sort=True, keys=['Run parameters', 'Fit parameters']).fillna('-'))
 
     # Plot cooling rate profiles
-    plotdata = pltdata_cool(dlbl=data_lbl, dcli=data_cli)
-    diffdata = pltdata_diffcool(dlbl=data_lbl, dcli=data_cli)
+    plotdata = pltdata_cool(dlbl=dlbl, dcli=dcli)
+    diffdata = pltdata_diffcool(dlbl=dlbl, dcli=dcli)
     fig_liny = plt_vert_profile_bokeh(pltdata=plotdata, y_axis_type='linear', prange=(50, 1050))
     fig_logy = plt_vert_profile_bokeh(pltdata=plotdata, y_axis_type='log', prange=(.01, 200))
     fig_diff = plt_vert_profile_bokeh(pltdata=diffdata, y_axis_type='log', prange=(.01, 200))
