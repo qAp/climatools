@@ -33,7 +33,8 @@ class AtmComposition():
     def to_cliradparam(self, **kwargs):
         "Return clirad input parameter dictionary."
         band = list(self.gasinbands.keys())
-        molecule = self.gasconcs
+        gs = set(g for _, gs in self.gasinbands.items() for g in gs)
+        molecule = {g:conc for g, conc in self.gasconcs.items() if g in gs}
         return CliradnewLWParam(band=band, molecule=molecule, **kwargs)
 
     def to_lblnewparam(self, bestfit_values=False, **kwargs):
