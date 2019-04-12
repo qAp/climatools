@@ -57,9 +57,20 @@ def show_cools(dlbl=None, dcli=None):
     fig_logy = plt_vert_profile_bokeh(pltdata=plotdata, y_axis_type='log', prange=(.01, 200))
     fig_diff = plt_vert_profile_bokeh(pltdata=diffdata, y_axis_type='log', prange=(.01, 200))
     show(gridplot(fig_liny, fig_logy, fig_diff, ncols=3, plot_height=500))    
+
+def get_df(ds=None, atmpro=None):
+    return (ds.sel(pressure=[ds.pressure.min(), tropopause_pressures()[atmpro], ds.pressure.max()], method='nearest')
+            .to_dataframe().set_index('level', append=True)[['flug', 'fldg', 'fnetg']])
+
+def show_flux_tables(dlbl=None, dcli=None, atmpro=None):
+    igg = 10
+    fcrd = get_df(dlbl.crd_flux.sum('g') if 'g' in dlbl.crd_flux.dims else dlbl.crd_flux, atmpro=atmpro)
+    fwgt = get_df((dlbl.wgt_flux.sum('g') if 'g' in dlbl.wgt_flux.dims else dlbl.wgt_flux).sel(igg=igg), atmpro=atmpro)
+    fcli = get_df(dcli.wgt_flux.sel(i=1).sum('band'), atmpro=atmpro)
+    df = pd.concat([fcrd, fwgt, fcli, fcli - fwgt], axis=1,
+                   keys=['CRD', f'WGT igg={igg}', 'CLIRAD', f'CLIRAD - WGT igg={igg}'])
+    display.display(df.round(4))
     
-
-
 def show_title(dlbl=None, dcli=None, add_idanchor=False):
     band, molecule, atmpro = [dcli.param.get(p) for p in ('band', 'molecule', 'atmpro')]
     title = f'{band} {molecule} {atmpro}'
