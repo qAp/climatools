@@ -1,4 +1,5 @@
 from IPython import display
+import re
 from bokeh.io import show
 from bokeh.palettes import all_palettes
 from bokeh.layouts import gridplot
@@ -6,12 +7,6 @@ from ..lblnew.bestfit_params import *
 from ..atm import *
 from ..plot.plot import *
 
-
-
-
-
-
-    
 def pltdata_cool(dlbl=None, dcli=None):
     colors = all_palettes['Set1'][4]
     igg = 10
@@ -32,8 +27,6 @@ def pltdata_cool(dlbl=None, dcli=None):
              'color':colors[3], 'alpha':.3}]
     return data
 
-
-
 def pltdata_diffcool(dlbl=None, dcli=None):
     colors = all_palettes['Set1'][4]
     igg = 10
@@ -50,16 +43,12 @@ def pltdata_diffcool(dlbl=None, dcli=None):
              'color':colors[3], 'alpha':.3}]
     return data
 
-
-
 def show_parameters(dlbl=None, dcli=None):
     gs = dlbl.param['molecule'].keys() if isinstance(dlbl.param['molecule'], dict) else [dlbl.param['molecule']]
     ps_cliradfit = {f"({g}, {dlbl.param['band']})": kdist_params(molecule=g, band=dlbl.param['band']) for g in gs}
     fitparams = pd.DataFrame({molgas: pd.Series(p) for molgas, p in ps_cliradfit.items()})
     runparams = pd.concat([pd.Series(dcli.param), pd.Series(dlbl.param)], axis=1, sort=True, keys=['CLIRAD', 'LBLNEW'])
     display.display(pd.concat([runparams, fitparams], axis=1, sort=True, keys=['Run parameters', 'Fit parameters']).fillna('-'))    
-
-
 
 def show_cools(dlbl=None, dcli=None):
     plotdata = pltdata_cool(dlbl=dlbl, dcli=dcli)
@@ -83,8 +72,6 @@ def show_title(dlbl=None, dcli=None, add_idanchor=False):
     else:
         display.display(display.Markdown(title))
 
-
-
 def show_href(idanchor=None, df=None, dlbl=None, dcli=None):
     band, molecule, atmpro = [dcli.param.get(p) for p in ('band', 'molecule', 'atmpro')]
     band_lblnew = '[' + ','.join(mapband_new2old()[b] for b in band) + ']'
@@ -94,14 +81,26 @@ def show_href(idanchor=None, df=None, dlbl=None, dcli=None):
     except KeyError:
         df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = html_hrefanchor
 
+def remove_href(idanchor=None, df=None, dlbl=None, dcli=None):
+    band, molecule, atmpro = [dcli.param.get(p) for p in ('band', 'molecule', 'atmpro')]
+    band_lblnew = '[' + ','.join(mapband_new2old()[b] for b in band) + ']'
+    html_hrefanchor = f'''<a href="#{idanchor}">{atmpro}</a>'''
+    try:
+        print(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")],
+              type(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]))
+        print(re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip())
+        df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip()
+    except KeyError:
+        pass
 
-
-def show_results(dlbl=None, dcli=None, add_idanchor=None):
+def show_results(dlbl=None, dcli=None, add_idanchor=None, atmpro=None):
     display.display(display.Markdown('-----------------------------'))
     ida = show_title(dlbl=dlbl, dcli=dcli, add_idanchor=add_idanchor)
     # Parameters
     show_parameters(dlbl=dlbl, dcli=dcli)
     # Plot cooling rate profiles
     show_cools(dlbl=dlbl, dcli=dcli)
+    # Show flux table
+    show_flux_tables(dlbl=dlbl, dcli=dcli, atmpro=atmpro)
     display.display(display.Markdown('--------------------------'))
     return ida
