@@ -97,9 +97,6 @@ def remove_href(idanchor=None, df=None, dlbl=None, dcli=None):
     band_lblnew = '[' + ','.join(mapband_new2old()[b] for b in band) + ']'
     html_hrefanchor = f'''<a href="#{idanchor}">{atmpro}</a>'''
     try:
-        print(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")],
-              type(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]))
-        print(re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip())
         df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip()
     except KeyError:
         pass
