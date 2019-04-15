@@ -88,16 +88,19 @@ def show_href(idanchor=None, df=None, dlbl=None, dcli=None):
     band_lblnew = '[' + ','.join(mapband_new2old()[b] for b in band) + ']'
     html_hrefanchor = f'''<a href="#{idanchor}">{atmpro}</a>'''
     try:
-        df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] + (' ' + html_hrefanchor)
+        if pd.isna(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]):
+            df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = html_hrefanchor
+        else:
+            df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = str(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]) + ' ' + html_hrefanchor
     except KeyError:
         df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = html_hrefanchor
 
 def remove_href(idanchor=None, df=None, dlbl=None, dcli=None):
     band, molecule, atmpro = [dcli.param.get(p) for p in ('band', 'molecule', 'atmpro')]
     band_lblnew = '[' + ','.join(mapband_new2old()[b] for b in band) + ']'
-    html_hrefanchor = f'''<a href="#{idanchor}">{atmpro}</a>'''
     try:
-        df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip()
+        if not pd.isna(df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]):
+            df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")] = re.sub(f'<a [^ <a]*>{atmpro}</a>', '', df.loc[f"{molecule}", (f"{band_lblnew}", f"{band}")]).strip()
     except KeyError:
         pass
 
