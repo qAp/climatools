@@ -67,8 +67,8 @@ def show_flux_tables(dlbl=None, dcli=None, atmpro=None):
     fcrd = get_df(dlbl.crd_flux.sum('g') if 'g' in dlbl.crd_flux.dims else dlbl.crd_flux, atmpro=atmpro)
     fwgt = get_df((dlbl.wgt_flux.sum('g') if 'g' in dlbl.wgt_flux.dims else dlbl.wgt_flux).sel(igg=igg), atmpro=atmpro)
     fcli = get_df(dcli.wgt_flux.sel(i=1).sum('band'), atmpro=atmpro)
-    df = pd.concat([fcrd, fwgt, fcli, fcli - fwgt], axis=1,
-                   keys=['CRD', f'WGT igg={igg}', 'CLIRAD', f'CLIRAD - WGT igg={igg}'])
+    df = pd.concat([fcrd, fwgt, fcli, fcli - fcrd], axis=1,
+                   keys=['CRD', f'WGT igg={igg}', 'CLIRAD', f'CLIRAD - CRD'])
     display.display(df.round(4))
     
 def show_title(dlbl=None, dcli=None, add_idanchor=False):
