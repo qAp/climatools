@@ -71,11 +71,10 @@ def show_flux_tables(dlbl=None, dcli=None, atmpro=None):
                    keys=['CRD', f'WGT igg={igg}', 'CLIRAD', f'CLIRAD - CRD'])
     display.display(df.round(4))
     
-def show_title(dlbl=None, dcli=None, add_idanchor=False):
+def show_title(dlbl=None, dcli=None, idanchor=None):
     band, molecule, atmpro = [dcli.param.get(p) for p in ('band', 'molecule', 'atmpro')]
-    title = f'{band} {molecule} {atmpro}'
-    if add_idanchor:
-        idanchor = ''.join(list(np.random.choice(range(9), 11).astype(str)))
+    title = f'#### {band} {molecule} {atmpro}'
+    if idanchor:
         html_idanchor = f'''<a id="{idanchor}"></a>'''
         display.display(display.Markdown(html_idanchor))
         display.display(display.Markdown(title))
@@ -104,14 +103,14 @@ def remove_href(idanchor=None, df=None, dlbl=None, dcli=None):
     except KeyError:
         pass
 
-def show_results(dlbl=None, dcli=None, add_idanchor=None, atmpro=None):
+def show_results(dlbl=None, dcli=None, idanchor=None, atmpro=None):
     display.display(display.Markdown('-----------------------------'))
-    ida = show_title(dlbl=dlbl, dcli=dcli, add_idanchor=add_idanchor)
+    ida = show_title(dlbl=dlbl, dcli=dcli, idanchor=idanchor)
     # Parameters
     show_parameters(dlbl=dlbl, dcli=dcli)
     # Plot cooling rate profiles
     show_cools(dlbl=dlbl, dcli=dcli)
     # Show flux table
     show_flux_tables(dlbl=dlbl, dcli=dcli, atmpro=atmpro)
-    display.display(display.Markdown('--------------------------'))
+    display.display(display.Markdown('_____'))
     return ida
