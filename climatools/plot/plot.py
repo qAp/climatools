@@ -274,7 +274,8 @@ def nice_xlims(pltdata=None, prange=None):
 
 
 def plt_vert_profile_bokeh(pltdata=None, 
-                           y_axis_type='linear', prange=(50, 1050)):
+                           y_axis_type='linear', prange=(50, 1050),
+                           xlabel='cooling rate [K/day]'):
     '''
     Make line plot(s) for dataset(s), with the domain 
     on the y-aixs and the image on the x-axis.
@@ -320,7 +321,7 @@ def plt_vert_profile_bokeh(pltdata=None,
     p.yaxis.axis_label = 'pressure [mb]'
     
     p.x_range = Range1d(xmin, xmax)
-    p.xaxis.axis_label = 'cooling rate [K/day]'
+    p.xaxis.axis_label = xlabel 
     
     items = [(d['label'], r) for r, d in zip(rs, pltdata)]
     legend = Legend(items=items, location=(10, 0))
