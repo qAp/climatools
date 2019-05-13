@@ -297,7 +297,7 @@ def plt_vert_profile_bokeh(pltdata=None,
     ymin = 1e-2 
     ymax = 1020
     
-    p = figure(y_axis_type=y_axis_type, plot_width=300)
+    p = figure(y_axis_type=y_axis_type, plot_width=500)
     xmin, xmax = nice_xlims(pltdata, prange=prange)
     
     rs = []
