@@ -192,7 +192,7 @@ def write_submit_file(param):
                       './lblnew-bestfit-sw.exe',
                       'sleep 10']))
 
-class LBLnewBestfitSWRun():
+class LBLnewBestfitSWRun(object):
     '''
     Class for running lblnew-bestfit-sw.
 
