@@ -6,7 +6,11 @@
 
 from pathlib import *
 
+# This is the path to lblnew-bestfit-sw repository
 SRC = Path('/chia_cluster/home/jackyu/radiation/crdnew-sw/')
+
+# This is the path to the repository for notebooks associated with lblnew-bestfit-sw.
+PATH_ANALYSIS = Path('/chia_cluster/home/jackyu/radiation/analysis_-_new_kdist_param_sw/')
 
 FNAMES = ['lblnew-bestfit-sw.f', 'lblcom.f']
 
