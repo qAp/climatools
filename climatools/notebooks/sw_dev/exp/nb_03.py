@@ -46,7 +46,7 @@ class LBLnewBestfitSWAnalysis(object):
             out, err = proc.communicate()
             print('Git-add', out.decode(), err.decode())
             title = f"band{self.runner.param.band:02d} {self.runner.param.molecule} {self.runner.param.atmpro} cosz={self.runner.param.cosz} nf_refs={self.runner.param.ng_refs}"
-            body = '\n'.join(sorted(f"{n} {v}" for n, v in vars(runner.param).items()))
+            body = '\n'.join(sorted(f"{n} {v}" for n, v in vars(self.runner.param).items()))
             proc = subprocess.Popen(f'''git commit -m "{title}" -m "{body}"''', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return proc
         finally: os.chdir(cwd)

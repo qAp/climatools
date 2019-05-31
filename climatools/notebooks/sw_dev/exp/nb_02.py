@@ -242,18 +242,27 @@ class LBLnewBestfitSWRun(object):
     def build(self):
         cwd = os.getcwd()
         os.chdir(self.path)
-        proc = subprocess.Popen(
-            ['ifort', '-g', '-CB', '-traceback', '-fpe0', '-r8', '-warn', 'unused',
-             'lblcom.f', 'lblnew-bestfit-sw.f', '-o', 'lblnew-bestfit-sw.exe'],
-             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.chdir(cwd)
-        return proc
+        try:
+            proc = subprocess.Popen(
+                ['ifort', '-g', '-CB', '-traceback', '-fpe0', '-r8', '-warn', 'unused',
+                 'lblcom.f', 'lblnew-bestfit-sw.f', '-o', 'lblnew-bestfit-sw.exe'],
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            return proc
+        finally:
+            os.chdir(cwd)
 
     def run(self):
         cwd = os.getcwd()
         os.chdir(self.path)
-        write_submit_file(self.param)
-        proc = subprocess.Popen('bsub < lblnew-bestfit-sw.sub', shell=True,
-                                stdout=subprocess.PIPE, stderr=subprocess.PIPE,)
-        os.chdir(cwd)
-        return proc
+        try:
+            write_submit_file(self.param)
+            proc = subprocess.Popen('bsub < lblnew-bestfit-sw.sub', shell=True,
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,)
+            out, err = proc.communicate()
+            out, err = out.decode(), err.decode()
+            if not err and out:
+                regex = re.compile(r'^Job <(\d+)> is submitted to queue <serial>.\n$')
+                self.job_id = regex.findall(out)[0]
+                print(out)
+        finally:
+            os.chdir(cwd)
