@@ -50,3 +50,18 @@ class LBLnewBestfitSWAnalysis(object):
             proc = subprocess.Popen(f'''git commit -m "{title}" -m "{body}"''', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             return proc
         finally: os.chdir(cwd)
+
+    def nbviewer_url(self, gitname):
+        '''
+        gitname: str
+            Git repository name.
+        '''
+        pre_url = Path('https://nbviewer.jupyter.org/github/qap')
+        spath = str(self.path)
+        if gitname in spath:
+            _, suf = spath.split(gitname)
+        else:
+            suf = spath
+        suf = ('blob/master' + suf).strip('/')
+        print(suf)
+        return pre_url/gitname/suf/'analysis_-_lblnew-bestfit-sw.ipynb'
