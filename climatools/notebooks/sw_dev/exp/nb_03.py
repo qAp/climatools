@@ -63,5 +63,4 @@ class LBLnewBestfitSWAnalysis(object):
         else:
             suf = spath
         suf = ('blob/master' + suf).strip('/')
-        print(suf)
         return pre_url/gitname/suf/'analysis_-_lblnew-bestfit-sw.ipynb'
