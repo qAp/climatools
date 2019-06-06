@@ -9,6 +9,9 @@ from pathlib import *
 # This is the path to lblnew-bestfit-sw repository
 SRC = Path('/chia_cluster/home/jackyu/radiation/crdnew-sw/')
 
+# This is the path under which to run lblnew-bestfit-sw's fortran code
+PATH_FORTRAN = Path('/chia_cluster/home/jackyu/radiation/crdnew-sw/examples')
+
 # This is the path to the repository for notebooks associated with lblnew-bestfit-sw.
 PATH_ANALYSIS = Path('/chia_cluster/home/jackyu/radiation/analysis_-_new_kdist_param_sw/')
 
@@ -16,3 +19,6 @@ FNAMES = ['lblnew-bestfit-sw.f', 'lblcom.f']
 
 COMPILE_COMMAND = ("ifort -CB -g -traceback -fpe0 -warn unused -r8 "
                    "lblcom.f lblnew-bestfit-sw.f -o lblnew-bestfit-sw.exe")
+
+# This is the url for `analysis_-_new_kdist_param_sw` repository on nbviewer.
+PRE_URL = Path("https://nbviewer.jupyter.org/github/qap/analysis_-_new_kdist_param_sw/blob/master/")
