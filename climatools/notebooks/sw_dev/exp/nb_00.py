@@ -5,6 +5,7 @@
 # file to edit: dev_nb/00_params.ipynb
 
 from climatools.parameters import *
+from pathlib import *
 
 class LBLnewBestfitSWParam(LBLnewParam):
     model_name = 'lblnew-bestfit-sw'
@@ -21,6 +22,9 @@ class LBLnewBestfitSWParam(LBLnewParam):
         self.cosz, self.rsfc = cosz, rsfc
         self.klin = klin
         self.option_k_lookup = option_k_lookup
+
+    def to_path(self):
+        return Path('/'.join(sorted(f'{n}_{v}' for n, v in vars(self).items())))
 
     def __repr__(self):
         return '\n'.join([f"{self.__class__}", str(vars(self))])
