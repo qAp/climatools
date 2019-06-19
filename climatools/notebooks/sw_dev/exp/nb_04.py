@@ -20,14 +20,14 @@ class LBLnewBestfitSWModelData():
         df = pd.read_csv(runner.path/'output_flux.dat', sep=r'\s+')
         df.drop(['level'], axis=1, inplace=True)
         df.set_index(['pressure', 'g'], inplace=True)
-        wgt_flux = xr.Dataset.from_dataframe(df[['wgt_flux']])
-        crd_flux = xr.Dataset.from_dataframe(df[['crd_flux']])
+        wgt_flux = xr.Dataset.from_dataframe(df[['wgt_flux']]).rename({'wgt_flux':'fldg'})
+        crd_flux = xr.Dataset.from_dataframe(df[['crd_flux']]).rename({'crd_flux':'fldg'})
 
         df = pd.read_csv(runner.path/'output_heat.dat', sep=r'\s+')
         df.drop(['layer'], axis=1, inplace=True)
         df.set_index(['pressure', 'g'], inplace=True)
-        wgt_heat = xr.Dataset.from_dataframe(df[['wgt_heat']])
-        crd_heat = xr.Dataset.from_dataframe(df[['crd_heat']])
+        wgt_heat = xr.Dataset.from_dataframe(df[['wgt_heat']]).rename({'wgt_heat':'heatrg'})
+        crd_heat = xr.Dataset.from_dataframe(df[['crd_heat']]).rename({'crd_heat':'heatrg'})
         return cls(runner.param, wgt_flux, wgt_heat, crd_flux, crd_heat)
 
     def from_mongodoc(self, doc):
