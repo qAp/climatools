@@ -27,7 +27,6 @@ class LBLnewBestfitSWAnalysis(object):
         with open('analysis_-_lblnew-bestfit-sw.ipynb') as f:  # Need to set to stored absolute path
             nb = nbformat.read(f, as_version=nbformat.NO_CONVERT)
         nb['cells'][2]['source'] = f'''PARAM = LBLnewBestfitSWParam(**{vars(self.runner.param)})'''
-        nb['cells'][3]['source'] = f'''PATH = Path("{self.runner.path}")'''
         return nb
 
     def run(self):
