@@ -4,7 +4,7 @@ import importlib
 import pandas as pd
 import xarray as xr
 
-from climatools.atm.absorbers import *
+from climatools.atm import *
 
 import climatools.cliradlw.setup as setup_cliradlw
 import climatools.cliradlw.pipeline as pipe_cliradlw
