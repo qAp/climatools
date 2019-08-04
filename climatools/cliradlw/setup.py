@@ -6,9 +6,9 @@ import collections
 
 # Specify the directory in which CLIRAD-LW source code is kept.
 DIR_SRC = os.path.join('/chia_cluster/home/jackyu/radiation',
-                       'clirad-lw/LW/cliradnew')
+                       'clirad-lw/LW/lee_hitran2012_update')
 
-FNAME_CLIRADLW = 'cliradnew-lw.f'
+FNAME_CLIRADLW = 'CLIRAD_new_25cm_re.f'
 
 FNAME_IPYNB = 'results_cliradlw.ipynb'
 
