@@ -32,7 +32,7 @@ This computes radiation for any selection of spectral bands and absorbers. e.g. 
 ## Results summary
 [Here](https://nbviewer.jupyter.org/github/qAp/analysis_-_new_kdist_param/blob/master/clirad_weblinks_latest.ipynb) are the most update-to-date results from `clirad-lw` for all considered combinations of spectral bands and absorbers.  The results of `clirad-lw` are compared with the *line-by-line* results from `lblnew-bestfit`.
 
-## Updating `clirad-lw` model parameters
-To update the k-distribution parameterization model `clirad-lw`'s model parameters, use the functions in `climatools.lblnew.export`.  Notebooks [get_kdist_bestfits_F77.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/get_kdist_bestfits_F77.ipynb) and [get_kdist_ktable_F77.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/get_kdist_ktable_F77.ipynb) allow the user to update all the parameters of `clirad-lw`.
+## Updating clirad-lw model parameters
+To update the k-distribution parameterization model `clirad-lw`'s model parameters, use the functions in `climatools.lblnew.export`.  Notebooks [get_kdist_bestfits_F77.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/get_kdist_bestfits_F77.ipynb) and [get_kdist_ktable_F77.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/get_kdist_ktable_F77.ipynb) allow the user to update all the parameters of clirad-lw.
 
 
