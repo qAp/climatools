@@ -8,6 +8,7 @@ This library lets you:
 
 ## Running the atmosphere radiation models
 `Climatools` provides utilities for running several atmosphere radiation, or radiative transfer, models.
+
 ### lblnew-bestfit
 This computes the radiation for a single absorber and spectral band, e.g. (h2o, band 2).  It outputs results using two methods: line-by-line and k-distribution parameterization.
 
@@ -18,15 +19,16 @@ Things to note:
 * Suppose its program files (Fortran) are in the directory `path/to/lblnew_bestfit`, then, before running it, you need to set `DIR_SRC` in `climatools/climatools/lblnew/setup_bestfit.py` to `path/to/lblnew_besfit`.
 * Setting `option_compute_ktable` to `True`, the model will compute large k-tables for the k-distribution method, which takes a long time.  This is normally reserved for the best-fit parameter values only, where one intends to export the k-tables to the `clirad-lw` model.
 
+### lblnew-overlap
+This computes radiation for a single spectral band with multiple absorbers. e.g. (band 3a, [h2o, o3]).  It outputs results using two methods: *line-by-line* and *k-distribution parameterization*.  The [run_lblnew-overlap.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/run_lblnew-overlap.ipynb) notebook demonstrates how to run it, store the results in MongoDB, execute the [analysis notebook](https://nbviewer.jupyter.org/github/qAp/analysis_-_new_kdist_param/blob/master/lblnew/h2o_atmpro_co2_0_o3_0_n2o_6.4e-07_ch4_1.8e-06_o2_0/band07_wn_1215_1380/nv_1000/dv_0.001/crd_a22ab94/atmpro_mls/results_overlap.ipynb).
 
-The following atmosphere radiation models can be run, their results analysed, or their parameters updated:  
-* lblnew-bestfit-lw
-* lblnew-overlap-lw
-* lblnew-bestfit-sw
-* lblnew-overlap-sw
-* cliradnew-lw
-* cliradnew-sw
+Things to note:
+* This model is primarily used to verify the accuracy of parameterized method relative to the line-by-line method.
 
-Please see their respective Wiki pages for more details.
+### clirad-lw
+This computes radiation for any selection of spectral bands and absorbers. e.g. ([band 1, band 7], [h2o, n2o]).  It outputs results using the *k-distribution parameterization* method.  The [run_cliradlw.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/run_cliradlw.ipynb) demonstrates how to run it, store the results in MongoDB and run the [analysis notebook](https://nbviewer.jupyter.org/github/qAp/analysis_-_new_kdist_param/blob/master/clirad/h2o_saw_n2o_3.2e-07_ch4_1.8e-06/band_9/atmpro_saw/cliradlw_1013f91/results_cliradlw.ipynb).
+
+
+
 
 
