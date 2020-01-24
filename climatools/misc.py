@@ -261,3 +261,52 @@ def print_diff_files(dcmp):
         
     for sub_dcmp in dcmp.subdirs.values():
         print_diff_files(sub_dcmp)
+
+
+
+def list_signposts(readfrom='out.log', label='signpost'):
+    '''
+    Read and return from a text file at READFROM
+    all lines that start with LABEL
+
+    Parameters
+    ----------
+    readfrom: path to text file to read from
+    label: lines starting with this string will be returned
+    lines: list of str
+    '''
+    with open(readfrom, mode='r', encoding='utf-8') as f:
+        lines = f.readlines()
+        
+    lines = [l.strip() for l in lines]
+    lines = [l for l in lines if l.startswith(label)]
+    return lines
+
+
+
+def enumerate_unique_signposts(signposts):
+    '''
+    Return the ordered and enumerated list of
+    unique signposts from SIGNPOSTS
+
+    Parameters
+    ----------
+    signposts: list of signposts (list of str)
+    signposts_enumerated: unique signposts enumerated
+                          in the order they appear in
+                          SIGNPOSTS
+    '''
+    set_signs = set(signposts)
+    set_ordered = []
+    for s in signposts:
+        if s in set_signs:
+            set_ordered.append(s)
+            set_signs.remove(s)
+        if not set_signs:
+            break
+    signposts_enumerated = [(i + 1, s)
+                            for i, s in enumerate(set_ordered)]
+    return signposts_enumerated
+    
+    
+    

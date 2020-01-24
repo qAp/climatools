@@ -1,13 +1,20 @@
 
-
-
 import numpy as np
 import pandas as pd
 
 import xarray as xr
 
 
+
+from bokeh.plotting import figure
+from bokeh.models import Range1d, Legend, ColumnDataSource, FactorRange
+from bokeh.transform import factor_cmap
+
 from ..viz import set_xaxis_datetime_ticklocs_ticklabels
+
+
+
+
 
 
 @xr.register_dataarray_accessor('climaviz')
@@ -233,4 +240,118 @@ class ClimavizArrayAccessor(object):
             ax.legend(loc='best')
         
         return primitive
+
+
+
+def nice_xlims(pltdata=None, prange=None):
+    '''
+    For a line plot with the domain on the y-aixs
+    and the image on the x-axis, work out a suitable 
+    displayed range for the x-axis, given a domain 
+    range.  This also works when multiple lines plotted.
+
+    Parameters
+    ----------
+    pltdata: list
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.
+    prange: tuple
+        y-axis (domain) range over which the
+        x-axis (codomain) range will be based.
+    '''
+    def get_slice(srs):
+        return srs.sel(pressure=slice(*prange))
+    
+    srss = [d['srs'] for d in pltdata]
+    vmin = min([get_slice(srs).min() for srs in srss])
+    vmax = max([get_slice(srs).max() for srs in srss])
+    dv = (vmax - vmin) * .01
+    if dv == 0:
+        dv = 1e-7
+    return float(vmin - dv), float(vmax + dv)
+
+
+
+def plt_vert_profile_bokeh(pltdata=None, 
+                           y_axis_type='linear', prange=(50, 1050),
+                           xlabel='cooling rate [K/day]'):
+    '''
+    Make line plot(s) for dataset(s), with the domain 
+    on the y-aixs and the image on the x-axis.
+
+    Parameters
+    ----------
+    pltdata: list
+        Plotting data. A list of dictionaries, 
+        each one containing the data and plot
+        attributes for a curve.
+    y_axis_type: string
+        Plot y-scale. 'linear', or 'log'.
+    prange: tuple
+        y-axis (domain) range over which the
+        x-axis (codomain) range will be based.
+    p: bokeh.plotting.figure
+        Plotted figure.
+    '''
+    ymin = 1e-2 
+    ymax = 1020
+    
+    p = figure(y_axis_type=y_axis_type, plot_width=500)
+    xmin, xmax = nice_xlims(pltdata, prange=prange)
+    
+    rs = []
+    for d in pltdata:
+        rd = []
+        if 'marker' in d:
+            r_mark = getattr(p, d['marker'])(d['srs'].values, 
+                        d['srs'].coords['pressure'].values,
+                        color=d['color'], alpha=.7)
+            rd.append(r_mark)
+        r_line = p.line(d['srs'].values, 
+                         d['srs'].coords['pressure'].values,
+                         color=d['color'], alpha=d['alpha'], 
+                         line_width=d['line_width'], 
+                         line_dash=d['line_dash'])
+        rd.append(r_line)
+      
+        rs.append(rd)
         
+    p.y_range = Range1d(ymax, ymin)  
+    p.yaxis.axis_label = 'pressure [mb]'
+    
+    p.x_range = Range1d(xmin, xmax)
+    p.xaxis.axis_label = xlabel 
+    
+    items = [(d['label'], r) for r, d in zip(rs, pltdata)]
+    legend = Legend(items=items, location=(10, 0))
+    legend.label_text_font_size = '8pt'
+    p.add_layout(legend, 'above')
+    p.legend.orientation = 'horizontal'
+    p.legend.location = 'top_center'
+    return p
+
+
+        
+def hist_band_vs_flux(da, title='Title'):
+    '''
+    Plot the histogram: spectral band vs flux
+
+    Parameters
+    ----------
+    da: xarray.DataArray (band,)
+        Flux.
+    p: bokeh.plotting.figure
+        Histogram plot.
+    '''
+    bands = [str(b.values) for b in da['band']]
+
+    source = ColumnDataSource(
+        data={'band': bands, 'flux': da.values})
+
+    p = figure(x_range=bands, title=title)
+    p.vbar(source=source, x='band', top='flux', width=.9)
+
+    p.yaxis.axis_label = 'flux (W m-2)'
+    p.xaxis.axis_label = 'spectral band'
+    return p
