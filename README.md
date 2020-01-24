@@ -1,14 +1,10 @@
-# Climate Science Tools
+# Climatools
 
-This library lets you conveniently run serveral atmosphere radiation models written in Fortran via Python.  It also lets you conveniently analyse their output results.
-
-## Installation  
-Clone this git repository  
-```
-git clone https://github.com/qap/climatools.git
-```
-and set your python path to it.
-
+This library lets you:
+1. Run atmosphere radiation models.
+2. Store, organize and retrieve results of each run in MongoDB.
+3. Visualize and tabulate results in the most common formats.
+4. Update parameter tables in parameterized atmosphere radiation model.
 
 ## Atmosphere radiation models
 The following atmosphere radiation models can be run, their results analysed, or their parameters updated:  
