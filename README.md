@@ -28,7 +28,7 @@ Things to note:
 ### clirad-lw
 This computes radiation for any selection of spectral bands and absorbers. e.g. ([band 1, band 7], [h2o, n2o]).  It outputs results using the *k-distribution parameterization* method.  The [run_cliradlw.ipynb](https://nbviewer.jupyter.org/github/qAp/climatools/blob/master/climatools/notebooks/run_cliradlw.ipynb) demonstrates how to run it, store the results in MongoDB and run the [analysis notebook](https://nbviewer.jupyter.org/github/qAp/analysis_-_new_kdist_param/blob/master/clirad/h2o_saw_n2o_3.2e-07_ch4_1.8e-06/band_9/atmpro_saw/cliradlw_1013f91/results_cliradlw.ipynb).
 
-## Already available results summarized
+## Results summary
 [Here](https://nbviewer.jupyter.org/github/qAp/analysis_-_new_kdist_param/blob/master/clirad_weblinks_latest.ipynb) are the most update-to-date results from `clirad-lw` for all considered combinations of spectral bands and absorbers.  The results of `clirad-lw` are compared with the *line-by-line* results from `lblnew-bestfit`.
 
 
